@@ -264,8 +264,8 @@ export default async function handler(req, res) {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
-      if (progError) return res.json({ program: null, allPrograms: [], _debug: { error: progError.message, userId } })
-      if (!allPrograms?.length) return res.json({ program: null, allPrograms: [], _debug: { note: 'no rows found', userId } })
+      if (progError) return res.json({ program: null, allPrograms: [], error: progError.message })
+      if (!allPrograms?.length) return res.json({ program: null, allPrograms: [] })
 
       // Prefer active, fall back to the most recent
       const program = allPrograms.find(p => p.status === 'active') || allPrograms[0]

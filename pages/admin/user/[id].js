@@ -373,17 +373,14 @@ export default function UserDetail() {
               ) : !prog?.program ? (
                 <div style={{ ...card, textAlign: 'center', padding: 40 }}>
                   <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
-                  <div style={{ fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>لا يوجد برنامج في قاعدة البيانات لهذا المستخدم</div>
-                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,0.25)', marginBottom: 16, fontFamily: 'monospace', wordBreak: 'break-all' }}>user_id: {id}</div>
-                  <button onClick={loadProg} style={{ background: 'rgba(203,162,59,0.1)', border: `1px solid ${G}40`, color: G, borderRadius: 9, padding: '8px 20px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer', marginBottom: 12 }}>
-                    🔄 إعادة تحميل
+                  <div style={{ fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>لا يوجد برنامج لهذا المستخدم</div>
+                  <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,0.3)', marginBottom: 20, lineHeight: 1.6, maxWidth: 340 }}>
+                    هذا المستخدم لم يبدأ برنامجاً بعد. الأدوات ستظهر هنا تلقائياً بمجرد إنشاء البرنامج من التطبيق.
+                  </div>
+                  <button onClick={loadProg} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', borderRadius: 9, padding: '8px 20px', fontFamily: F, fontWeight: 600, fontSize: '.8rem', cursor: 'pointer' }}>
+                    تحديث
                   </button>
-                  {prog?._debug && (
-                    <div style={{ marginTop: 8, fontSize: '.7rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace', background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: '8px 12px', textAlign: 'left', maxWidth: 420 }}>
-                      {JSON.stringify(prog._debug, null, 2)}
-                    </div>
-                  )}
-                  {prog?.error && <div style={{ marginTop: 8, fontSize: '.72rem', color: '#ef4444', fontFamily: 'monospace' }}>{prog.error}</div>}
+                  {prog?.error && <div style={{ marginTop: 12, fontSize: '.72rem', color: '#ef4444', fontFamily: 'monospace' }}>{prog.error}</div>}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
