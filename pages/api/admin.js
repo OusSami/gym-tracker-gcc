@@ -258,15 +258,15 @@ export default async function handler(req, res) {
 
     // PROGRAM STATUS
     if (action === 'program_status' && userId) {
-      const { data: program } = await sb
+      const { data: rows } = await sb
         .from('user_programs')
-        .select('id,package_id,package_name,total_days,current_day,days_completed,status,created_at,end_date')
+        .select('*')
         .eq('user_id', userId)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
 
+      const program = rows?.[0] || null
       if (!program) return res.json({ program: null })
 
       const { data: dayRows } = await sb
@@ -306,17 +306,19 @@ export default async function handler(req, res) {
       const day = parseInt(targetDay)
       if (!day || day < 1) return res.status(400).json({ error: 'Invalid day' })
 
-      const { data: program } = await sb
+      const { data: pRows1 } = await sb
         .from('user_programs')
         .select('id,total_days')
         .eq('user_id', userId)
         .eq('status', 'active')
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)
+      const program = pRows1?.[0] || null
       if (!program) return res.status(404).json({ error: 'No active program' })
       if (day > program.total_days) return res.status(400).json({ error: 'Day exceeds program length' })
 
       await sb.from('user_programs')
-        .update({ current_day: day, days_completed: Math.max(0, day - 1) })
+        .update({ current_day: day })
         .eq('id', program.id)
 
       await sb.from('program_days')
@@ -349,16 +351,18 @@ export default async function handler(req, res) {
 
     // PROGRAM: reset to day 1
     if (action === 'program_reset' && userId) {
-      const { data: program } = await sb
+      const { data: pRows2 } = await sb
         .from('user_programs')
         .select('id,total_days')
         .eq('user_id', userId)
         .eq('status', 'active')
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)
+      const program = pRows2?.[0] || null
       if (!program) return res.status(404).json({ error: 'No active program' })
 
       await sb.from('user_programs')
-        .update({ current_day: 1, days_completed: 0 })
+        .update({ current_day: 1 })
         .eq('id', program.id)
 
       await sb.from('program_days')
@@ -389,12 +393,14 @@ export default async function handler(req, res) {
 
     // PROGRAM: regenerate today's workout
     if (action === 'program_regen_today' && userId) {
-      const { data: program } = await sb
+      const { data: pRows3 } = await sb
         .from('user_programs')
         .select('id,current_day')
         .eq('user_id', userId)
         .eq('status', 'active')
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)
+      const program = pRows3?.[0] || null
       if (!program) return res.status(404).json({ error: 'No active program' })
 
       await sb.from('program_days')
@@ -407,12 +413,14 @@ export default async function handler(req, res) {
 
     // PROGRAM: end (pause) active program
     if (action === 'program_end' && userId) {
-      const { data: program } = await sb
+      const { data: pRows4 } = await sb
         .from('user_programs')
         .select('id')
         .eq('user_id', userId)
         .eq('status', 'active')
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)
+      const program = pRows4?.[0] || null
       if (!program) return res.status(404).json({ error: 'No active program' })
 
       await sb.from('user_programs')
