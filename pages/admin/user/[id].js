@@ -26,6 +26,13 @@ export default function UserDetail() {
   const [busy, setBusy] = useState(null)
   const [tab, setTab] = useState('overview')
 
+  // Program tab state
+  const [prog, setProg] = useState(null)      // { program, days, stats }
+  const [progLoading, setProgLoading] = useState(false)
+  const [confirm, setConfirm] = useState(null) // { action, label, desc, payload }
+  const [targetDay, setTargetDay] = useState('')
+  const [progMsg, setProgMsg] = useState(null) // { ok, text }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user || session.user.email !== ADMIN_EMAIL) { router.replace('/'); return }
@@ -42,11 +49,41 @@ export default function UserDetail() {
   }, [authed, id])
 
   const approve = async () => { setBusy('a'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'approve', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
-  const suspend = async () => { if (!confirm('إيقاف؟')) return; setBusy('s'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suspend', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
+  const suspend = async () => { if (!window.confirm('إيقاف؟')) return; setBusy('s'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suspend', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
+
+  const loadProg = async () => {
+    setProgLoading(true)
+    const r = await fetch(`/api/admin?action=program_status&userId=${id}`)
+    setProg(await r.json())
+    setProgLoading(false)
+  }
+
+  const runProgAction = async () => {
+    if (!confirm) return
+    setBusy('prog')
+    setProgMsg(null)
+    try {
+      const r = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: confirm.action, userId: id, ...confirm.payload }),
+      })
+      const data = await r.json()
+      if (!r.ok) throw new Error(data.error || 'خطأ')
+      setProgMsg({ ok: true, text: confirm.successText })
+      await loadProg()
+    } catch (e) {
+      setProgMsg({ ok: false, text: e.message })
+    }
+    setConfirm(null)
+    setBusy(null)
+  }
 
   if (!authed) return null
 
-  const TABS = [['overview','نظرة عامة'],['sessions','التمارين'],['nutrition','التغذية'],['body','الجسم'],['costs','تكاليف API'],['apptime','وقت التطبيق']]
+  const TABS = [['overview','نظرة عامة'],['sessions','التمارين'],['nutrition','التغذية'],['body','الجسم'],['program','البرنامج'],['costs','تكاليف API'],['apptime','وقت التطبيق']]
+
+  useEffect(() => { if (tab === 'program' && authed && id && !prog && !progLoading) loadProg() }, [tab, authed, id])
   const st = d?.profile ? (ST[d.profile.status] || { l: d.profile.status, c: '#888', b: 'rgba(255,255,255,0.05)', br: 'rgba(255,255,255,0.1)' }) : null
 
   return (
@@ -304,6 +341,188 @@ export default function UserDetail() {
                       <Line type="monotone" dataKey="weight" name="الوزن كجم" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', r: 3 }} activeDot={{ r: 5 }} />
                     </LineChart>
                   </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ═══ PROGRAM TAB ═══ */}
+          {tab === 'program' && (
+            <div>
+              {/* Feedback banner */}
+              {progMsg && (
+                <div style={{ marginBottom: 16, padding: '12px 16px', borderRadius: 12, background: progMsg.ok ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${progMsg.ok ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, color: progMsg.ok ? '#22c55e' : '#ef4444', fontWeight: 700, fontSize: '.88rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {progMsg.text}
+                  <button onClick={() => setProgMsg(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+                </div>
+              )}
+
+              {progLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 40, color: 'rgba(255,255,255,0.3)' }}>
+                  <div style={{ width: 20, height: 20, border: '3px solid rgba(203,162,59,0.15)', borderTopColor: G, borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
+                  جاري تحميل البرنامج...
+                </div>
+              ) : !prog?.program ? (
+                <div style={{ ...card, textAlign: 'center', padding: 40 }}>
+                  <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
+                  <div style={{ fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>لا يوجد برنامج نشط لهذا المستخدم</div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                  {/* Program status card */}
+                  <div style={{ ...card }}>
+                    <div style={{ fontWeight: 700, fontSize: '.75rem', letterSpacing: 1.5, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: 14 }}>حالة البرنامج</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(110px,1fr))', gap: 10, marginBottom: 14 }}>
+                      {[
+                        ['اليوم الحالي', `${prog.program.current_day} / ${prog.program.total_days}`, G],
+                        ['الأيام المكتملة', prog.stats?.completed ?? '—', '#22c55e'],
+                        ['الأيام الغائبة', prog.stats?.missed ?? '—', '#ef4444'],
+                        ['الالتزام', prog.stats?.compliance != null ? `${prog.stats.compliance}%` : '—', '#3b82f6'],
+                        ['التمارين المولّدة', prog.stats?.withWorkout ?? '—', '#a855f7'],
+                      ].map(([l, v, c]) => (
+                        <div key={l} style={{ background: 'rgba(0,0,0,0.3)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+                          <div style={{ fontWeight: 900, fontSize: '1.1rem', color: c, fontFamily: 'monospace', lineHeight: 1 }}>{v}</div>
+                          <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 5, fontFamily: F }}>{l}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Day grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(28px,1fr))', gap: 4 }}>
+                      {(prog.days || []).map(day => {
+                        const isCur = day.day_number === prog.program.current_day
+                        const cs = day.checkin_status
+                        const bg = isCur ? `${G}30` : cs === 'completed' ? 'rgba(34,197,94,0.2)' : cs === 'partial' ? 'rgba(251,146,60,0.15)' : cs === 'missed' ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.04)'
+                        const border = isCur ? `${G}80` : cs === 'completed' ? 'rgba(34,197,94,0.5)' : cs === 'partial' ? 'rgba(251,146,60,0.4)' : cs === 'missed' ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.07)'
+                        const lbl = isCur ? '▶' : cs === 'completed' ? '✓' : cs === 'partial' ? '◑' : cs === 'missed' ? '✕' : ''
+                        const col = isCur ? G : cs === 'completed' ? '#22c55e' : cs === 'partial' ? '#f97316' : cs === 'missed' ? '#ef4444' : 'rgba(255,255,255,0.2)'
+                        return (
+                          <div key={day.day_number} title={`يوم ${day.day_number}`} style={{ aspectRatio: '1', background: bg, border: `1.5px solid ${border}`, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: lbl.length > 1 ? '.5rem' : '.65rem', color: col, fontWeight: 700 }}>
+                            {lbl || day.day_number}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div style={{ display: 'flex', gap: 14, marginTop: 10, flexWrap: 'wrap' }}>
+                      {[['▶ اليوم الحالي', G], ['✓ مكتمل', '#22c55e'], ['◑ جزئي', '#f97316'], ['✕ غاب', '#ef4444']].map(([l, c]) => (
+                        <span key={l} style={{ fontSize: '.65rem', color: c }}>{l}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* ── Actions ── */}
+
+                  {/* 1. Set to specific day */}
+                  <div style={{ ...card }}>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>📅 الانتقال إلى يوم محدد</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
+                      يضبط اليوم الحالي على الرقم الذي تختاره ويمسح تقدم كل يوم بعده — بما فيها التمارين المولّدة وسجلات الأداء.
+                    </div>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <input
+                        type="number" min="1" max={prog.program.total_days}
+                        value={targetDay}
+                        onChange={e => setTargetDay(e.target.value)}
+                        placeholder={`1 — ${prog.program.total_days}`}
+                        style={{ width: 100, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', color: '#ECE3CF', fontFamily: F, fontSize: '.88rem', outline: 'none' }}
+                      />
+                      <button
+                        disabled={!targetDay || parseInt(targetDay) < 1 || parseInt(targetDay) > prog.program.total_days || busy === 'prog'}
+                        onClick={() => setConfirm({
+                          action: 'program_set_day',
+                          payload: { targetDay: parseInt(targetDay) },
+                          label: `الانتقال إلى اليوم ${targetDay}`,
+                          desc: `سيتم ضبط البرنامج على اليوم ${targetDay} ومسح بيانات الأيام ${targetDay} إلى ${prog.program.total_days} بالكامل. لا يمكن التراجع.`,
+                          successText: `✓ تم الانتقال إلى اليوم ${targetDay}`,
+                        })}
+                        style={{ background: G, color: '#09090B', border: 'none', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer', opacity: (!targetDay || parseInt(targetDay) < 1 || parseInt(targetDay) > prog.program.total_days) ? 0.4 : 1 }}>
+                        انتقل
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 2. Reset to day 1 */}
+                  <div style={{ ...card }}>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>🔄 إعادة تعيين للبداية (اليوم 1)</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
+                      يمسح كامل تقدم البرنامج ويعيد المستخدم لليوم الأول. التواريخ تُعاد من اليوم. لا يمكن التراجع.
+                    </div>
+                    <button
+                      disabled={busy === 'prog'}
+                      onClick={() => setConfirm({
+                        action: 'program_reset',
+                        payload: {},
+                        label: 'إعادة تعيين كامل للبرنامج',
+                        desc: `سيتم مسح جميع بيانات الأيام الـ ${prog.program.total_days} وإعادة المستخدم لليوم 1. هذا الإجراء لا يمكن التراجع عنه.`,
+                        successText: '✓ تم إعادة تعيين البرنامج لليوم 1',
+                      })}
+                      style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.3)', color: '#f97316', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                      إعادة تعيين للبداية
+                    </button>
+                  </div>
+
+                  {/* 3. Regen today's workout */}
+                  <div style={{ ...card }}>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>⚡ إعادة توليد تمرين اليوم</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
+                      يمسح فقط تمرين اليوم الحالي (اليوم {prog.program.current_day}). عند فتح المستخدم التطبيق سيتم توليد تمرين جديد تلقائياً.
+                    </div>
+                    <button
+                      disabled={busy === 'prog'}
+                      onClick={() => setConfirm({
+                        action: 'program_regen_today',
+                        payload: {},
+                        label: `إعادة توليد تمرين اليوم ${prog.program.current_day}`,
+                        desc: `سيتم مسح التمرين المحفوظ لليوم ${prog.program.current_day} فقط. التمرين سيُولَّد من جديد عند فتح المستخدم التطبيق.`,
+                        successText: `✓ تم مسح تمرين اليوم ${prog.program.current_day} — سيُولَّد عند أول فتح`,
+                      })}
+                      style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                      إعادة توليد تمرين اليوم
+                    </button>
+                  </div>
+
+                  {/* 4. End program */}
+                  <div style={{ ...card, border: '1px solid rgba(239,68,68,0.15)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4, color: '#ef4444' }}>🛑 إنهاء البرنامج</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
+                      يوقف البرنامج الحالي ويجعله غير مرئي للمستخدم. البيانات تُحفظ ولا تُحذف.
+                    </div>
+                    <button
+                      disabled={busy === 'prog'}
+                      onClick={() => setConfirm({
+                        action: 'program_end',
+                        payload: {},
+                        label: 'إنهاء البرنامج',
+                        desc: 'سيتم إيقاف البرنامج الحالي. لن يراه المستخدم في التطبيق حتى يُنشئ برنامجاً جديداً.',
+                        successText: '✓ تم إنهاء البرنامج',
+                      })}
+                      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                      إنهاء البرنامج
+                    </button>
+                  </div>
+
+                </div>
+              )}
+
+              {/* ── Confirmation modal ── */}
+              {confirm && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+                  onClick={() => { if (busy !== 'prog') setConfirm(null) }}>
+                  <div onClick={e => e.stopPropagation()} style={{ background: '#0F0E0B', border: `1px solid ${G}30`, borderRadius: 18, padding: 24, maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}>
+                    <div style={{ fontWeight: 900, fontSize: '1rem', marginBottom: 8, color: G }}>⚠️ تأكيد: {confirm.label}</div>
+                    <div style={{ fontSize: '.85rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 20 }}>{confirm.desc}</div>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button onClick={runProgAction} disabled={busy === 'prog'}
+                        style={{ flex: 1, background: G, color: '#09090B', border: 'none', borderRadius: 10, padding: '12px', fontFamily: F, fontWeight: 900, fontSize: '.88rem', cursor: 'pointer' }}>
+                        {busy === 'prog' ? '...' : 'نعم، نفّذ'}
+                      </button>
+                      <button onClick={() => setConfirm(null)} disabled={busy === 'prog'}
+                        style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', borderRadius: 10, padding: '12px', fontFamily: F, fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
+                        إلغاء
+      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

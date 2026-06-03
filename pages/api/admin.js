@@ -256,6 +256,36 @@ export default async function handler(req, res) {
       })
     }
 
+    // PROGRAM STATUS
+    if (action === 'program_status' && userId) {
+      const { data: program } = await sb
+        .from('user_programs')
+        .select('id,package_id,package_name,total_days,current_day,days_completed,status,created_at,end_date')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (!program) return res.json({ program: null })
+
+      const { data: dayRows } = await sb
+        .from('program_days')
+        .select('day_number,checkin_status,daily_workout')
+        .eq('program_id', program.id)
+        .order('day_number', { ascending: true })
+
+      const days = dayRows || []
+      const completed = days.filter(d => ['completed','partial'].includes(d.checkin_status)).length
+      const missed    = days.filter(d => d.checkin_status === 'missed').length
+      const withWorkout = days.filter(d => d.daily_workout).length
+      const compliance = completed + missed > 0
+        ? Math.round((completed / (completed + missed)) * 100)
+        : null
+
+      return res.json({ program, days, stats: { completed, missed, withWorkout, compliance } })
+    }
+
     return res.status(400).json({ error: 'Unknown action' })
   }
 
@@ -269,6 +299,129 @@ export default async function handler(req, res) {
       await sb.from('profiles').update({ status: 'suspended' }).eq('id', userId)
       return res.json({ success: true })
     }
+
+    // PROGRAM: set to a specific day
+    if (action === 'program_set_day' && userId) {
+      const { targetDay } = req.body
+      const day = parseInt(targetDay)
+      if (!day || day < 1) return res.status(400).json({ error: 'Invalid day' })
+
+      const { data: program } = await sb
+        .from('user_programs')
+        .select('id,total_days')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single()
+      if (!program) return res.status(404).json({ error: 'No active program' })
+      if (day > program.total_days) return res.status(400).json({ error: 'Day exceeds program length' })
+
+      await sb.from('user_programs')
+        .update({ current_day: day, days_completed: Math.max(0, day - 1) })
+        .eq('id', program.id)
+
+      await sb.from('program_days')
+        .update({ checkin_status: null, daily_workout: null, actual_logs: null, incomplete_reason: null, session_id: null })
+        .eq('program_id', program.id)
+        .gte('day_number', day)
+
+      // Re-sequence planned_date from today for days >= targetDay
+      const { data: futureDays } = await sb
+        .from('program_days')
+        .select('id,day_number')
+        .eq('program_id', program.id)
+        .gte('day_number', day)
+        .order('day_number', { ascending: true })
+
+      if (futureDays?.length) {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        for (let i = 0; i < futureDays.length; i++) {
+          const d = new Date(today)
+          d.setDate(today.getDate() + i)
+          await sb.from('program_days')
+            .update({ planned_date: d.toISOString().split('T')[0] })
+            .eq('id', futureDays[i].id)
+        }
+      }
+
+      return res.json({ success: true })
+    }
+
+    // PROGRAM: reset to day 1
+    if (action === 'program_reset' && userId) {
+      const { data: program } = await sb
+        .from('user_programs')
+        .select('id,total_days')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single()
+      if (!program) return res.status(404).json({ error: 'No active program' })
+
+      await sb.from('user_programs')
+        .update({ current_day: 1, days_completed: 0 })
+        .eq('id', program.id)
+
+      await sb.from('program_days')
+        .update({ checkin_status: null, daily_workout: null, actual_logs: null, incomplete_reason: null, session_id: null })
+        .eq('program_id', program.id)
+
+      // Re-sequence all planned_dates from today
+      const { data: allDays } = await sb
+        .from('program_days')
+        .select('id,day_number')
+        .eq('program_id', program.id)
+        .order('day_number', { ascending: true })
+
+      if (allDays?.length) {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        for (let i = 0; i < allDays.length; i++) {
+          const d = new Date(today)
+          d.setDate(today.getDate() + i)
+          await sb.from('program_days')
+            .update({ planned_date: d.toISOString().split('T')[0] })
+            .eq('id', allDays[i].id)
+        }
+      }
+
+      return res.json({ success: true })
+    }
+
+    // PROGRAM: regenerate today's workout
+    if (action === 'program_regen_today' && userId) {
+      const { data: program } = await sb
+        .from('user_programs')
+        .select('id,current_day')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single()
+      if (!program) return res.status(404).json({ error: 'No active program' })
+
+      await sb.from('program_days')
+        .update({ daily_workout: null })
+        .eq('program_id', program.id)
+        .eq('day_number', program.current_day)
+
+      return res.json({ success: true })
+    }
+
+    // PROGRAM: end (pause) active program
+    if (action === 'program_end' && userId) {
+      const { data: program } = await sb
+        .from('user_programs')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single()
+      if (!program) return res.status(404).json({ error: 'No active program' })
+
+      await sb.from('user_programs')
+        .update({ status: 'paused' })
+        .eq('id', program.id)
+
+      return res.json({ success: true })
+    }
+
     return res.status(400).json({ error: 'Unknown action' })
   }
 
