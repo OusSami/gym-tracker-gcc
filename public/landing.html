@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GYM TRACKER GCC — حوّل جسمك خلال 21 يوماً</title>
+<meta name="description" content="التطبيق الأول في الخليج لبناء عادة التمرين الحقيقية. برامج مخصصة، تغذية خليجية، ومحاسبة يومية."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#CBA23B;--gold-dim:rgba(203,162,59,0.12);
+  --onyx:#080807;--onyx2:#111009;--onyx3:#1A1710;
+  --text:#ECE3CF;--text-muted:#6B5F47;--text-dim:#2E2618;
+  --red:#EF4444;--green:#22C55E;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--onyx);color:var(--text);font-family:'Tajawal',sans-serif;direction:rtl;overflow-x:hidden;line-height:1.65}
+.max{max-width:700px;margin:0 auto;padding:0 20px}
+section{padding:72px 0}
+.gold{color:var(--gold)}
+.xl{font-size:clamp(2rem,6.5vw,4rem);font-weight:900;line-height:1.05}
+.lg{font-size:clamp(1.4rem,3.5vw,2.2rem);font-weight:800;line-height:1.2}
+.md{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:700;line-height:1.3}
+.sm{font-size:.88rem;color:var(--text-muted);line-height:1.75}
+.label{font-size:.68rem;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--text-muted)}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(203,162,59,0.18),transparent)}
+.card{background:var(--onyx2);border:1px solid rgba(203,162,59,0.12);border-radius:20px;padding:28px}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--gold);color:#080807;padding:18px 36px;border-radius:14px;font-family:'Tajawal',sans-serif;font-weight:900;font-size:1.05rem;border:none;cursor:pointer;text-decoration:none;width:100%;max-width:420px;margin:0 auto;transition:all .2s;box-shadow:0 8px 40px rgba(203,162,59,0.28)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 50px rgba(203,162,59,0.42)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(203,162,59,0.3);color:var(--gold);padding:11px 22px;border-radius:11px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;text-decoration:none;transition:all .2s}
+
+/* TOP NAV */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,7,0.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(203,162,59,0.08);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:900;font-size:1.05rem;letter-spacing:1px}
+.logo span{color:var(--gold)}
+
+/* COUNTDOWN */
+.countdown-bar{background:linear-gradient(90deg,rgba(203,162,59,0.12),rgba(203,162,59,0.06),rgba(203,162,59,0.12));border-bottom:1px solid rgba(203,162,59,0.18);padding:10px 20px;text-align:center;font-size:.82rem;font-weight:700}
+#timer{color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.95rem;letter-spacing:1px}
+
+/* HERO */
+.hero{padding:64px 0 80px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(203,162,59,0.055) 0%,transparent 68%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(203,162,59,0.1);border:1px solid rgba(203,162,59,0.22);border-radius:100px;padding:6px 14px;font-size:.73rem;font-weight:700;letter-spacing:.5px;color:var(--gold);margin-bottom:22px}
+.glow-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* PRICE BADGE */
+.price-wrap{display:inline-flex;align-items:center;gap:14px;background:rgba(203,162,59,0.07);border:1px solid rgba(203,162,59,0.18);border-radius:14px;padding:14px 22px;margin:22px auto;width:fit-content}
+.price-now{font-size:2.4rem;font-weight:900;color:var(--gold);line-height:1;font-family:'IBM Plex Mono',monospace}
+.price-old{font-size:.95rem;color:var(--text-muted);text-decoration:line-through;line-height:1}
+
+/* SYMPTOM LIST */
+.symptom{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border-radius:14px;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.04);margin-bottom:10px;transition:border-color .2s}
+.symptom:hover{border-color:rgba(203,162,59,0.14)}
+.s-icon{font-size:1.25rem;flex-shrink:0;margin-top:3px}
+.s-title{font-weight:700;font-size:.93rem;margin-bottom:5px}
+.s-desc{font-size:.8rem;color:var(--text-muted);line-height:1.55}
+
+/* CYCLE */
+.cycle{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c-step{background:var(--onyx2);border:1px solid rgba(203,162,59,0.08);border-radius:14px;padding:20px}
+.c-num{font-size:1.8rem;font-weight:900;color:rgba(203,162,59,0.18);font-family:'IBM Plex Mono',monospace;line-height:1;margin-bottom:8px}
+
+/* PHASES */
+.phase{border-radius:20px;padding:26px 28px;margin-bottom:12px}
+.ph1{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18)}
+.ph2{background:rgba(203,162,59,0.07);border:1px solid rgba(203,162,59,0.25)}
+.ph3{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18)}
+.ph-badge{display:inline-block;padding:4px 13px;border-radius:100px;font-size:.68rem;font-weight:700;letter-spacing:.8px;margin-bottom:12px}
+.ph-item{display:flex;align-items:flex-start;gap:9px;font-size:.84rem;margin-top:9px;color:var(--text)}
+.ph-item::before{content:'✓';color:var(--gold);font-weight:900;flex-shrink:0;margin-top:1px}
+
+/* BENEFITS */
+.benefit{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;background:var(--onyx2);border:1px solid rgba(203,162,59,0.08);border-radius:16px;margin-bottom:10px;transition:all .2s}
+.benefit:hover{border-color:rgba(203,162,59,0.2);transform:translateX(-3px)}
+.b-num{font-size:1.7rem;font-weight:900;color:rgba(203,162,59,0.18);font-family:'IBM Plex Mono',monospace;flex-shrink:0;line-height:1;min-width:34px}
+.b-title{font-weight:700;font-size:.93rem;margin-bottom:5px}
+
+/* FOR/NOT-FOR */
+.for-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.for-card{border-radius:18px;padding:22px}
+.for-item{display:flex;align-items:flex-start;gap:9px;font-size:.85rem;line-height:1.5;margin-top:11px}
+
+/* TABLE */
+.comp-table{width:100%;border-collapse:collapse}
+.comp-table th,.comp-table td{padding:13px 11px;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,0.05);text-align:center}
+.comp-table th{font-weight:700;font-size:.7rem;letter-spacing:1px;color:var(--text-muted)}
+.comp-table td:first-child{text-align:right;font-weight:600;color:var(--text)}
+.comp-table tr:last-child td{border-bottom:none}
+.col-us{color:var(--gold);font-weight:800}
+.ck-y{color:var(--green)}
+.ck-n{color:rgba(255,255,255,0.18)}
+
+/* TESTIMONIALS */
+.testi{background:var(--onyx2);border:1px solid rgba(203,162,59,0.1);border-radius:18px;padding:24px;margin-bottom:11px;position:relative;overflow:hidden}
+.testi::before{content:'"';position:absolute;top:10px;left:16px;font-size:5rem;line-height:1;color:rgba(203,162,59,0.08);font-family:Georgia,serif;pointer-events:none}
+.t-stars{color:var(--gold);font-size:.8rem;margin-bottom:8px}
+.t-text{font-size:.87rem;line-height:1.8;margin-bottom:14px}
+.t-author{display:flex;align-items:center;gap:10px}
+.t-av{width:36px;height:36px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(203,162,59,0.25);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.88rem;color:var(--gold);flex-shrink:0}
+.t-name{font-weight:700;font-size:.83rem}
+.t-time{font-size:.7rem;color:var(--text-muted)}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid rgba(255,255,255,0.055);padding:20px 0}
+.faq-q{font-weight:700;font-size:.93rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:14px}
+.faq-icon{color:var(--gold);font-size:1.3rem;flex-shrink:0;transition:transform .3s;line-height:1}
+.faq-a{font-size:.84rem;color:var(--text-muted);line-height:1.8;margin-top:12px;display:none}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-item.open .faq-a{display:block}
+
+/* GUARANTEE */
+.guarantee{background:linear-gradient(135deg,rgba(34,197,94,0.07),rgba(203,162,59,0.04));border:1px solid rgba(34,197,94,0.18);border-radius:18px;padding:26px;text-align:center}
+
+/* STICKY BAR */
+.sticky-cta{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(8,8,7,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(203,162,59,0.14);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.sticky-price{font-weight:900;font-size:1.15rem;color:var(--gold);white-space:nowrap}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.revealed{opacity:1;transform:translateY(0)}
+
+@media(max-width:560px){
+  .for-grid,.cycle{grid-template-columns:1fr}
+  .sticky-price{display:none}
+  section{padding:56px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ── COUNTDOWN ── -->
+<div class="countdown-bar">
+  ⚡ &nbsp;سعر التأسيس ينتهي خلال &nbsp;<span id="timer">15:00</span>&nbsp; — 149 ر.س بدلاً من 299 ر.س
+</div>
+
+<!-- ── NAV ── -->
+<nav class="topbar">
+  <div class="logo">GYM<span>TRACKER</span> GCC</div>
+  <a href="#checkout" class="btn-ghost">ابدأ الآن</a>
+</nav>
+
+<!-- ════════════════════════════════
+     1. HERO
+════════════════════════════════ -->
+<section class="hero">
+  <div class="max" style="text-align:center">
+
+    <div class="hero-tag" style="margin:0 auto 22px">
+      <span class="glow-dot"></span>
+      الباقة التأسيسية · أول 500 عضو فقط
+    </div>
+
+    <h1 class="xl" style="margin-bottom:14px">
+      لسنين وأنت<br/>
+      <span class="gold">تبدأ وتوقف.</span>
+    </h1>
+
+    <p style="font-size:1.05rem;color:var(--text-muted);max-width:480px;margin:0 auto 10px;line-height:1.7">
+      المشكلة مو في إرادتك.<br/>
+      المشكلة إن ما عندك <strong style="color:var(--text)">نظام حقيقي يحاسبك ويتكيف معك.</strong>
+    </p>
+
+    <div class="price-wrap" style="margin:26px auto">
+      <div>
+        <div class="price-now">149</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">ر.س / شهر</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,0.08);padding-right:16px;text-align:right">
+        <div class="price-old">299 ر.س</div>
+        <div style="font-size:.72rem;color:var(--gold);font-weight:700">وفّر 150 ر.س</div>
+        <div style="font-size:.68rem;color:var(--text-muted)">عرض محدود</div>
+      </div>
+    </div>
+
+    <a href="#checkout" class="btn" style="margin:0 auto 14px">
+      ابدأ برنامجي الآن 🔥
+    </a>
+    <div style="font-size:.73rem;color:var(--text-muted)">
+      ✓ برنامج مخصص بالذكاء · ✓ أكل خليجي · ✓ دخول فوري
+    </div>
+
+    <!-- MINI STATS -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px">
+      <div class="card" style="padding:18px 12px;text-align:center">
+        <div style="font-size:1.7rem;font-weight:900;color:var(--gold);line-height:1;font-family:'IBM Plex Mono',monospace">21</div>
+        <div style="font-size:.7rem;color:var(--text-muted);margin-top:5px">يوم للتغيير</div>
+      </div>
+      <div class="card" style="padding:18px 12px;text-align:center">
+        <div style="font-size:1.7rem;font-weight:900;color:var(--gold);line-height:1;font-family:'IBM Plex Mono',monospace">100%</div>
+        <div style="font-size:.7rem;color:var(--text-muted);margin-top:5px">مخصص لجسمك</div>
+      </div>
+      <div class="card" style="padding:18px 12px;text-align:center">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--gold);line-height:1;font-family:'IBM Plex Mono',monospace">GCC</div>
+        <div style="font-size:.7rem;color:var(--text-muted);margin-top:5px">مطبخ خليجي</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     2. PAIN — هل هذا أنت؟
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">هل هذا أنت؟</div>
+    <h2 class="lg reveal" style="margin-bottom:6px">
+      متى أصبح التمرين<br/><span class="gold">"بكرة أبدأ"؟</span>
+    </h2>
+    <p class="sm reveal" style="margin-bottom:32px">كل هذه الأنماط تعيشها — وكلها تأتي من نفس المشكلة.</p>
+
+    <div class="symptom reveal">
+      <div class="s-icon">📱</div>
+      <div>
+        <div class="s-title">تشترك في التطبيقات وتتركها بعد أسبوع</div>
+        <div class="s-desc">اشتريت اشتراكات، شاهدت يوتيوب — لكن ما ثبّتت أكثر من أسبوعين.</div>
+      </div>
+    </div>
+    <div class="symptom reveal">
+      <div class="s-icon">🍔</div>
+      <div>
+        <div class="s-title">تتمرن ثم "تكافئ" نفسك وتخرب الحساب</div>
+        <div class="s-desc">أسبوع التزام — عطلة نهاية الأسبوع تمحو كل شيء وتبدأ من الصفر.</div>
+      </div>
+    </div>
+    <div class="symptom reveal">
+      <div class="s-icon">🥗</div>
+      <div>
+        <div class="s-title">التغذية مترجمة من أمريكا — ما تلائم أكلنا</div>
+        <div class="s-desc">تقول "أكل كبسة؟" — يعطيك علامات استفهام. ما في حل للمطبخ الخليجي.</div>
+      </div>
+    </div>
+    <div class="symptom reveal">
+      <div class="s-icon">📉</div>
+      <div>
+        <div class="s-title">تغيّب يوم واحد وتحس إنك خسرت كل شيء</div>
+        <div class="s-desc">مناسبة، سفر، يوم تعبان — وتقرر إنك ستبدأ "من الأول" الأسبوع الجاي.</div>
+      </div>
+    </div>
+    <div class="symptom reveal">
+      <div class="s-icon">🏋️</div>
+      <div>
+        <div class="s-title">كل شخص يقول شيء مختلف — ضعت في التعليمات</div>
+        <div class="s-desc">كارديو أو وزن؟ كيتو أو كارب؟ صيام متقطع؟ ما تعرف من تصدق.</div>
+      </div>
+    </div>
+
+    <blockquote class="reveal" style="border-right:3px solid var(--gold);padding:14px 20px;margin-top:28px;font-style:italic;color:var(--text-muted);font-size:.9rem;line-height:1.7">
+      "ما كنت هكذا دائماً... أصبحت أبدأ وأوقف، أبدأ وأوقف، حتى ظننت إن الاستمرار مو من طبيعتي."
+    </blockquote>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     3. ROOT PROBLEM — دائرة الفشل
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">سبب المشكلة الحقيقي</div>
+    <h2 class="lg reveal" style="margin-bottom:14px">
+      المشكلة مو في إرادتك.<br/>
+      <span class="gold">المشكلة غياب النظام الكامل.</span>
+    </h2>
+    <p class="sm reveal" style="margin-bottom:32px">
+      في علم السلوك، الالتزام ما يأتي من الحماس — يأتي من البنية.
+      البنية اللي ترشدك يومياً، تحاسبك، وتتكيف معك حين تتعثر.
+    </p>
+
+    <div class="card reveal" style="margin-bottom:16px">
+      <div class="md" style="margin-bottom:20px;text-align:center">دائرة "أبدأ وأوقف" المتكررة</div>
+      <div class="cycle">
+        <div class="c-step">
+          <div class="c-num">01</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:5px">حماس البداية</div>
+          <div class="sm" style="font-size:.78rem">تشتري ملابس، تتابع محتوى، تبدأ بطاقة عالية.</div>
+        </div>
+        <div class="c-step">
+          <div class="c-num">02</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:5px">أول عائق</div>
+          <div class="sm" style="font-size:.78rem">يوم مشغول، مناسبة عيلية، تعب — تغيب يومين.</div>
+        </div>
+        <div class="c-step">
+          <div class="c-num">03</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:5px">الشعور بالفشل</div>
+          <div class="sm" style="font-size:.78rem">"خربت كل شيء — بكرة أبدأ من الصفر."</div>
+        </div>
+        <div class="c-step" style="border-color:rgba(239,68,68,0.2)">
+          <div class="c-num" style="color:rgba(239,68,68,0.25)">04</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:5px;color:var(--red)">توقف كامل</div>
+          <div class="sm" style="font-size:.78rem">وتكرر نفس الدائرة الشهر القادم.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card reveal" style="background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.2)">
+      <div class="md" style="margin-bottom:10px">ماذا لو استمرت الدائرة؟</div>
+      <p class="sm" style="margin-bottom:16px">سنة وأنت في نفس المكان. ثم سنتين. الجسم اللي تريده يبتعد كل يوم تؤجله.</p>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="font-size:.84rem;display:flex;gap:10px"><span style="color:var(--red);flex-shrink:0">✗</span>صحة تتراجع ببطء دون أن تحس</div>
+        <div style="font-size:.84rem;display:flex;gap:10px"><span style="color:var(--red);flex-shrink:0">✗</span>ثقة بالنفس تنهار مع كل بداية فاشلة</div>
+        <div style="font-size:.84rem;display:flex;gap:10px"><span style="color:var(--red);flex-shrink:0">✗</span>الجسم اللي تريده يصبح "حلم ما وصلت له"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     4. SOLUTION
+════════════════════════════════ -->
+<section style="background:linear-gradient(180deg,transparent,rgba(203,162,59,0.025),transparent)">
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">الحل</div>
+    <h2 class="lg reveal" style="margin-bottom:14px">
+      GYM TRACKER GCC<br/>
+      <span class="gold">نظامك الشخصي للتحول الحقيقي.</span>
+    </h2>
+    <p class="sm reveal" style="margin-bottom:36px">
+      مو مجرد تطبيق تتبع.
+      <strong style="color:var(--text)">مدرب ذكي يعرف جسمك، يفهم أكلك الخليجي، ويبني خطتك يومياً</strong>
+      بناءً على ما حصل بالفعل — لا على ما خُطّط.
+    </p>
+
+    <div class="phase ph1 reveal">
+      <div class="ph-badge" style="background:rgba(239,68,68,0.12);color:var(--red)">الأيام 1 – 7</div>
+      <div class="md" style="margin-bottom:6px">بناء الأساس الحقيقي</div>
+      <p class="sm" style="margin-bottom:12px">تحليل جسمك الفعلي — قياسات + هدف + مستوى. برنامج مخصص لك من اليوم الأول.</p>
+      <div class="ph-item">فهم جسمك وأين أنت الآن بالأرقام</div>
+      <div class="ph-item">برنامج تمرين خليجي (جيم أو بيت)</div>
+      <div class="ph-item">خطة تغذية من أكل تعرفه — كبسة، مندي، حمص، شاورما</div>
+    </div>
+
+    <div class="phase ph2 reveal">
+      <div class="ph-badge" style="background:rgba(203,162,59,0.12);color:var(--gold)">الأيام 8 – 14 ← المرحلة الأهم</div>
+      <div class="md" style="margin-bottom:6px">النظام يتكيف معك — لا يعاقبك</div>
+      <p class="sm" style="margin-bottom:12px">فاتك يوم؟ عندك مناسبة؟ النظام يعدّل ويكمل. "عدنا — اليوم نكمل من هنا."</p>
+      <div class="ph-item">محاسبة يومية ذكية — تقدير لا مثالية</div>
+      <div class="ph-item">مدرب ذكي بالعربي يرد على أسئلتك فوراً</div>
+      <div class="ph-item">الخطة تتكيف مع حياتك — مو العكس</div>
+    </div>
+
+    <div class="phase ph3 reveal">
+      <div class="ph-badge" style="background:rgba(34,197,94,0.1);color:var(--green)">الأيام 15 – 21</div>
+      <div class="md" style="margin-bottom:6px">التحول يصبح عادة</div>
+      <p class="sm" style="margin-bottom:12px">ما انتهى الأمر بعد 21 يوم — أصبحت طريقة حياة. التقييم يقودك للمرحلة التالية.</p>
+      <div class="ph-item">قياس النتائج الحقيقية بالأرقام والجسم</div>
+      <div class="ph-item">توصية الباقة التالية بناءً على تقدمك</div>
+      <div class="ph-item">أنت الآن تعرف كيف تستمر — حياة</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     5. BENEFITS
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">ما ستحصل عليه</div>
+    <h2 class="lg reveal" style="margin-bottom:30px">6 تحولات حقيقية<br/><span class="gold">خلال 21 يوماً</span></h2>
+
+    <div class="benefit reveal">
+      <div class="b-num">01</div>
+      <div>
+        <div class="b-title">برنامج تمرين مخصص 100% لجسمك</div>
+        <div class="sm" style="font-size:.82rem">ليس برنامجاً عاماً. برنامج يعرف وزنك، مستواك، معداتك، والوقت المتاح عندك.</div>
+      </div>
+    </div>
+    <div class="benefit reveal">
+      <div class="b-num">02</div>
+      <div>
+        <div class="b-title">تغذية من مطبخك الخليجي الحقيقي</div>
+        <div class="sm" style="font-size:.82rem">أول تطبيق يحتوي الكبسة، المندي، الحمص، الفول، والشاورما بقيم غذائية دقيقة.</div>
+      </div>
+    </div>
+    <div class="benefit reveal">
+      <div class="b-num">03</div>
+      <div>
+        <div class="b-title">نظام يتكيف مع حياتك — مو يوقفها</div>
+        <div class="sm" style="font-size:.82rem">فاتك يوم؟ مناسبة؟ سفر؟ النظام يعدّل ويعيدك بشكل تدريجي. ما في "من الصفر".</div>
+      </div>
+    </div>
+    <div class="benefit reveal">
+      <div class="b-num">04</div>
+      <div>
+        <div class="b-title">مدرب ذكي بالعربي 24/7</div>
+        <div class="sm" style="font-size:.82rem">اسأل عن التمرين، التغذية، التعافي — ردود متخصصة في اللياقة، بأسلوب خليجي.</div>
+      </div>
+    </div>
+    <div class="benefit reveal">
+      <div class="b-num">05</div>
+      <div>
+        <div class="b-title">محاسبة يومية بالأرقام الحقيقية</div>
+        <div class="sm" style="font-size:.82rem">وزنك، خصرك، تمارينك، سعراتك — كل شيء في مكان. الأرقام لا تكذب.</div>
+      </div>
+    </div>
+    <div class="benefit reveal">
+      <div class="b-num">06</div>
+      <div>
+        <div class="b-title">تحليل الجسم — مع أو بدون صورة</div>
+        <div class="sm" style="font-size:.82rem">نسبة دهونك وأولوياتك بدقة — عبر القياسات فقط. خصوصيتك محفوظة.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     6. FOR / NOT FOR
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px;text-align:center">هذا البرنامج ليس للجميع</div>
+    <h2 class="md reveal" style="margin-bottom:26px;text-align:center">الصدق هو ما يصنع النتائج.</h2>
+
+    <div class="for-grid reveal">
+      <div class="for-card" style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.18)">
+        <div style="font-weight:800;color:var(--red);font-size:.9rem;margin-bottom:4px">✕ مو مناسب لك إذا</div>
+        <div class="for-item"><span style="color:var(--red);flex-shrink:0">✗</span>تبحث عن حبوب أو حلول بدون أي جهد</div>
+        <div class="for-item"><span style="color:var(--red);flex-shrink:0">✗</span>تريد نتائج أسبوع بدون تغيير أي عادة</div>
+        <div class="for-item"><span style="color:var(--red);flex-shrink:0">✗</span>غير مستعد تتحمل مسؤولية ما تأكله</div>
+      </div>
+      <div class="for-card" style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.18)">
+        <div style="font-weight:800;color:var(--green);font-size:.9rem;margin-bottom:4px">✓ مناسب لك تماماً إذا</div>
+        <div class="for-item"><span style="color:var(--green);flex-shrink:0">✓</span>تعبت من "بكرة أبدأ" وجاهز لنظام حقيقي</div>
+        <div class="for-item"><span style="color:var(--green);flex-shrink:0">✓</span>تريد برنامجاً يفهم حياتك الخليجية</div>
+        <div class="for-item"><span style="color:var(--green);flex-shrink:0">✓</span>مستعد تلتزم 21 يوماً ولو جزئياً</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     7. COMPARISON TABLE
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">المقارنة</div>
+    <h2 class="md reveal" style="margin-bottom:26px">لماذا GYM TRACKER GCC؟</h2>
+
+    <div class="card reveal" style="overflow-x:auto;padding:0">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th style="text-align:right;padding:16px">الميزة</th>
+            <th>يوتيوب / سوشيال</th>
+            <th>مدرب شخصي</th>
+            <th class="col-us">GYM TRACKER GCC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>برنامج لجسمك تحديداً</td><td class="ck-n">✗</td><td class="ck-y">✓</td><td class="ck-y col-us">✓</td></tr>
+          <tr><td>أكل خليجي بالماكروز</td><td class="ck-n">✗</td><td class="ck-n">نادراً</td><td class="ck-y col-us">✓</td></tr>
+          <tr><td>متاح 24/7 بالعربي</td><td class="ck-n">✗</td><td class="ck-n">✗</td><td class="ck-y col-us">✓</td></tr>
+          <tr><td>يتكيف مع انقطاعك</td><td class="ck-n">✗</td><td style="color:var(--text-muted)">أحياناً</td><td class="ck-y col-us">✓ دائماً</td></tr>
+          <tr><td>محاسبة يومية</td><td class="ck-n">✗</td><td class="ck-y">✓</td><td class="ck-y col-us">✓</td></tr>
+          <tr><td>التكلفة الشهرية</td><td style="color:var(--text-muted)">مجاني</td><td style="color:var(--text-muted)">+1500 ر.س</td><td class="col-us" style="font-weight:800">149 ر.س</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     8. TESTIMONIALS
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">من جربوه</div>
+    <h2 class="md reveal" style="margin-bottom:26px">من "بكرة أبدأ"…<br/><span class="gold">إلى نتائج حقيقية</span></h2>
+
+    <div class="testi reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">أول مرة في حياتي أكمل أكثر من أسبوعين متواصلين. البرنامج ما طالب مني المستحيل — طالب مني أكمل فقط. الفرق في الميزان؟ 3.2 كجم في 21 يوم والخصر نزل 4 سم.</p>
+      <div class="t-author">
+        <div class="t-av">خ</div>
+        <div><div class="t-name">خالد العنزي — الرياض</div><div class="t-time">بعد 21 يوماً من البرنامج</div></div>
+      </div>
+    </div>
+
+    <div class="testi reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">اللي أعجبني إنه يفهم إني آكل كبسة وشاورما. ما طالب مني آكل سلطة وبروتين شيك. عدّل على أكلي الحقيقي وأعطاني سعرات دقيقة. هذا اللي كان ناقص في كل التطبيقات.</p>
+      <div class="t-author">
+        <div class="t-av">م</div>
+        <div><div class="t-name">محمد الدوسري — الكويت</div><div class="t-time">الأسبوع الثالث</div></div>
+      </div>
+    </div>
+
+    <div class="testi reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">كانت عندي مناسبة في اليوم العاشر وأكلت بدون حساب. رجعت للتطبيق خايف قال لي "خلصت". قال لي "عدنا — اليوم نكمل من هنا." هذا الشيء اللي خلاني أكمل الـ 21 يوم.</p>
+      <div class="t-author">
+        <div class="t-av">ع</div>
+        <div><div class="t-name">عبدالله المطيري — أبوظبي</div><div class="t-time">بعد 30 يوماً متواصلة</div></div>
+      </div>
+    </div>
+
+    <div class="testi reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">جربت 4 تطبيقات قبله. كلها إنجليزية، بأكل ما نعرفه. هذا أول تطبيق يحسسني إنه مبني لي أنا — خليجي، بحياة خليجية، وبأكل خليجي.</p>
+      <div class="t-author">
+        <div class="t-av">ف</div>
+        <div><div class="t-name">فيصل الشهري — جدة</div><div class="t-time">عضو مؤسس</div></div>
+      </div>
+    </div>
+
+    <div class="testi reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">المدرب الذكي غيّر كل شيء. سألته عن تمرين في الفندق ومعي 20 دقيقة فقط. أعطاني برنامجاً مناسباً في 30 ثانية. مدرب شخصي بسعر القهوة اليومية.</p>
+      <div class="t-author">
+        <div class="t-av">س</div>
+        <div><div class="t-name">سلطان القحطاني — الدوحة</div><div class="t-time">مشترك منذ شهرين</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     9. CHECKOUT
+════════════════════════════════ -->
+<section id="checkout">
+  <div class="max">
+    <div class="card reveal" style="border-color:rgba(203,162,59,0.28);background:linear-gradient(135deg,rgba(203,162,59,0.06),transparent);text-align:center">
+      <div class="label" style="margin-bottom:12px">انضم الآن — الباقة التأسيسية</div>
+      <h2 class="lg" style="margin-bottom:6px">ابدأ تحولك اليوم</h2>
+      <p class="sm" style="margin-bottom:24px;max-width:380px;margin-left:auto;margin-right:auto">برنامجك يُبنى فور موافقتنا على اشتراكك. لا انتظار — دخول خلال 24 ساعة.</p>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:26px">
+        <div>
+          <div style="font-size:3.2rem;font-weight:900;color:var(--gold);line-height:1;font-family:'IBM Plex Mono',monospace">149</div>
+          <div style="font-size:.8rem;color:var(--text-muted)">ر.س / شهر</div>
+        </div>
+        <div style="border-right:1px solid rgba(255,255,255,0.08);padding-right:16px;text-align:right">
+          <div style="font-size:1rem;color:var(--text-muted);text-decoration:line-through">299 ر.س</div>
+          <div style="font-size:.75rem;color:var(--gold);font-weight:700">وفّر 150 ر.س</div>
+          <div style="font-size:.7rem;color:var(--text-muted)">عرض تأسيسي محدود</div>
+        </div>
+      </div>
+
+      <a href="https://gym-tracker-gcc.vercel.app" class="btn" style="margin-bottom:16px">
+        ابدأ برنامجي الآن 🔥
+      </a>
+
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:.73rem;color:var(--text-muted);margin-bottom:24px">
+        <div>✓ برنامج مخصص بالذكاء الاصطناعي من اليوم الأول</div>
+        <div>✓ خطة تغذية من مطبخك الخليجي</div>
+        <div>✓ مدرب ذكي بالعربي 24/7</div>
+        <div>✓ دخول خلال 24 ساعة من الاشتراك</div>
+      </div>
+
+      <div class="guarantee">
+        <div style="font-size:1.8rem;margin-bottom:8px">🛡️</div>
+        <div style="font-weight:800;font-size:.95rem;margin-bottom:6px">ضمان 7 أيام كامل</div>
+        <div class="sm" style="font-size:.82rem">جرّب 7 أيام. إذا ما شفت فرقاً حقيقياً — نرد لك المبلغ كاملاً بدون أسئلة.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     10. FAQ
+════════════════════════════════ -->
+<section>
+  <div class="max">
+    <div class="label reveal" style="margin-bottom:14px">أسئلة شائعة</div>
+    <h2 class="md reveal" style="margin-bottom:28px">ردود على ما يدور في بالك</h2>
+
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">هل البرنامج مناسب للمبتدئين؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">نعم. البرنامج يبدأ بتقييم مستواك الحالي ويبني عليه. سواء ما دخلت جيم من قبل أو كنت نشيطاً — البرنامج يتكيف.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">ماذا لو فاتني أيام؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">هذا بالضبط ما يفرق GYM TRACKER GCC. إذا غبت يوماً أو أكثر، النظام يعدّل ويعيدك للمسار تدريجياً. ما في "انتهى كل شيء".</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">هل يلزمني جيم؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">لا. البرنامج يتكيف مع ما متاح عندك — جيم متكامل، دمبل فقط، أو وزن الجسم في البيت.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">كيف يعمل المدرب الذكي؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">مدرب متخصص في اللياقة والتغذية الخليجية، يرد فوراً بالعربي على أسئلتك المتعلقة بالتمرين والأكل والتعافي.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">هل التطبيق آمن وخاص؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">بياناتك محمية ومشفرة. تحليل الجسم بالصورة اختياري — تقدر تحصل على نفس النتائج عبر القياسات فقط بدون أي صورة.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">ماذا بعد الـ 21 يوم؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">النظام يقيّم تقدمك ويوصي بالمرحلة التالية. الاشتراك مستمر شهرياً وتحصل على برامج جديدة باستمرار.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">متى أحصل على الدخول؟<span class="faq-icon">+</span></div>
+      <div class="faq-a">بعد تأكيد الاشتراك نتواصل معك خلال 24 ساعة لتفعيل حسابك. العملية يدوية لضمان أفضل تجربة لكل عضو.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     11. FINAL CTA
+════════════════════════════════ -->
+<section style="padding-bottom:120px">
+  <div class="max" style="text-align:center">
+    <div style="font-size:2.4rem;margin-bottom:16px">💪</div>
+    <h2 class="lg reveal" style="margin-bottom:12px">
+      لا تنتظر حتى<br/><span class="gold">يصبح التأجيل عادة.</span>
+    </h2>
+    <p class="sm reveal" style="max-width:430px;margin:0 auto 30px">
+      كل يوم تؤجله هو يوم أضفته على الطريق.
+      البداية الحقيقية تبدأ بقرار واحد — اليوم.
+    </p>
+    <a href="#checkout" class="btn reveal" style="margin:0 auto 12px">
+      ابدأ تحولي — 149 ر.س فقط 🔥
+    </a>
+    <p style="font-size:.72rem;color:var(--text-muted);margin-top:12px">ضمان 7 أيام · إلغاء في أي وقت · دخول خلال 24 ساعة</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(255,255,255,0.055);padding:28px 20px;text-align:center">
+  <div class="logo" style="font-size:.95rem;margin-bottom:12px">GYM<span>TRACKER</span> GCC</div>
+  <div style="font-size:.72rem;color:var(--text-muted);display:flex;gap:22px;justify-content:center;flex-wrap:wrap">
+    <a href="#" style="color:inherit;text-decoration:none">الشروط والأحكام</a>
+    <a href="#" style="color:inherit;text-decoration:none">سياسة الخصوصية</a>
+    <a href="#" style="color:inherit;text-decoration:none">تواصل معنا</a>
+  </div>
+  <div style="font-size:.68rem;color:rgba(255,255,255,0.1);margin-top:10px">© 2026 GYM TRACKER GCC. جميع الحقوق محفوظة.</div>
+</footer>
+
+<!-- STICKY CTA BAR -->
+<div class="sticky-cta">
+  <div>
+    <div style="font-size:.68rem;color:var(--text-muted)">الباقة التأسيسية</div>
+    <div class="sticky-price">149 ر.س / شهر</div>
+  </div>
+  <a href="#checkout" class="btn" style="width:auto;max-width:none;padding:13px 26px;font-size:.9rem">
+    ابدأ الآن 🔥
+  </a>
+</div>
+
+<script>
+// COUNTDOWN — persists across page refreshes
+(function(){
+  const key='gtc_end';
+  let end=+localStorage.getItem(key);
+  if(!end||end<Date.now()){end=Date.now()+15*60*1000;localStorage.setItem(key,end)}
+  const el=document.getElementById('timer');
+  function tick(){
+    const s=Math.max(0,Math.floor((end-Date.now())/1000));
+    el.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  }
+  tick();setInterval(tick,1000);
+})();
+
+// FAQ TOGGLE
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  const open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+  if(!open)item.classList.add('open');
+}
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('revealed')});
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
