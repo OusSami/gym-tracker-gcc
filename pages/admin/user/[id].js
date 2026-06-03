@@ -79,11 +79,12 @@ export default function UserDetail() {
     setBusy(null)
   }
 
+  useEffect(() => { if (tab === 'program' && authed && id && !prog && !progLoading) loadProg() }, [tab, authed, id])
+
   if (!authed) return null
 
   const TABS = [['overview','نظرة عامة'],['sessions','التمارين'],['nutrition','التغذية'],['body','الجسم'],['program','البرنامج'],['costs','تكاليف API'],['apptime','وقت التطبيق']]
 
-  useEffect(() => { if (tab === 'program' && authed && id && !prog && !progLoading) loadProg() }, [tab, authed, id])
   const st = d?.profile ? (ST[d.profile.status] || { l: d.profile.status, c: '#888', b: 'rgba(255,255,255,0.05)', br: 'rgba(255,255,255,0.1)' }) : null
 
   return (
