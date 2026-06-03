@@ -52,9 +52,16 @@ export default function UserDetail() {
   const suspend = async () => { if (!window.confirm('إيقاف؟')) return; setBusy('s'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suspend', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
 
   const loadProg = async () => {
+    if (progLoading) return
     setProgLoading(true)
-    const r = await fetch(`/api/admin?action=program_status&userId=${id}`)
-    setProg(await r.json())
+    setProg(null)
+    try {
+      const r = await fetch(`/api/admin?action=program_status&userId=${id}`)
+      const data = await r.json()
+      setProg(data)
+    } catch (e) {
+      setProg({ program: null, error: e.message })
+    }
     setProgLoading(false)
   }
 
@@ -79,7 +86,7 @@ export default function UserDetail() {
     setBusy(null)
   }
 
-  useEffect(() => { if (tab === 'program' && authed && id && !prog && !progLoading) loadProg() }, [tab, authed, id])
+  useEffect(() => { if (tab === 'program' && authed && id) loadProg() }, [tab, authed, id])
 
   if (!authed) return null
 
@@ -366,14 +373,23 @@ export default function UserDetail() {
               ) : !prog?.program ? (
                 <div style={{ ...card, textAlign: 'center', padding: 40 }}>
                   <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
-                  <div style={{ fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>لا يوجد برنامج نشط لهذا المستخدم</div>
+                  <div style={{ fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>لا يوجد برنامج نشط لهذا المستخدم</div>
+                  <button onClick={loadProg} style={{ background: 'rgba(203,162,59,0.1)', border: `1px solid ${G}40`, color: G, borderRadius: 9, padding: '8px 20px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                    🔄 إعادة تحميل
+                  </button>
+                  {prog?.error && <div style={{ marginTop: 12, fontSize: '.72rem', color: '#ef4444', fontFamily: 'monospace' }}>{prog.error}</div>}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                   {/* Program status card */}
                   <div style={{ ...card }}>
-                    <div style={{ fontWeight: 700, fontSize: '.75rem', letterSpacing: 1.5, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: 14 }}>حالة البرنامج</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                      <div style={{ fontWeight: 700, fontSize: '.75rem', letterSpacing: 1.5, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>
+                        {prog.program.package_name || prog.program.package_id} — {prog.program.total_days} يوم
+                      </div>
+                      <button onClick={loadProg} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '.8rem', fontFamily: F }}>🔄 تحديث</button>
+                    </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(110px,1fr))', gap: 10, marginBottom: 14 }}>
                       {[
                         ['اليوم الحالي', `${prog.program.current_day} / ${prog.program.total_days}`, G],
