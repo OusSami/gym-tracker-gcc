@@ -177,8 +177,9 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
 
   if(!exercises.length) return null
   const ex = exercises[exIdx]
-  const log = logs[exIdx]
-  const isLastSet = setIdx >= ex.sets-1
+  if(!ex) return null
+  const log = logs[exIdx] || {sets:[]}
+  const isLastSet = setIdx >= (ex.sets||1)-1
   const isLastEx = exIdx >= exercises.length-1
 
   const logSet = () => {
@@ -202,9 +203,11 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
 
   const afterRest = () => {
     setRegistering(false)   // allow next set to be logged
-    if(isLastSet){
-      if(isLastEx) setPhase('done')
-      else { setExIdx(e=>e+1); setSetIdx(0); setPhase('exercise') }
+    const curIsLastSet = setIdx >= (ex.sets||1)-1
+    const curIsLastEx = exIdx >= exercises.length-1
+    if(curIsLastSet){
+      if(curIsLastEx) setPhase('done')
+      else { setExIdx(e=>Math.min(e+1, exercises.length-1)); setSetIdx(0); setPhase('exercise') }
     } else {
       setSetIdx(s=>s+1); setPhase('exercise')
     }
@@ -216,7 +219,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
     if (wasSkip) {
       setRegistering(false)
       const nextIdx = exIdx + 1
-      if (nextIdx >= exercises.length) setPhase('done')
+      if (nextIdx >= exercises.length || !exercises[nextIdx]) setPhase('done')
       else { setExIdx(nextIdx); setSetIdx(0); setPhase('exercise') }
     }
   }
@@ -265,7 +268,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             <span style={{fontSize:'1.1rem'}}>🔥</span>
             <div>
               <div style={{fontWeight:700,fontSize:'.82rem',color:'#3b82f6',marginBottom:3}}>الإحماء — {warmup.length} تمارين</div>
-              <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)'}}>{warmup.map(w=>w.name.split('|')[0].trim()).join(' · ')}</div>
+              <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)'}}>{warmup.map(w=>(w.name||'').split('|')[0].trim()).join(' · ')}</div>
             </div>
             <div style={{marginRight:'auto',fontSize:'.7rem',color:'rgba(59,130,246,0.7)',fontFamily:'monospace'}}>{warmup.reduce((a,w)=>a+(w.duration_seconds||30),0)}ث</div>
           </div>
@@ -287,8 +290,8 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             <div key={i} style={{padding:'6px 0',borderTop:i>0?'1px solid rgba(255,255,255,0.04)':'none'}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                 <div>
-                  <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.8)',fontWeight:600}}>{e.name.split('|')[0].trim()}</span>
-                  {e.name.includes('|')&&<span style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)',marginRight:6}}>{e.name.split('|')[1]?.trim()}</span>}
+                  <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.8)',fontWeight:600}}>{(e.name||'').split('|')[0].trim()}</span>
+                  {e.name?.includes('|')&&<span style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)',marginRight:6}}>{e.name.split('|')[1]?.trim()}</span>}
                 </div>
                 <span style={{fontFamily:'monospace',color:G,fontSize:'.78rem',fontWeight:700}}>{e.sets}×{e.reps}</span>
               </div>
@@ -303,7 +306,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             <span style={{fontSize:'1.1rem'}}>🧘</span>
             <div>
               <div style={{fontWeight:700,fontSize:'.82rem',color:'#22c55e',marginBottom:3}}>تبريد وتمديد — {cooldown.length} تمارين</div>
-              <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)'}}>{cooldown.map(c=>c.name.split('|')[0].trim()).join(' · ')}</div>
+              <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)'}}>{cooldown.map(c=>(c.name||'').split('|')[0].trim()).join(' · ')}</div>
             </div>
           </div>
         </div>
@@ -385,7 +388,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
     <div>
       {whyOverlay}
       <div style={{textAlign:'center',marginBottom:12,fontSize:'.8rem',color:'rgba(255,255,255,0.4)'}}>
-        {ex.name.split('|')[1]?.trim()||ex.name} · مجموعة {setIdx+1} من {ex.sets} ✓
+        {ex.name?.split('|')[1]?.trim()||ex.name||''} · مجموعة {setIdx+1} من {ex.sets} ✓
       </div>
       <RestTimer seconds={ex.rest||45} onDone={afterRest}/>
       {/* Why modal overlay during rest */}
@@ -447,8 +450,8 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             return (
               <div key={i} style={{marginBottom:10}}>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:5,fontSize:'.8rem'}}>
-                  <span style={{color:'rgba(255,255,255,0.7)'}}>{l.name.split('|')[0].trim()}</span>
-                    {l.name.includes('|')&&<span style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)',marginRight:4}}>{l.name.split('|')[1]?.trim()}</span>}
+                  <span style={{color:'rgba(255,255,255,0.7)'}}>{(l.name||'').split('|')[0].trim()}</span>
+                    {l.name?.includes('|')&&<span style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)',marginRight:4}}>{l.name.split('|')[1]?.trim()}</span>}
                   <span style={{color:ok?'#22c55e':'#f97316',fontWeight:700}}>{actual}/{target} تكرار ({p}%)</span>
                 </div>
                 <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden'}}>
@@ -530,8 +533,8 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}22`,borderRadius:18,padding:'16px',marginBottom:12}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
           <div>
-            <div style={{fontWeight:900,fontSize:'1rem',marginBottom:1}}>{ex.name.split('|')[0].trim()}</div>
-            {ex.name.includes('|')&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginBottom:3}}>{ex.name.split('|')[1]?.trim()}</div>}
+            <div style={{fontWeight:900,fontSize:'1rem',marginBottom:1}}>{(ex.name||'').split('|')[0].trim()}</div>
+            {ex.name?.includes('|')&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginBottom:3}}>{ex.name.split('|')[1]?.trim()}</div>}
             <div style={{fontSize:'.72rem',color:G}}>{ex.muscle}</div>
           </div>
           <div style={{background:`${G}18`,borderRadius:10,padding:'6px 12px',textAlign:'center'}}>
