@@ -27,15 +27,28 @@ export default async function handler(req, res) {
 
     // USERS LIST
     if (action === 'users') {
-      const { data: profiles } = await sb.from('profiles').select('id,full_name,email,goal,status,created_at,unit_system,fitness_level,waist_cm,approved_at').order('created_at', { ascending: false })
-      const { data: sessions } = await sb.from('sessions').select('user_id,created_at').order('created_at', { ascending: false })
-      const { data: usage } = await sb.from('api_usage').select('user_id,cost_usd').gte('created_at', monthStart())
+      const [{ data: profiles }, { data: sessions }, { data: usage }, authResult] = await Promise.all([
+        sb.from('profiles').select('id,full_name,email,goal,status,created_at,unit_system,fitness_level,waist_cm,approved_at').order('created_at', { ascending: false }),
+        sb.from('sessions').select('user_id,created_at').order('created_at', { ascending: false }),
+        sb.from('api_usage').select('user_id,cost_usd').gte('created_at', monthStart()),
+        sb.auth.admin.listUsers({ perPage: 1000 }),
+      ])
+
+      // Build email map from real auth users (profiles.email may be null)
+      const authEmailMap = {}
+      authResult?.data?.users?.forEach(u => { authEmailMap[u.id] = u.email })
 
       const sessionCount = {}, lastActive = {}, monthlyCost = {}
       sessions?.forEach(s => { sessionCount[s.user_id] = (sessionCount[s.user_id] || 0) + 1; if (!lastActive[s.user_id]) lastActive[s.user_id] = s.created_at })
       usage?.forEach(u => { monthlyCost[u.user_id] = ((monthlyCost[u.user_id] || 0) + (u.cost_usd || 0)) })
 
-      return res.json({ users: (profiles || []).map(p => ({ ...p, session_count: sessionCount[p.id] || 0, last_active: lastActive[p.id] || null, monthly_cost: (monthlyCost[p.id] || 0).toFixed(4) })) })
+      return res.json({ users: (profiles || []).map(p => ({
+        ...p,
+        email: p.email || authEmailMap[p.id] || null,   // fall back to auth email
+        session_count: sessionCount[p.id] || 0,
+        last_active: lastActive[p.id] || null,
+        monthly_cost: (monthlyCost[p.id] || 0).toFixed(4)
+      })) })
     }
 
     // COSTS
@@ -139,7 +152,7 @@ export default async function handler(req, res) {
     // FULL USER DETAIL
     if (action === 'user_full' && userId) {
       const mStart = monthStart()
-      const [profR, sessR, weightR, mealsR, costR, costEpR, appSessR, bodyR] = await Promise.all([
+      const [profR, sessR, weightR, mealsR, costR, costEpR, appSessR, bodyR, authResult2] = await Promise.all([
         sb.from('profiles').select('*').eq('id', userId).single(),
         sb.from('sessions').select('*').eq('user_id', userId).order('session_date', { ascending: false }),
         sb.from('weight_history').select('weight_kg,recorded_at').eq('user_id', userId).order('recorded_at', { ascending: false }),
@@ -148,7 +161,11 @@ export default async function handler(req, res) {
         sb.from('api_usage').select('endpoint,cost_usd,created_at').eq('user_id', userId),
         sb.from('app_sessions').select('started_at,ended_at,duration_seconds').eq('user_id', userId).order('started_at', { ascending: false }).limit(50),
         sb.from('body_analyses').select('created_at,overall_score').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+        sb.auth.admin.getUserById(userId),
       ])
+
+      const authEmail = authResult2?.data?.user?.email || null
+      const profile = profR.data ? { ...profR.data, email: profR.data.email || authEmail } : null
 
       const sessions = sessR.data || []
       const weights = weightR.data || []
@@ -224,7 +241,7 @@ export default async function handler(req, res) {
       const musclesDist = Object.entries(muscMap).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count)
 
       return res.json({
-        profile: profR.data,
+        profile,
         stats: {
           total_sessions: sessions.length,
           sessions_this_week: sessions.filter(s => new Date(s.session_date + 'T12:00:00') >= weekAgo).length,
@@ -258,13 +275,28 @@ export default async function handler(req, res) {
 
     // PROGRAM STATUS — returns most recent program regardless of status
     if (action === 'program_status' && userId) {
-      const { data: allPrograms, error: progError } = await sb
+      let { data: allPrograms, error: progError } = await sb
         .from('user_programs')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
       if (progError) return res.json({ program: null, allPrograms: [], error: progError.message })
+
+      // If no programs found with profile ID, look up the real auth UID via email
+      if (!allPrograms?.length) {
+        const { data: profileRow } = await sb.from('profiles').select('email').eq('id', userId).single()
+        if (profileRow?.email) {
+          const { data: authData } = await sb.auth.admin.listUsers({ perPage: 1000 })
+          const authUser = authData?.users?.find(u => u.email === profileRow.email)
+          if (authUser && authUser.id !== userId) {
+            const { data: prog2 } = await sb.from('user_programs').select('*')
+              .eq('user_id', authUser.id).order('created_at', { ascending: false })
+            if (prog2?.length) allPrograms = prog2
+          }
+        }
+      }
+
       if (!allPrograms?.length) return res.json({ program: null, allPrograms: [] })
 
       // Prefer active, fall back to the most recent
