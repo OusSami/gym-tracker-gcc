@@ -258,13 +258,14 @@ export default async function handler(req, res) {
 
     // PROGRAM STATUS — returns most recent program regardless of status
     if (action === 'program_status' && userId) {
-      const { data: allPrograms } = await sb
+      const { data: allPrograms, error: progError } = await sb
         .from('user_programs')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
-      if (!allPrograms?.length) return res.json({ program: null, allPrograms: [] })
+      if (progError) return res.json({ program: null, allPrograms: [], _debug: { error: progError.message, userId } })
+      if (!allPrograms?.length) return res.json({ program: null, allPrograms: [], _debug: { note: 'no rows found', userId } })
 
       // Prefer active, fall back to the most recent
       const program = allPrograms.find(p => p.status === 'active') || allPrograms[0]
