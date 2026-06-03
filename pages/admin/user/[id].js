@@ -428,13 +428,20 @@ export default function UserDetail() {
                     </div>
                   </div>
 
+                  {/* Status badge if paused */}
+                  {prog.program.status !== 'active' && (
+                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, padding: '10px 14px', fontSize: '.82rem', color: '#f87171' }}>
+                      ⚠️ البرنامج حالياً: <strong>{prog.program.status}</strong> — استخدم "إعادة تعيين" لإعادة تفعيله.
+                    </div>
+                  )}
+
                   {/* ── Actions ── */}
 
                   {/* 1. Set to specific day */}
                   <div style={{ ...card }}>
                     <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>📅 الانتقال إلى يوم محدد</div>
                     <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
-                      يضبط اليوم الحالي على الرقم الذي تختاره ويمسح تقدم كل يوم بعده — بما فيها التمارين المولّدة وسجلات الأداء.
+                      يضبط اليوم الحالي على الرقم الذي تختاره ويمسح تقدم كل يوم بعده. إذا كان البرنامج موقوفاً سيُعاد تفعيله تلقائياً.
                     </div>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <input
@@ -442,15 +449,15 @@ export default function UserDetail() {
                         value={targetDay}
                         onChange={e => setTargetDay(e.target.value)}
                         placeholder={`1 — ${prog.program.total_days}`}
-                        style={{ width: 100, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', color: '#ECE3CF', fontFamily: F, fontSize: '.88rem', outline: 'none' }}
+                        style={{ width: 110, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 9, padding: '9px 12px', color: '#ECE3CF', fontFamily: F, fontSize: '.88rem', outline: 'none' }}
                       />
                       <button
                         disabled={!targetDay || parseInt(targetDay) < 1 || parseInt(targetDay) > prog.program.total_days || busy === 'prog'}
                         onClick={() => setConfirm({
                           action: 'program_set_day',
-                          payload: { targetDay: parseInt(targetDay) },
+                          payload: { targetDay: parseInt(targetDay), programId: prog.program.id },
                           label: `الانتقال إلى اليوم ${targetDay}`,
-                          desc: `سيتم ضبط البرنامج على اليوم ${targetDay} ومسح بيانات الأيام ${targetDay} إلى ${prog.program.total_days} بالكامل. لا يمكن التراجع.`,
+                          desc: `سيتم ضبط البرنامج على اليوم ${targetDay} ومسح بيانات الأيام ${targetDay}–${prog.program.total_days} بالكامل. لا يمكن التراجع.`,
                           successText: `✓ تم الانتقال إلى اليوم ${targetDay}`,
                         })}
                         style={{ background: G, color: '#09090B', border: 'none', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer', opacity: (!targetDay || parseInt(targetDay) < 1 || parseInt(targetDay) > prog.program.total_days) ? 0.4 : 1 }}>
@@ -463,15 +470,15 @@ export default function UserDetail() {
                   <div style={{ ...card }}>
                     <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>🔄 إعادة تعيين للبداية (اليوم 1)</div>
                     <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
-                      يمسح كامل تقدم البرنامج ويعيد المستخدم لليوم الأول. التواريخ تُعاد من اليوم. لا يمكن التراجع.
+                      يمسح كامل تقدم البرنامج ويعيد المستخدم لليوم الأول ويُعيد تفعيل البرنامج. التواريخ تُعاد من اليوم.
                     </div>
                     <button
                       disabled={busy === 'prog'}
                       onClick={() => setConfirm({
                         action: 'program_reset',
-                        payload: {},
+                        payload: { programId: prog.program.id },
                         label: 'إعادة تعيين كامل للبرنامج',
-                        desc: `سيتم مسح جميع بيانات الأيام الـ ${prog.program.total_days} وإعادة المستخدم لليوم 1. هذا الإجراء لا يمكن التراجع عنه.`,
+                        desc: `سيتم مسح جميع بيانات الأيام الـ ${prog.program.total_days} وإعادة المستخدم لليوم 1. لا يمكن التراجع.`,
                         successText: '✓ تم إعادة تعيين البرنامج لليوم 1',
                       })}
                       style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.3)', color: '#f97316', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
@@ -483,16 +490,16 @@ export default function UserDetail() {
                   <div style={{ ...card }}>
                     <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4 }}>⚡ إعادة توليد تمرين اليوم</div>
                     <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
-                      يمسح فقط تمرين اليوم الحالي (اليوم {prog.program.current_day}). عند فتح المستخدم التطبيق سيتم توليد تمرين جديد تلقائياً.
+                      يمسح تمرين اليوم الحالي (اليوم {prog.program.current_day}) فقط — سيُولَّد تمرين جديد عند فتح المستخدم التطبيق.
                     </div>
                     <button
                       disabled={busy === 'prog'}
                       onClick={() => setConfirm({
                         action: 'program_regen_today',
-                        payload: {},
+                        payload: { programId: prog.program.id },
                         label: `إعادة توليد تمرين اليوم ${prog.program.current_day}`,
-                        desc: `سيتم مسح التمرين المحفوظ لليوم ${prog.program.current_day} فقط. التمرين سيُولَّد من جديد عند فتح المستخدم التطبيق.`,
-                        successText: `✓ تم مسح تمرين اليوم ${prog.program.current_day} — سيُولَّد عند أول فتح`,
+                        desc: `سيتم مسح التمرين المحفوظ لليوم ${prog.program.current_day} فقط. سيُولَّد من جديد عند فتح التطبيق.`,
+                        successText: `✓ تم مسح تمرين اليوم ${prog.program.current_day}`,
                       })}
                       style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
                       إعادة توليد تمرين اليوم
@@ -501,21 +508,21 @@ export default function UserDetail() {
 
                   {/* 4. End program */}
                   <div style={{ ...card, border: '1px solid rgba(239,68,68,0.15)' }}>
-                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4, color: '#ef4444' }}>🛑 إنهاء البرنامج</div>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4, color: '#ef4444' }}>🛑 إنهاء / إيقاف البرنامج</div>
                     <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
-                      يوقف البرنامج الحالي ويجعله غير مرئي للمستخدم. البيانات تُحفظ ولا تُحذف.
+                      يوقف البرنامج ويجعله غير مرئي للمستخدم. البيانات تُحفظ ويمكن إعادة التفعيل بـ"إعادة تعيين".
                     </div>
                     <button
-                      disabled={busy === 'prog'}
+                      disabled={busy === 'prog' || prog.program.status === 'paused'}
                       onClick={() => setConfirm({
                         action: 'program_end',
-                        payload: {},
+                        payload: { programId: prog.program.id },
                         label: 'إنهاء البرنامج',
-                        desc: 'سيتم إيقاف البرنامج الحالي. لن يراه المستخدم في التطبيق حتى يُنشئ برنامجاً جديداً.',
-                        successText: '✓ تم إنهاء البرنامج',
+                        desc: 'سيتم إيقاف البرنامج. لن يراه المستخدم حتى يُعاد تفعيله أو يُنشئ برنامجاً جديداً.',
+                        successText: '✓ تم إيقاف البرنامج',
                       })}
-                      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
-                      إنهاء البرنامج
+                      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: prog.program.status === 'paused' ? 'rgba(255,255,255,0.2)' : '#ef4444', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: prog.program.status === 'paused' ? 'not-allowed' : 'pointer' }}>
+                      {prog.program.status === 'paused' ? 'موقوف بالفعل' : 'إنهاء البرنامج'}
                     </button>
                   </div>
 

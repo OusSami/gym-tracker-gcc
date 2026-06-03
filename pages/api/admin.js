@@ -256,18 +256,18 @@ export default async function handler(req, res) {
       })
     }
 
-    // PROGRAM STATUS
+    // PROGRAM STATUS — returns most recent program regardless of status
     if (action === 'program_status' && userId) {
-      const { data: rows } = await sb
+      const { data: allPrograms } = await sb
         .from('user_programs')
         .select('*')
         .eq('user_id', userId)
-        .eq('status', 'active')
         .order('created_at', { ascending: false })
-        .limit(1)
 
-      const program = rows?.[0] || null
-      if (!program) return res.json({ program: null })
+      if (!allPrograms?.length) return res.json({ program: null, allPrograms: [] })
+
+      // Prefer active, fall back to the most recent
+      const program = allPrograms.find(p => p.status === 'active') || allPrograms[0]
 
       const { data: dayRows } = await sb
         .from('program_days')
@@ -283,7 +283,7 @@ export default async function handler(req, res) {
         ? Math.round((completed / (completed + missed)) * 100)
         : null
 
-      return res.json({ program, days, stats: { completed, missed, withWorkout, compliance } })
+      return res.json({ program, days, allPrograms, stats: { completed, missed, withWorkout, compliance } })
     }
 
     return res.status(400).json({ error: 'Unknown action' })
@@ -300,133 +300,89 @@ export default async function handler(req, res) {
       return res.json({ success: true })
     }
 
+    // Helper: resolve program from explicit id or fallback to user's most recent
+    const resolveProgram = async (programId, selectCols = 'id,total_days,current_day') => {
+      if (programId) {
+        const { data: r } = await sb.from('user_programs').select(selectCols).eq('id', programId).limit(1)
+        return r?.[0] || null
+      }
+      const { data: r } = await sb.from('user_programs').select(selectCols)
+        .eq('user_id', userId).order('created_at', { ascending: false }).limit(1)
+      return r?.[0] || null
+    }
+
     // PROGRAM: set to a specific day
     if (action === 'program_set_day' && userId) {
-      const { targetDay } = req.body
+      const { targetDay, programId } = req.body
       const day = parseInt(targetDay)
       if (!day || day < 1) return res.status(400).json({ error: 'Invalid day' })
 
-      const { data: pRows1 } = await sb
-        .from('user_programs')
-        .select('id,total_days')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-      const program = pRows1?.[0] || null
-      if (!program) return res.status(404).json({ error: 'No active program' })
+      const program = await resolveProgram(programId)
+      if (!program) return res.status(404).json({ error: 'No program found' })
       if (day > program.total_days) return res.status(400).json({ error: 'Day exceeds program length' })
 
-      await sb.from('user_programs')
-        .update({ current_day: day })
-        .eq('id', program.id)
+      await sb.from('user_programs').update({ current_day: day, status: 'active' }).eq('id', program.id)
 
       await sb.from('program_days')
         .update({ checkin_status: null, daily_workout: null, actual_logs: null, incomplete_reason: null, session_id: null })
-        .eq('program_id', program.id)
-        .gte('day_number', day)
+        .eq('program_id', program.id).gte('day_number', day)
 
-      // Re-sequence planned_date from today for days >= targetDay
-      const { data: futureDays } = await sb
-        .from('program_days')
-        .select('id,day_number')
-        .eq('program_id', program.id)
-        .gte('day_number', day)
-        .order('day_number', { ascending: true })
+      const { data: futureDays } = await sb.from('program_days').select('id,day_number')
+        .eq('program_id', program.id).gte('day_number', day).order('day_number', { ascending: true })
 
       if (futureDays?.length) {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        const today = new Date(); today.setHours(0, 0, 0, 0)
         for (let i = 0; i < futureDays.length; i++) {
-          const d = new Date(today)
-          d.setDate(today.getDate() + i)
-          await sb.from('program_days')
-            .update({ planned_date: d.toISOString().split('T')[0] })
-            .eq('id', futureDays[i].id)
+          const d = new Date(today); d.setDate(today.getDate() + i)
+          await sb.from('program_days').update({ planned_date: d.toISOString().split('T')[0] }).eq('id', futureDays[i].id)
         }
       }
-
       return res.json({ success: true })
     }
 
     // PROGRAM: reset to day 1
     if (action === 'program_reset' && userId) {
-      const { data: pRows2 } = await sb
-        .from('user_programs')
-        .select('id,total_days')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-      const program = pRows2?.[0] || null
-      if (!program) return res.status(404).json({ error: 'No active program' })
+      const { programId } = req.body
+      const program = await resolveProgram(programId)
+      if (!program) return res.status(404).json({ error: 'No program found' })
 
-      await sb.from('user_programs')
-        .update({ current_day: 1 })
-        .eq('id', program.id)
+      await sb.from('user_programs').update({ current_day: 1, status: 'active' }).eq('id', program.id)
 
       await sb.from('program_days')
         .update({ checkin_status: null, daily_workout: null, actual_logs: null, incomplete_reason: null, session_id: null })
         .eq('program_id', program.id)
 
-      // Re-sequence all planned_dates from today
-      const { data: allDays } = await sb
-        .from('program_days')
-        .select('id,day_number')
-        .eq('program_id', program.id)
-        .order('day_number', { ascending: true })
+      const { data: allDays } = await sb.from('program_days').select('id,day_number')
+        .eq('program_id', program.id).order('day_number', { ascending: true })
 
       if (allDays?.length) {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        const today = new Date(); today.setHours(0, 0, 0, 0)
         for (let i = 0; i < allDays.length; i++) {
-          const d = new Date(today)
-          d.setDate(today.getDate() + i)
-          await sb.from('program_days')
-            .update({ planned_date: d.toISOString().split('T')[0] })
-            .eq('id', allDays[i].id)
+          const d = new Date(today); d.setDate(today.getDate() + i)
+          await sb.from('program_days').update({ planned_date: d.toISOString().split('T')[0] }).eq('id', allDays[i].id)
         }
       }
-
       return res.json({ success: true })
     }
 
     // PROGRAM: regenerate today's workout
     if (action === 'program_regen_today' && userId) {
-      const { data: pRows3 } = await sb
-        .from('user_programs')
-        .select('id,current_day')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-      const program = pRows3?.[0] || null
-      if (!program) return res.status(404).json({ error: 'No active program' })
+      const { programId } = req.body
+      const program = await resolveProgram(programId)
+      if (!program) return res.status(404).json({ error: 'No program found' })
 
-      await sb.from('program_days')
-        .update({ daily_workout: null })
-        .eq('program_id', program.id)
-        .eq('day_number', program.current_day)
-
+      await sb.from('program_days').update({ daily_workout: null })
+        .eq('program_id', program.id).eq('day_number', program.current_day)
       return res.json({ success: true })
     }
 
-    // PROGRAM: end (pause) active program
+    // PROGRAM: end (pause) program
     if (action === 'program_end' && userId) {
-      const { data: pRows4 } = await sb
-        .from('user_programs')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-      const program = pRows4?.[0] || null
-      if (!program) return res.status(404).json({ error: 'No active program' })
+      const { programId } = req.body
+      const program = await resolveProgram(programId, 'id')
+      if (!program) return res.status(404).json({ error: 'No program found' })
 
-      await sb.from('user_programs')
-        .update({ status: 'paused' })
-        .eq('id', program.id)
-
+      await sb.from('user_programs').update({ status: 'paused' }).eq('id', program.id)
       return res.json({ success: true })
     }
 
