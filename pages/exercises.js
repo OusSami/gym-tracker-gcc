@@ -216,9 +216,17 @@ function ExerciseCard({ ex, onSelect }) {
       onMouseEnter={e=>{e.currentTarget.style.borderColor=color+'55';e.currentTarget.style.background='#111118'}}
       onMouseLeave={e=>{e.currentTarget.style.borderColor=color+'22';e.currentTarget.style.background='#0a0a0e'}}>
       {/* Illustration */}
-      <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,padding:'14px',display:'flex',alignItems:'center',justifyContent:'center',minHeight:100,position:'relative'}}>
-        <div style={{position:'absolute',top:6,right:8,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}77`}}>{ex.equipment.toUpperCase()}</div>
-        <ExSVG type={ex.shape} color={color}/>
+      <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,position:'relative',overflow:'hidden',minHeight:100}}>
+        <div style={{position:'absolute',top:6,right:8,zIndex:2,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}cc`,background:'rgba(0,0,0,0.45)',borderRadius:6,padding:'1px 6px'}}>{ex.equipment.toUpperCase()}</div>
+        <img
+          src={`/exercises/${ex.id}.png`}
+          alt={ex.name}
+          style={{width:'100%',display:'block',objectFit:'cover',maxHeight:160}}
+          onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}}
+        />
+        <div style={{display:'none',alignItems:'center',justifyContent:'center',minHeight:100}}>
+          <ExSVG type={ex.shape} color={color}/>
+        </div>
       </div>
       {/* Info */}
       <div style={{padding:'10px 12px'}}>
