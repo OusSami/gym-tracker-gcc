@@ -207,7 +207,7 @@ function GifPlayer({ src, color, name }) {
   )
 }
 
-function ExerciseCard({ ex, onSelect }) {
+function ExerciseCard({ ex, onSelect, sex = 'male' }) {
   const color = mc(ex.category)
   return (
     <div onClick={() => onSelect(ex)}
@@ -219,7 +219,7 @@ function ExerciseCard({ ex, onSelect }) {
       <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,position:'relative',overflow:'hidden',minHeight:100}}>
         <div style={{position:'absolute',top:6,right:8,zIndex:2,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}cc`,background:'rgba(0,0,0,0.45)',borderRadius:6,padding:'1px 6px'}}>{ex.equipment.toUpperCase()}</div>
         <img
-          src={`/exercises/${ex.id}.png`}
+          src={`/exercises/${ex.id}-${sex}.png`}
           alt={ex.name}
           style={{width:'100%',display:'block',objectFit:'cover',maxHeight:160}}
           onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}}
@@ -251,7 +251,7 @@ function ExerciseCard({ ex, onSelect }) {
   )
 }
 
-function ExerciseDetail({ ex, onClose }) {
+function ExerciseDetail({ ex, onClose, sex = 'male' }) {
   const color = mc(ex.category)
   const [showStretch, setShowStretch] = useState(false)
   const stretches = STRETCHING[ex.category] || []
@@ -275,7 +275,7 @@ function ExerciseDetail({ ex, onClose }) {
         <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,border:`1px solid ${color}25`,borderRadius:20,overflow:'hidden',marginBottom:16}}>
           {ex.id ? (
             <img
-              src={`/exercises/${ex.id}.png`}
+              src={`/exercises/${ex.id}-${sex}.png`}
               alt={ex.name}
               style={{width:'100%',display:'block',borderRadius:20}}
               onError={e => {
@@ -402,6 +402,7 @@ export default function Exercises() {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const [tab, setTab] = useState('exercises')
+  const [sex, setSex] = useState('male')
 
   // Sub-muscles available in current env + category
   const subOptions = cat === 'الكل' ? [] : [
@@ -420,6 +421,16 @@ export default function Exercises() {
       setUser(session.user)
     })
   }, [cat, env])
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({data:{session}}) => {
+      if (!session?.user) return
+      fetch(`/api/profile?userId=${session.user.id}`)
+        .then(r => r.json())
+        .then(d => { if (d.profile?.sex) setSex(d.profile.sex) })
+        .catch(() => {})
+    })
+  }, [])
 
   const filtered = EXERCISE_DB.filter(ex =>
     (e => e.environment||'gym')(ex) === env &&
@@ -492,7 +503,7 @@ export default function Exercises() {
               {filtered.length} تمرين · {env==='home'?'🏠 المنزل':'🏋️ الصالة'}
             </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,marginBottom:20}}>
-              {filtered.map(ex=><ExerciseCard key={ex.id} ex={ex} onSelect={setSelected}/>)}
+              {filtered.map(ex=><ExerciseCard key={ex.id} ex={ex} onSelect={setSelected} sex={sex}/>)}
             </div>
           </>
         )}
@@ -507,7 +518,9 @@ export default function Exercises() {
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {stretches.map((s,i)=>(
-                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,padding:'14px 16px'}}>
+                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
+                      {s.id&&<img src={`/exercises/${s.id}-${sex}.png`} alt={s.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
+                      <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{s.name}</div>
                         <span style={{background:mc(muscle)+'18',border:`1px solid ${mc(muscle)}33`,color:mc(muscle),padding:'3px 9px',borderRadius:20,fontSize:'.65rem',fontWeight:700,whiteSpace:'nowrap',marginLeft:8,flexShrink:0}}>{s.duration}</span>
@@ -519,6 +532,7 @@ export default function Exercises() {
                           <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
                         </div>
                       ))}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -526,7 +540,6 @@ export default function Exercises() {
             ))}
           </div>
         )}
-      </div>
 
         {tab === 'warmup' && (
           <div>
@@ -538,7 +551,9 @@ export default function Exercises() {
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {routines.map((r,i) => (
-                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,padding:'14px 16px'}}>
+                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
+                      {r.id&&<img src={`/exercises/${r.id}-${sex}.png`} alt={r.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
+                      <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{r.name}</div>
                         <div style={{display:'flex',gap:6,flexShrink:0,marginLeft:10}}>
@@ -553,6 +568,7 @@ export default function Exercises() {
                           <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
                         </div>
                       ))}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -560,8 +576,9 @@ export default function Exercises() {
             ))}
           </div>
         )}
+      </div>
 
-      {selected && <ExerciseDetail ex={selected} onClose={()=>setSelected(null)}/>}
+      {selected && <ExerciseDetail ex={selected} onClose={()=>setSelected(null)} sex={sex}/>}
       <BottomTabs active="exercises"/>
     </div>
   )
