@@ -253,8 +253,20 @@ function ExerciseDetail({ ex, onClose }) {
           <button onClick={onClose} style={{background:'rgba(203,162,59,0.10)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:10,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'rgba(255,255,255,0.6)',fontSize:'1rem',flexShrink:0}}>✕</button>
         </div>
 
-        {/* GIF demonstration */}
+        {/* Exercise illustration / GIF demonstration */}
         <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,border:`1px solid ${color}25`,borderRadius:20,overflow:'hidden',marginBottom:16}}>
+          {ex.id ? (
+            <img
+              src={`/exercises/${ex.id}.png`}
+              alt={ex.name}
+              style={{width:'100%',display:'block',borderRadius:20}}
+              onError={e => {
+                e.target.style.display = 'none'
+                e.target.nextSibling && (e.target.nextSibling.style.display = 'block')
+              }}
+            />
+          ) : null}
+          <div style={{display: ex.id ? 'none' : 'block'}}>
           {ex.gifUrl ? (
             <GifPlayer src={ex.gifUrl} color={color} name={ex.name}/>
           ) : (
@@ -276,6 +288,7 @@ function ExerciseDetail({ ex, onClose }) {
               </div>
             </div>
           )}
+          </div>
           {/* Muscle activation tags */}
           <div style={{padding:'12px 16px',borderTop:`1px solid ${color}18`}}>
             <div style={{fontSize:'.58rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.2)',marginBottom:6}}>العضلات المُشغَّلة</div>
