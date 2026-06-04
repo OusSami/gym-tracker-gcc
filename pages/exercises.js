@@ -230,12 +230,22 @@ function ExerciseCard({ ex, onSelect }) {
       </div>
       {/* Info */}
       <div style={{padding:'10px 12px'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:5}}>
           <span style={{background:`${color}20`,color,padding:'2px 7px',borderRadius:20,fontSize:'.6rem',fontWeight:700,border:`1px solid ${color}33`}}>{SUB_AR[ex.sub]||ex.sub}</span>
           <span style={{fontSize:'.6rem',fontWeight:700,color:LEVEL_C[ex.level]||'#888'}}>{ex.level}</span>
         </div>
-        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',lineHeight:1.25,marginBottom:3}}>{ex.name}</div>
-        <div style={{fontSize:'.67rem',color:'rgba(255,255,255,0.3)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{ex.primary}</div>
+        {/* Arabic name */}
+        <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.92rem',lineHeight:1.25,marginBottom:2,direction:'rtl'}}>
+          {ex.name.includes('|') ? ex.name.split('|')[1].trim() : ex.name}
+        </div>
+        {/* English name */}
+        {ex.name.includes('|') && (
+          <div style={{fontFamily:"'DM Sans','Space Grotesk',sans-serif",fontWeight:500,fontSize:'.72rem',color:'rgba(255,255,255,0.35)',marginBottom:3}}>
+            {ex.name.split('|')[0].trim()}
+          </div>
+        )}
+        {/* Target muscle */}
+        <div style={{fontSize:'.65rem',color:`${color}bb`,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{ex.primary}</div>
       </div>
     </div>
   )
@@ -386,14 +396,22 @@ function ExerciseDetail({ ex, onClose }) {
 export default function Exercises() {
   const router = useRouter()
   const [user, setUser] = useState(null)
+  const [env, setEnv] = useState('home')   // 'home' | 'gym'
   const [cat, setCat] = useState('الكل')
   const [sub, setSub] = useState('الكل')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
-  const [tab, setTab] = useState('exercises') // exercises | stretching
+  const [tab, setTab] = useState('exercises')
 
-  // Get sub-muscles for selected category
-  const subOptions = cat === 'الكل' ? [] : ['الكل', ...new Set(EXERCISE_DB.filter(e=>e.category===cat).map(e=>e.sub))]
+  // Sub-muscles available in current env + category
+  const subOptions = cat === 'الكل' ? [] : [
+    'الكل',
+    ...new Set(
+      EXERCISE_DB
+        .filter(e => e.category===cat && (e.environment||'gym')===env)
+        .map(e => e.sub)
+    )
+  ]
 
   useEffect(() => {
     setSub('الكل')
@@ -401,12 +419,15 @@ export default function Exercises() {
       if (!session?.user) { router.push('/'); return }
       setUser(session.user)
     })
-  }, [cat])
+  }, [cat, env])
 
   const filtered = EXERCISE_DB.filter(ex =>
+    (e => e.environment||'gym')(ex) === env &&
     (cat==='الكل'||ex.category===cat) &&
     (sub==='الكل'||ex.sub===sub) &&
-    (ex.name.toLowerCase().includes(search.toLowerCase()) || ex.primary.toLowerCase().includes(search.toLowerCase()) || ex.sub.toLowerCase().includes(search.toLowerCase()))
+    (ex.name.toLowerCase().includes(search.toLowerCase()) ||
+     ex.primary.toLowerCase().includes(search.toLowerCase()) ||
+     ex.sub.toLowerCase().includes(search.toLowerCase()))
   )
 
   return (
@@ -433,6 +454,19 @@ export default function Exercises() {
 
         {tab === 'exercises' && (
           <>
+            {/* Home / Gym toggle */}
+            <div style={{display:'flex',gap:8,marginBottom:14}}>
+              {[['home','🏠 المنزل'],['gym','🏋️ الصالة']].map(([v,lbl])=>(
+                <button key={v} onClick={()=>{setEnv(v);setCat('الكل')}}
+                  style={{flex:1,padding:'10px 0',borderRadius:22,fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.9rem',cursor:'pointer',transition:'all .2s',
+                    background: env===v ? '#CBA23B' : 'rgba(255,255,255,0.04)',
+                    color:       env===v ? '#09090B' : 'rgba(255,255,255,0.45)',
+                    border:      env===v ? 'none'    : '1px solid rgba(255,255,255,0.1)',
+                  }}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
             <input type="text" placeholder="ابحث باسم التمرين أو العضلة…" value={search} onChange={e=>setSearch(e.target.value)} style={{marginBottom:12}}/>
             {/* Category filter */}
             <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:sub!=='الكل'||subOptions.length>0?8:12,scrollbarWidth:'none'}}>
@@ -454,7 +488,9 @@ export default function Exercises() {
                 ))}
               </div>
             )}
-            <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:10}}>{filtered.length} تمرين</div>
+            <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:10}}>
+              {filtered.length} تمرين · {env==='home'?'🏠 المنزل':'🏋️ الصالة'}
+            </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,marginBottom:20}}>
               {filtered.map(ex=><ExerciseCard key={ex.id} ex={ex} onSelect={setSelected}/>)}
             </div>
