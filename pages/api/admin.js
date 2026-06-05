@@ -154,9 +154,11 @@ export default async function handler(req, res) {
       const mStart = monthStart()
       const [profR, sessR, weightR, mealsR, costR, costEpR, appSessR, bodyR, authResult2] = await Promise.all([
         sb.from('profiles').select('*').eq('id', userId).single(),
-        sb.from('sessions').select('*').eq('user_id', userId).order('session_date', { ascending: false }),
+        // FIX: join exercises→sets so we can compute volume and set counts
+        sb.from('sessions').select('*, exercises(id,name,muscle,duration_seconds,sets(id,weight_kg,reps,set_number,duration_seconds))').eq('user_id', userId).order('session_date', { ascending: false }),
         sb.from('weight_history').select('weight_kg,recorded_at').eq('user_id', userId).order('recorded_at', { ascending: false }),
-        sb.from('meals').select('calories,protein_g,carbs_g,fat_g,created_at').eq('user_id', userId).order('created_at', { ascending: true }),
+        // FIX: column is total_calories not calories
+        sb.from('meals').select('total_calories,protein_g,carbs_g,fat_g,created_at').eq('user_id', userId).order('created_at', { ascending: true }),
         sb.from('api_usage').select('cost_usd,created_at').eq('user_id', userId),
         sb.from('api_usage').select('endpoint,cost_usd,created_at').eq('user_id', userId),
         sb.from('app_sessions').select('started_at,ended_at,duration_seconds').eq('user_id', userId).order('started_at', { ascending: false }).limit(50),
@@ -174,9 +176,12 @@ export default async function handler(req, res) {
       const allCosts = costEpR.data || []
       const appSessions = appSessR.data || []
 
-      // Stats
-      const totalVol = sessions.reduce((a, s) => a + (s.total_volume_kg || 0), 0)
-      const totalSets = sessions.reduce((a, s) => a + (s.exercises?.reduce((b, e) => b + (e.sets?.length || 0), 0) || 0), 0)
+      // FIX: compute volume from sets (total_volume_kg is not a DB column)
+      const sessionVolume = s => (s.exercises||[]).reduce((vol, ex) =>
+        vol + (ex.sets||[]).reduce((sv, set) => sv + ((set.weight_kg||0) * (set.reps||0)), 0), 0)
+
+      const totalVol = sessions.reduce((a, s) => a + sessionVolume(s), 0)
+      const totalSets = sessions.reduce((a, s) => a + (s.exercises||[]).reduce((b, e) => b + (e.sets?.length||0), 0), 0)
       const now = new Date(); now.setHours(0,0,0,0)
       const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
       const mAgo = new Date(now); mAgo.setDate(1)
@@ -417,6 +422,21 @@ export default async function handler(req, res) {
 
       await sb.from('user_programs').update({ status: 'paused' }).eq('id', program.id)
       return res.json({ success: true })
+    }
+
+    if (action === 'updateProfile' && userId) {
+      const allowed = ['full_name', 'goal', 'fitness_level', 'unit_system', 'waist_cm', 'height_cm', 'weight_kg']
+      const numeric = ['waist_cm', 'height_cm', 'weight_kg']
+      const updates = {}
+      allowed.forEach(k => {
+        if (req.body[k] !== undefined && req.body[k] !== '') {
+          updates[k] = numeric.includes(k) ? parseFloat(req.body[k]) : req.body[k]
+        }
+      })
+      if (!Object.keys(updates).length) return res.status(400).json({ error: 'لا توجد حقول للتحديث' })
+      const { data, error } = await sb.from('profiles').update(updates).eq('id', userId).select().single()
+      if (error) return res.status(500).json({ error: error.message })
+      return res.json({ success: true, profile: data })
     }
 
     return res.status(400).json({ error: 'Unknown action' })

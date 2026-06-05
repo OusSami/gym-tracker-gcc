@@ -33,6 +33,11 @@ export default function UserDetail() {
   const [targetDay, setTargetDay] = useState('')
   const [progMsg, setProgMsg] = useState(null) // { ok, text }
 
+  const [editMode, setEditMode] = useState(false)
+  const [editForm, setEditForm] = useState({})
+  const [editBusy, setEditBusy] = useState(false)
+  const [editMsg, setEditMsg] = useState(null)
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user || session.user.email !== ADMIN_EMAIL) { router.replace('/'); return }
@@ -50,6 +55,28 @@ export default function UserDetail() {
 
   const approve = async () => { setBusy('a'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'approve', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
   const suspend = async () => { if (!window.confirm('إيقاف؟')) return; setBusy('s'); await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suspend', userId: id }) }); const r = await fetch(`/api/admin?action=user_full&userId=${id}`); setD(await r.json()); setBusy(null) }
+
+  const saveProfile = async () => {
+    setEditBusy(true)
+    setEditMsg(null)
+    try {
+      const r = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateProfile', userId: id, ...editForm }),
+      })
+      const data = await r.json()
+      if (!r.ok) throw new Error(data.error || 'خطأ في الحفظ')
+      const r2 = await fetch(`/api/admin?action=user_full&userId=${id}`)
+      setD(await r2.json())
+      setEditMode(false)
+      setEditMsg({ ok: true, text: 'تم حفظ الملف الشخصي بنجاح' })
+      setTimeout(() => setEditMsg(null), 4000)
+    } catch (e) {
+      setEditMsg({ ok: false, text: e.message })
+    }
+    setEditBusy(false)
+  }
 
   const loadProg = async () => {
     if (progLoading) return
@@ -107,6 +134,7 @@ export default function UserDetail() {
         <div style={{ marginRight: 'auto', display: 'flex', gap: 8 }}>
           {d?.profile?.status !== 'approved' && <button onClick={approve} disabled={busy==='a'} style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', padding: '7px 14px', borderRadius: 9, cursor: 'pointer', fontSize: '.78rem', fontFamily: F }}>{busy==='a'?'...':'✓ قبول'}</button>}
           {d?.profile?.status !== 'suspended' && <button onClick={suspend} disabled={busy==='s'} style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', padding: '7px 14px', borderRadius: 9, cursor: 'pointer', fontSize: '.78rem', fontFamily: F }}>{busy==='s'?'...':'✕ إيقاف'}</button>}
+          {d && <button onClick={() => { if (editMode) { setEditMode(false) } else { setEditForm({ full_name: d.profile?.full_name || '', goal: d.profile?.goal || '', fitness_level: d.profile?.fitness_level || '', unit_system: d.profile?.unit_system || 'metric', waist_cm: d.profile?.waist_cm || '', height_cm: d.profile?.height_cm || '', weight_kg: d.profile?.weight_kg || '' }); setEditMode(true) } }} style={{ background: editMode ? 'rgba(203,162,59,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${editMode ? 'rgba(203,162,59,0.4)' : 'rgba(255,255,255,0.1)'}`, color: editMode ? G : 'rgba(255,255,255,0.5)', padding: '7px 14px', borderRadius: 9, cursor: 'pointer', fontSize: '.78rem', fontFamily: F }}>✎ تعديل الملف</button>}
         </div>
       </div>
 
@@ -118,28 +146,97 @@ export default function UserDetail() {
       ) : d && (
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 20px' }}>
 
+          {editMsg && (
+            <div style={{ marginBottom: 16, padding: '12px 16px', borderRadius: 12, background: editMsg.ok ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${editMsg.ok ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, color: editMsg.ok ? '#22c55e' : '#ef4444', fontWeight: 700, fontSize: '.88rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {editMsg.text}
+              <button onClick={() => setEditMsg(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+            </div>
+          )}
+
           {/* PROFILE HEADER CARD */}
           <div style={{ ...card, marginBottom: 20, display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(203,162,59,0.1)', border: `2px solid ${G}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', flexShrink: 0 }}>
               {d.profile?.full_name?.[0] || '?'}
             </div>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ fontWeight: 900, fontSize: '1.2rem', marginBottom: 4 }}>{d.profile?.full_name || 'بدون اسم'}</div>
-              <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>{d.profile?.email}</div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                {[
-                  ['الهدف', GOAL_AR[d.profile?.goal] || d.profile?.goal || '—'],
-                  ['المستوى', d.profile?.fitness_level || '—'],
-                  ['وحدة القياس', d.profile?.unit_system === 'imperial' ? 'رطل' : 'كجم'],
-                  ['تاريخ الانضمام', d.profile?.created_at ? new Date(d.profile.created_at).toLocaleDateString('ar-SA') : '—'],
-                ].map(([k, v]) => (
-                  <div key={k} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '5px 12px', fontSize: '.75rem' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>{k}: </span>
-                    <span style={{ fontWeight: 600 }}>{v}</span>
+            {editMode ? (
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>الاسم الكامل</div>
+                    <input value={editForm.full_name} onChange={e => setEditForm(f => ({...f, full_name: e.target.value}))}
+                      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }} />
                   </div>
-                ))}
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>الهدف</div>
+                    <select value={editForm.goal} onChange={e => setEditForm(f => ({...f, goal: e.target.value}))}
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }}>
+                      <option value="" style={{ background: '#1a1a0e' }}>—</option>
+                      <option value="muscle" style={{ background: '#1a1a0e' }}>بناء عضل</option>
+                      <option value="weight" style={{ background: '#1a1a0e' }}>خفض دهون</option>
+                      <option value="strength" style={{ background: '#1a1a0e' }}>قوة</option>
+                      <option value="endurance" style={{ background: '#1a1a0e' }}>تحمل</option>
+                      <option value="general" style={{ background: '#1a1a0e' }}>لياقة عامة</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>المستوى</div>
+                    <input value={editForm.fitness_level} onChange={e => setEditForm(f => ({...f, fitness_level: e.target.value}))}
+                      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>وحدة القياس</div>
+                    <select value={editForm.unit_system} onChange={e => setEditForm(f => ({...f, unit_system: e.target.value}))}
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }}>
+                      <option value="metric" style={{ background: '#1a1a0e' }}>كجم / سم</option>
+                      <option value="imperial" style={{ background: '#1a1a0e' }}>رطل / بوصة</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>الخصر (سم)</div>
+                    <input type="number" value={editForm.waist_cm} onChange={e => setEditForm(f => ({...f, waist_cm: e.target.value}))}
+                      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>الطول (سم)</div>
+                    <input type="number" value={editForm.height_cm} onChange={e => setEditForm(f => ({...f, height_cm: e.target.value}))}
+                      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)', marginBottom: 4, fontWeight: 700 }}>الوزن (كجم)</div>
+                    <input type="number" value={editForm.weight_kg} onChange={e => setEditForm(f => ({...f, weight_kg: e.target.value}))}
+                      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#ECE3CF', fontFamily: F, fontSize: '.82rem', outline: 'none' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={saveProfile} disabled={editBusy}
+                    style={{ background: G, color: '#09090B', border: 'none', borderRadius: 9, padding: '8px 20px', fontFamily: F, fontWeight: 900, fontSize: '.82rem', cursor: 'pointer' }}>
+                    {editBusy ? '...' : 'حفظ التعديلات'}
+                  </button>
+                  <button onClick={() => { setEditMode(false); setEditMsg(null) }} disabled={editBusy}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', borderRadius: 9, padding: '8px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                    إلغاء
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ fontWeight: 900, fontSize: '1.2rem', marginBottom: 4 }}>{d.profile?.full_name || 'بدون اسم'}</div>
+                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>{d.profile?.email}</div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  {[
+                    ['الهدف', GOAL_AR[d.profile?.goal] || d.profile?.goal || '—'],
+                    ['المستوى', d.profile?.fitness_level || '—'],
+                    ['وحدة القياس', d.profile?.unit_system === 'imperial' ? 'رطل' : 'كجم'],
+                    ['تاريخ الانضمام', d.profile?.created_at ? new Date(d.profile.created_at).toLocaleDateString('ar-SA') : '—'],
+                  ].map(([k, v]) => (
+                    <div key={k} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '5px 12px', fontSize: '.75rem' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.35)' }}>{k}: </span>
+                      <span style={{ fontWeight: 600 }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* Quick KPIs */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, minWidth: 400 }}>
               {[
