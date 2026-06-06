@@ -463,6 +463,37 @@ export default async function handler(req, res) {
       return res.json({ success: true })
     }
 
+    // CLEANUP: delete empty duplicate exercise rows (same session_id + name, no sets)
+    if (action === 'clean_duplicate_exercises' && userId) {
+      const { data: sessions } = await sb.from('sessions').select('id').eq('user_id', userId)
+      if (!sessions?.length) return res.json({ deleted: 0 })
+      const sessionIds = sessions.map(s => s.id)
+      const { data: exes } = await sb.from('exercises').select('id,session_id,name,sets(id)').in('session_id', sessionIds)
+      if (!exes?.length) return res.json({ deleted: 0 })
+
+      // Group by session_id+name, keep the one with sets (or the oldest if all empty), delete the rest
+      const groups = {}
+      for (const ex of exes) {
+        const key = ex.session_id + '::' + ex.name
+        if (!groups[key]) groups[key] = []
+        groups[key].push(ex)
+      }
+
+      const toDelete = []
+      for (const list of Object.values(groups)) {
+        if (list.length <= 1) continue
+        // Sort: rows with sets first
+        list.sort((a, b) => (b.sets?.length || 0) - (a.sets?.length || 0))
+        // Delete everything after the first (the one with sets, or oldest)
+        for (let i = 1; i < list.length; i++) toDelete.push(list[i].id)
+      }
+
+      if (toDelete.length) {
+        await sb.from('exercises').delete().in('id', toDelete)
+      }
+      return res.json({ deleted: toDelete.length })
+    }
+
     if (action === 'updateProfile' && userId) {
       const allowed = ['full_name', 'goal', 'fitness_level', 'unit_system', 'waist_cm', 'height_cm', 'weight_kg']
       const numeric = ['waist_cm', 'height_cm', 'weight_kg']

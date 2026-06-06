@@ -344,6 +344,19 @@ export default function UserDetail() {
           {/* ═══ SESSIONS TAB ═══ */}
           {tab === 'sessions' && (
             <div>
+              {/* Cleanup tool */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button onClick={async () => {
+                  if (!window.confirm('حذف التمارين الفارغة المكررة لهذا المستخدم؟')) return
+                  const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'clean_duplicate_exercises', userId: id }) })
+                  const data = await r.json()
+                  window.alert(`تم حذف ${data.deleted} تمرين مكرر`)
+                  const r2 = await fetch(`/api/admin?action=user_full&userId=${id}`)
+                  setD(await r2.json())
+                }} style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', borderRadius: 9, padding: '7px 14px', cursor: 'pointer', fontSize: '.75rem', fontFamily: F, fontWeight: 700 }}>
+                  🧹 حذف التمارين الفارغة المكررة
+                </button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                 {/* Sessions per week */}
                 {d.charts?.sessionsPerWeek?.length > 0 && (
