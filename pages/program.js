@@ -764,16 +764,35 @@ export default function Program() {
             <div style={{background:isRest?'linear-gradient(135deg,rgba(59,130,246,0.07),rgba(59,130,246,0.02))':'linear-gradient(135deg,rgba(203,162,59,0.08),rgba(203,162,59,0.02))',border:`1px solid ${isRest?'rgba(59,130,246,0.2)':`${G}28`}`,borderRadius:20,padding:'20px',marginBottom:14,boxShadow:isRest?'none':'0 4px 24px rgba(203,162,59,0.06)'}}>
               <div style={{fontSize:'.62rem',fontWeight:700,color:isRest?'#3b82f6':G,letterSpacing:1.5,marginBottom:5,textTransform:'uppercase'}}>اليوم {currentDay} — {todayTarget.day_type||'تمرين'}</div>
               <div style={{fontWeight:800,fontSize:'1rem',marginBottom:8}}>{todayTarget.daily_focus||'ركّز على الأداء الصحيح'}</div>
-              {!isRest&&(
-                <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}>
-                  {[[todayTarget.session_type||'لياقة','النوع'],[(todayTarget.intensity_target||5)+'/10','الشدة'],[(todayTarget.estimated_duration_min||30)+' د','المدة'],[(todayTarget.sets_target||10)+' مجموعة','الحجم']].map(([v,l])=>(
-                    <div key={l} style={{background:'rgba(0,0,0,0.3)',borderRadius:9,padding:'6px 10px',textAlign:'center'}}>
-                      <div style={{fontWeight:800,fontSize:'.82rem',color:G}}>{v}</div>
-                      <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {!isRest&&(()=>{
+                const gauges=[
+                  {label:'الشدة',  display:(todayTarget.intensity_target||5)+'/10',       pct:((todayTarget.intensity_target||5)/10)*100,                          color:'#ef4444'},
+                  {label:'المدة',  display:(todayTarget.estimated_duration_min||30)+'د',  pct:Math.min(100,((todayTarget.estimated_duration_min||30)/60)*100),    color:'#3b82f6'},
+                  {label:'الحجم',  display:(todayTarget.sets_target||10)+'م',             pct:Math.min(100,((todayTarget.sets_target||10)/24)*100),               color:G},
+                  {label:'النوع',  display:(todayTarget.session_type||'لياقة').slice(0,5),pct:100,                                                                color:'#22c55e'},
+                ]
+                const R=22,CIRC=2*Math.PI*R
+                return(
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:14}}>
+                    {gauges.map(({label,display,pct,color})=>(
+                      <div key={label} style={{textAlign:'center'}}>
+                        <div style={{position:'relative',width:58,height:58,margin:'0 auto 5px'}}>
+                          <svg width="58" height="58" viewBox="0 0 58 58" style={{transform:'rotate(-90deg)'}}>
+                            <circle cx="29" cy="29" r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5"/>
+                            <circle cx="29" cy="29" r={R} fill="none" stroke={color} strokeWidth="5"
+                              strokeDasharray={`${(pct/100)*CIRC} ${CIRC}`} strokeLinecap="round"
+                              style={{filter:`drop-shadow(0 0 5px ${color}60)`,transition:'stroke-dasharray .7s ease'}}/>
+                          </svg>
+                          <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <span style={{fontFamily:'monospace',fontWeight:900,fontSize:display.length>4?'.52rem':'.65rem',color,lineHeight:1.1,textAlign:'center'}}>{display}</span>
+                          </div>
+                        </div>
+                        <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.4)',fontWeight:600}}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
               {todayTarget.coach_tip&&<div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.5)',background:'rgba(0,0,0,0.2)',borderRadius:9,padding:'9px 12px',marginBottom:12,lineHeight:1.6}}>💬 {todayTarget.coach_tip}</div>}
 
               {checkinDone?(
@@ -1142,16 +1161,35 @@ export default function Program() {
             <div style={{background:isRest?'linear-gradient(135deg,rgba(59,130,246,0.07),rgba(59,130,246,0.02))':'linear-gradient(135deg,rgba(203,162,59,0.08),rgba(203,162,59,0.02))',border:`1px solid ${isRest?'rgba(59,130,246,0.2)':`${G}28`}`,borderRadius:20,padding:'20px',marginBottom:14,boxShadow:isRest?'none':'0 4px 24px rgba(203,162,59,0.06)'}}>
               <div style={{fontSize:'.62rem',fontWeight:700,color:isRest?'#3b82f6':G,letterSpacing:1.5,marginBottom:5,textTransform:'uppercase'}}>اليوم {currentDay} — {todayTarget.day_type||'تمرين'}</div>
               <div style={{fontWeight:800,fontSize:'1rem',marginBottom:8}}>{todayTarget.daily_focus||'ركّز على الأداء الصحيح'}</div>
-              {!isRest&&(
-                <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}>
-                  {[[todayTarget.session_type||'لياقة','النوع'],[(todayTarget.intensity_target||5)+'/10','الشدة'],[(todayTarget.estimated_duration_min||30)+' د','المدة'],[(todayTarget.sets_target||10)+' مجموعة','الحجم']].map(([v,l])=>(
-                    <div key={l} style={{background:'rgba(0,0,0,0.3)',borderRadius:9,padding:'6px 10px',textAlign:'center'}}>
-                      <div style={{fontWeight:800,fontSize:'.82rem',color:G}}>{v}</div>
-                      <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {!isRest&&(()=>{
+                const gauges=[
+                  {label:'الشدة',  display:(todayTarget.intensity_target||5)+'/10',       pct:((todayTarget.intensity_target||5)/10)*100,                          color:'#ef4444'},
+                  {label:'المدة',  display:(todayTarget.estimated_duration_min||30)+'د',  pct:Math.min(100,((todayTarget.estimated_duration_min||30)/60)*100),    color:'#3b82f6'},
+                  {label:'الحجم',  display:(todayTarget.sets_target||10)+'م',             pct:Math.min(100,((todayTarget.sets_target||10)/24)*100),               color:G},
+                  {label:'النوع',  display:(todayTarget.session_type||'لياقة').slice(0,5),pct:100,                                                                color:'#22c55e'},
+                ]
+                const R=22,CIRC=2*Math.PI*R
+                return(
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:14}}>
+                    {gauges.map(({label,display,pct,color})=>(
+                      <div key={label} style={{textAlign:'center'}}>
+                        <div style={{position:'relative',width:58,height:58,margin:'0 auto 5px'}}>
+                          <svg width="58" height="58" viewBox="0 0 58 58" style={{transform:'rotate(-90deg)'}}>
+                            <circle cx="29" cy="29" r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5"/>
+                            <circle cx="29" cy="29" r={R} fill="none" stroke={color} strokeWidth="5"
+                              strokeDasharray={`${(pct/100)*CIRC} ${CIRC}`} strokeLinecap="round"
+                              style={{filter:`drop-shadow(0 0 5px ${color}60)`,transition:'stroke-dasharray .7s ease'}}/>
+                          </svg>
+                          <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <span style={{fontFamily:'monospace',fontWeight:900,fontSize:display.length>4?'.52rem':'.65rem',color,lineHeight:1.1,textAlign:'center'}}>{display}</span>
+                          </div>
+                        </div>
+                        <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.4)',fontWeight:600}}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
               {todayTarget.coach_tip&&<div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.5)',background:'rgba(0,0,0,0.2)',borderRadius:9,padding:'9px 12px',marginBottom:12,lineHeight:1.6}}>💬 {todayTarget.coach_tip}</div>}
 
               {checkinDone?(
