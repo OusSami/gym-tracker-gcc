@@ -997,9 +997,8 @@ function HomeScreen({ user, quote, onStart, router }) {
       fetch('/api/weight?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/profile?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/packages/status?userId=' + uid).then(r => r.json()).catch(() => ({})),
-      supabase.from('meals').select('total_calories,protein_g,carbs_g,fat_g').eq('user_id', uid).eq('meal_date', new Date().toISOString().split('T')[0]),
-    ]).then(([sd, wd, pd, prog, mealRes]) => {
-      const md = mealRes
+    ]).then(([sd, wd, pd, prog]) => {
+      const md = {}
       if (prog?.program) setActiveProgram(prog)
       const sessions = sd.sessions || []
       // Streak: consecutive days with at least one session
@@ -1047,13 +1046,23 @@ function HomeScreen({ user, quote, onStart, router }) {
       const bfPct = pd?.profile?.body_fat_pct || null
       const bmi = pd?.profile?.weight_kg && pd?.profile?.height_cm
         ? Math.round(pd.profile.weight_kg / Math.pow(pd.profile.height_cm/100,2) * 10)/10 : null
-      const meals = md?.data || []
-      const todayCalories = meals.reduce((s, m) => s + (m.total_calories || 0), 0)
-      const todayProtein = Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0))
-      const todayCarbs = Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0))
-      const todayFat = Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0))
-      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex, todayCalories, todayProtein, todayCarbs, todayFat })
+      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex, todayCalories: 0, todayProtein: 0, todayCarbs: 0, todayFat: 0 })
     }).catch(() => {})
+
+    // Fetch meals via API (uses admin client, bypasses RLS)
+    const todayDate = new Date().toISOString().split('T')[0]
+    fetch('/api/meals?userId=' + uid + '&date=' + todayDate)
+      .then(async r => {
+        if (!r.ok) return
+        const data = await r.json()
+        const meals = data.meals || []
+        const todayCalories = meals.reduce((s, m) => s + (m.total_calories || 0), 0)
+        const todayProtein = Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0))
+        const todayCarbs = Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0))
+        const todayFat = Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0))
+        setHomeData(prev => prev ? { ...prev, todayCalories, todayProtein, todayCarbs, todayFat } : prev)
+      })
+      .catch(() => {})
   }, [user?.id])
 
   const d = homeData
