@@ -682,24 +682,51 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.35)',textAlign:'center',marginBottom:14}}>تمرين {exIdx+1} من {exercises.length}</div>
 
       {/* Exercise card */}
-      <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}22`,borderRadius:18,padding:'16px',marginBottom:12}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-          <div>
-            <div style={{fontWeight:900,fontSize:'1rem',marginBottom:1}}>{(ex.name||'').split('|')[0].trim()}</div>
-            {ex.name?.includes('|')&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginBottom:3}}>{ex.name.split('|')[1]?.trim()}</div>}
-            <div style={{fontSize:'.72rem',color:G}}>{ex.muscle}</div>
+      <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}22`,borderRadius:18,marginBottom:12,overflow:'hidden'}}>
+        {/* Exercise image */}
+        {ex.imageKey && (
+          <div style={{position:'relative',width:'100%',height:170,background:'rgba(0,0,0,0.5)',overflow:'hidden'}}>
+            <img
+              src={`/exercises/${ex.imageKey}-${workout.sex==='female'?'female':'male'}.png`}
+              alt={ex.name}
+              onError={e=>{e.target.parentNode.style.display='none'}}
+              style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',opacity:.85}}/>
+            <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent 40%,rgba(9,9,11,0.95))'}}/>
+            <div style={{position:'absolute',bottom:10,right:14,display:'flex',gap:6,alignItems:'center'}}>
+              <span style={{fontSize:'.68rem',fontWeight:700,color:G,background:'rgba(0,0,0,0.55)',padding:'3px 10px',borderRadius:20,backdropFilter:'blur(4px)'}}>{ex.muscle}</span>
+            </div>
           </div>
-          <div style={{background:`${G}18`,borderRadius:10,padding:'6px 12px',textAlign:'center'}}>
-            <div style={{fontWeight:900,fontSize:'.95rem',color:G,fontFamily:'monospace'}}>{ex.sets}×{ex.reps}</div>
-            <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.35)'}}>هدف</div>
+        )}
+        <div style={{padding:'14px 16px'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+            <div>
+              <div style={{fontWeight:900,fontSize:'1rem',marginBottom:1}}>{(ex.name||'').split('|')[0].trim()}</div>
+              {ex.name?.includes('|')&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginBottom:3}}>{ex.name.split('|')[1]?.trim()}</div>}
+              {!ex.imageKey&&<div style={{fontSize:'.72rem',color:G}}>{ex.muscle}</div>}
+            </div>
+            <div style={{background:`${G}18`,borderRadius:10,padding:'6px 12px',textAlign:'center',flexShrink:0}}>
+              <div style={{fontWeight:900,fontSize:'.95rem',color:G,fontFamily:'monospace'}}>{ex.sets}×{ex.reps}</div>
+              <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.35)'}}>هدف</div>
+            </div>
           </div>
+          {/* Steps */}
+          {ex.steps?.length>0&&(
+            <div style={{background:'rgba(0,0,0,0.2)',borderRadius:10,padding:'10px 12px',marginBottom:10}}>
+              {ex.steps.map((s,i)=>(
+                <div key={i} style={{display:'flex',gap:8,alignItems:'flex-start',marginBottom:i<ex.steps.length-1?6:0,fontSize:'.76rem',color:'rgba(255,255,255,0.55)',lineHeight:1.5}}>
+                  <span style={{color:G,fontWeight:900,fontSize:'.7rem',minWidth:16,marginTop:1}}>{i+1}.</span>
+                  <span>{s}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {ex.tip&&<div style={{background:'rgba(203,162,59,0.06)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:9,padding:'7px 12px',fontSize:'.75rem',color:`${G}cc`,lineHeight:1.55,marginBottom:10}}>💡 {ex.tip}</div>}
+          {/* Set dots */}
+          <div style={{display:'flex',gap:5,marginBottom:3}}>
+            {Array.from({length:ex.sets},(_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<setIdx?'#22c55e':i===setIdx?G:'rgba(255,255,255,0.08)',transition:'background .25s'}}/>)}
+          </div>
+          <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)'}}>المجموعة {setIdx+1} من {ex.sets}</div>
         </div>
-        {ex.tip&&<div style={{background:'rgba(0,0,0,0.25)',borderRadius:9,padding:'7px 12px',fontSize:'.76rem',color:'rgba(255,255,255,0.5)',lineHeight:1.55,marginBottom:10}}>💡 {ex.tip}</div>}
-        {/* Set dots */}
-        <div style={{display:'flex',gap:5,marginBottom:3}}>
-          {Array.from({length:ex.sets},(_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<setIdx?'#22c55e':i===setIdx?G:'rgba(255,255,255,0.08)',transition:'background .25s'}}/>)}
-        </div>
-        <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)'}}>المجموعة {setIdx+1} من {ex.sets}</div>
       </div>
 
       {/* Reps input */}
