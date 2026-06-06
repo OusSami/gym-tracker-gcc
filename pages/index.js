@@ -1300,8 +1300,6 @@ function HomeScreen({ user, quote, onStart, router }) {
                 style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'12px 11px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:8}}
                 onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
                 onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                {/* Top glow line */}
-                <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${arcColor}66,transparent)`}}/>
                 {/* Label */}
                 <div style={{fontSize:'.52rem',color:'rgba(203,162,59,0.55)',fontWeight:700,letterSpacing:2,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif"}}>CALORIES</div>
                 {/* Ring + number */}
