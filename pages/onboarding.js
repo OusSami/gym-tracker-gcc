@@ -348,14 +348,18 @@ export default function Onboarding() {
           {/* ══ STEP 6: BODY SHAPE ══ */}
           {step === 6 && (
             <div className="fu">
-              <h2 style={{ fontSize:'1.3rem', fontWeight:900, marginBottom:6 }}>{STEPS[5].q}</h2>
-              <p style={{ fontSize:'.83rem', color:'rgba(255,255,255,0.4)', marginBottom:28 }}>{STEPS[5].sub}</p>
+              <h2 style={{ fontSize:'1.3rem', fontWeight:900, marginBottom:6 }}>{STEPS[6].q}</h2>
+              <p style={{ fontSize:'.83rem', color:'rgba(255,255,255,0.4)', marginBottom:28 }}>{STEPS[6].sub}</p>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
                 {(form.sex==='female'?BODY_SHAPES_F:BODY_SHAPES_M).map(b=>(
-                  <div key={b.id} onClick={()=>{set('bodyShape',b.id); setTimeout(()=>setStep(6),300)}}
-                    style={{ padding:'20px 14px', textAlign:'center', background:form.bodyShape===b.id?'rgba(203,162,59,0.12)':'rgba(255,255,255,0.03)', border:`1px solid ${form.bodyShape===b.id?'rgba(203,162,59,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:18, cursor:'pointer', transition:'all .2s' }}>
-                    <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
-                      {b.id==='belly'||b.id==='obese' ? <SilhouetteMaleBelly filled={form.bodyShape===b.id}/> : <SilhouetteMale filled={form.bodyShape===b.id}/>}
+                  <div key={b.id} onClick={()=>{set('bodyShape',b.id); setTimeout(()=>setStep(7),300)}}
+                    style={{ padding:'16px 14px 18px', textAlign:'center', background:form.bodyShape===b.id?'rgba(203,162,59,0.12)':'rgba(255,255,255,0.03)', border:`1px solid ${form.bodyShape===b.id?'rgba(203,162,59,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:18, cursor:'pointer', transition:'all .2s' }}>
+                    <div style={{ display:'flex', justifyContent:'center', marginBottom:10, height:110, alignItems:'flex-end' }}>
+                      <img
+                        src={`/body-shapes/${b.id}-${form.sex === 'female' ? 'female' : 'male'}.png`}
+                        alt={b.label}
+                        style={{ height:100, width:100, objectFit:'contain', borderRadius:12, opacity: form.bodyShape===b.id ? 1 : 0.65, transition:'opacity .2s' }}
+                      />
                     </div>
                     <div style={{ fontWeight:800, fontSize:'.88rem', color:form.bodyShape===b.id?G:'#ECE3CF', marginBottom:3 }}>{b.label}</div>
                     <div style={{ fontSize:'.7rem', color:'rgba(255,255,255,0.4)' }}>{b.desc}</div>
@@ -407,7 +411,7 @@ export default function Onboarding() {
         </div>
 
         {/* NEXT BUTTON (for steps that need it) */}
-        {[2, 4, 5].includes(step) && (
+        {[2, 4, 5, 6].includes(step) && (
           <div style={{ flexShrink:0, paddingBottom:20 }}>
             <button onClick={()=>setStep(s=>s+1)} disabled={!canNext}
               style={{ width:'100%', background:canNext?G:'rgba(255,255,255,0.06)', color:canNext?'#09090B':'rgba(255,255,255,0.2)', border:'none', borderRadius:14, padding:'15px', fontFamily:F, fontWeight:900, fontSize:'.98rem', cursor:canNext?'pointer':'not-allowed', transition:'all .2s', boxShadow:canNext?`0 4px 20px rgba(203,162,59,0.28)`:'none' }}>
