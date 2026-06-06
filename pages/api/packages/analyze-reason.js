@@ -85,7 +85,13 @@ ${conditionsText}
 وصف المستخدم: "${reasonText}"
 
 قواعد التقييم:
-- ألم في الصدر أو ضيق تنفس أو دوار أو إغماء = urgent + medical_warning = true دائماً
+- ألم في الصدر أو ضغط على الصدر أو نبض غير منتظم = urgent + medical_warning = true + suggest_health_condition = heart
+- ضيق تنفس حاد أو دوار أو إغماء = urgent + medical_warning = true دائماً
+- صعوبة تنفس متكررة أثناء التمرين (بدون ألم صدر) = suggest_health_condition = asthma
+- دوار مستمر مرتبط بارتفاع ضغط الدم = suggest_health_condition = hypertension
+- ألم في الركبة أو الضغط عليها = suggest_health_condition = knee_pain
+- ألم في الظهر أو أسفل الظهر = suggest_health_condition = back_pain
+- ألم في الكتف أو مفصل الكتف = suggest_health_condition = shoulder_pain
 - ألم حاد مفاجئ = high severity
 - ألم مزمن معروف = moderate severity
 - إزعاج خفيف أو تعب عضلي = low severity
@@ -101,7 +107,7 @@ ${conditionsText}
   "safe_alternatives": ["تمرين بديل آمن بالعربية 1", "تمرين بديل آمن بالعربية 2"],
   "exercises_to_avoid": ["keyword1", "keyword2"],
   "adapt_level": "same|easier|recovery|stop",
-  "suggest_health_condition": "knee_pain|back_pain|shoulder_pain|null",
+  "suggest_health_condition": "knee_pain|back_pain|shoulder_pain|heart|hypertension|asthma|null",
   "suggest_extend_days": 0,
   "coach_reply": "رد مباشر وصادق للمستخدم بالعربية الخليجية — حدد المشكلة واذكر ما يجب فعله",
   "medical_warning": false,

@@ -57,15 +57,18 @@ export default async function handler(req, res) {
     .single()
 
   const baseCals  = profile?.calorie_target || 1800
+  const conditions   = profile?.health_conditions || []
+  const isPregnant   = conditions.includes('pregnancy')
   // Gradual deficit: Week 1 = maintenance, Week 2 = -150, Week 3+ = -300
+  // No deficit during pregnancy — caloric restriction is harmful
   const { data: prog } = await sb.from('user_programs')
     .select('current_day').eq('user_id', userId).eq('status','active').single()
   const weekNum = prog?.current_day ? Math.ceil(prog.current_day / 7) : 1
-  const deficit = weekNum === 1 ? 0 : weekNum === 2 ? 150 : 300
-  const totalCals = Math.max(1200, baseCals - deficit)
+  const deficit = isPregnant ? 0 : (weekNum === 1 ? 0 : weekNum === 2 ? 150 : 300)
+  // Pregnancy needs at least 1800 kcal; never restrict below that
+  const totalCals = isPregnant ? Math.max(1800, baseCals) : Math.max(1200, baseCals - deficit)
   const weight       = profile?.weight_kg || 75
   const proteinTotal = Math.round(weight * 1.6)
-  const conditions   = profile?.health_conditions || []
 
   const plan = []
   const seed = Math.floor(Date.now() / 86400000) // changes daily
@@ -89,11 +92,24 @@ export default async function handler(req, res) {
         // Pick by daily seed for variety
         const idx = (seed + plan.length * 7 + Object.keys(MEAL_STRUCTURE).indexOf(mealTime)) % foods.length
 
-        // Apply health filters
+        // Apply health filters — order matters (most restrictive first, fallback to full list)
         let candidates = foods
-        if (conditions.includes('diabetes'))    candidates = foods.filter(f => (f.carbs_g || 0) <= 40)
-        if (conditions.includes('cholesterol')) candidates = foods.filter(f => (f.fat_g || 0) <= 10)
-        if (conditions.includes('hypertension')) candidates = foods.filter(f => !f.name_ar?.includes('مملح'))
+        if (conditions.includes('diabetes'))
+          candidates = foods.filter(f => (f.carbs_g || 0) <= 40)
+        if (conditions.includes('cholesterol') || conditions.includes('heart'))
+          candidates = (candidates.length ? candidates : foods).filter(f => (f.fat_g || 0) <= 12)
+        if (conditions.includes('hypertension'))
+          candidates = (candidates.length ? candidates : foods).filter(f =>
+            !f.name_ar?.includes('مملح') && !f.name_ar?.includes('مقلي') && !f.name_ar?.includes('مخلل'))
+        if (conditions.includes('pregnancy'))
+          candidates = (candidates.length ? candidates : foods).filter(f =>
+            !f.name_ar?.includes('نيء') && !f.name_ar?.includes('سوشي') &&
+            !f.name_ar?.includes('كيلو') && !f.name_en?.toLowerCase().includes('raw') &&
+            !f.name_en?.toLowerCase().includes('sushi') && !f.name_en?.toLowerCase().includes('tuna') &&
+            !f.name_en?.toLowerCase().includes('swordfish'))
+        if (conditions.includes('asthma'))
+          candidates = (candidates.length ? candidates : foods).filter(f =>
+            !f.name_ar?.includes('مكرونة جافة') && !f.name_en?.toLowerCase().includes('sulfite'))
         if (!candidates.length) candidates = foods
 
         found = candidates[idx % candidates.length]
@@ -141,18 +157,27 @@ export default async function handler(req, res) {
     }
   }
 
-  // Tip based on goal
+  // Tip based on goal — overridden by health conditions when present
   const tips = {
     weight: 'ركّز على البروتين في كل وجبة — يساعد على الشبع وحفظ العضل مع الحمية',
     muscle: 'تأكد من الكمية الكافية من السعرات لدعم بناء العضل — خصوصاً بعد التمرين',
     general: 'الأكل المتوازن من مطبخك الخليجي هو أفضل حمية — التزم بالكميات',
   }
+  let tip = tips[profile?.goal || 'general']
+  if (isPregnant)
+    tip = 'أثناء الحمل ركّزي على البروتين والحديد وحمض الفوليك. تجنبي الأسماك النيئة والتونة بكميات كبيرة. استشيري طبيبك دائماً قبل أي تغيير غذائي.'
+  else if (conditions.includes('heart'))
+    tip = 'ركّز على الدهون الصحية (زيت الزيتون، المكسرات) وتجنب الصوديوم العالي والمقليات — نظام البحر الأبيض المتوسط مثالي لصحة القلب.'
+  else if (conditions.includes('hypertension'))
+    tip = 'قلل الملح والمواد المصنّعة. أكثر من الخضار والبوتاسيوم (موز، أفوكادو). تجنب الأكل الجاهز والمخللات.'
+  else if (conditions.includes('asthma'))
+    tip = 'تجنب الأكل الثقيل قبل التمرين بأقل من ساعتين. الأطعمة المضادة للالتهاب كالزنجبيل والكركم مفيدة.'
 
   return res.json({
     date: new Date().toISOString().split('T')[0],
     total_calories: totalCals,
     total_protein: proteinTotal,
     plan,
-    tip: tips[profile?.goal || 'general'],
+    tip,
   })
 }
