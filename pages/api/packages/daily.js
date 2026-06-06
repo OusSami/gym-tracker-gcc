@@ -107,31 +107,31 @@ const WARMUP_ALL = [
 const COOLDOWN = [
   {
     name:'تمديد البطن | Cobra Stretch', duration_seconds:35,
-    imageKey:null, target:'البطن · الظهر السفلي',
+    imageKey:'w-cat-cow', target:'البطن · الظهر السفلي',
     instructions:'استلقِ وارفع صدرك للأعلى',
     steps:['استلقِ على بطنك مع وضع يديك أسفل كتفيك','ارفع صدرك للأعلى ببطء مع تمديد الظهر','حافظ على الحوض في الأرض','ابقَ ٥ ثوانٍ ثم خفّض واكرر'],
   },
   {
     name:'تمديد الأرجل | Hamstring Stretch', duration_seconds:35,
-    imageKey:null, target:'أوتار الركبة · الفخذين',
+    imageKey:'w-pelvic-tilt', target:'أوتار الركبة · الفخذين',
     instructions:'مدّ ساقيك وانحنِ للأمام',
     steps:['اجلس على الأرض مع مد ساقيك للأمام','انحنِ ببطء نحو قدميك دون تقوس الركبة','حافظ على الظهر مستقيماً','ابقَ في هذا الوضع ١٠ ثوانٍ وكرر'],
   },
   {
     name:'تمديد الكتفين | Shoulder Stretch', duration_seconds:30,
-    imageKey:null, target:'الكتفين · الصدر',
+    imageKey:'w-shoulder-swing', target:'الكتفين · الصدر',
     instructions:'شبّك يديك خلف ظهرك وارفعهما',
     steps:['قف مستقيماً وشبّك أصابع يديك خلف ظهرك','ارفع يديك ببطء حتى تشعر بتمديد في الصدر','أبقِ الذقن مرتفعاً والكتفين متراجعين','ابقَ ١٠ ثوانٍ ثم أرخِ واكرر'],
   },
   {
     name:'وضع الطفل | Child Pose', duration_seconds:45,
-    imageKey:null, target:'الظهر الكامل · الكتفين',
+    imageKey:'w-bird-dog', target:'الظهر الكامل · الكتفين',
     instructions:'اجلس على كعبيك ومدّ يديك للأمام',
     steps:['ابدأ في وضع الركوع على ركبتيك','اجلس للخلف على كعبيك','مدّ يديك للأمام واخفض جبهتك للأرض','تنفس ببطء وابقَ في هذا الوضع'],
   },
   {
     name:'تمديد الأرداف | Glute Stretch', duration_seconds:30,
-    imageKey:null, target:'الأرداف · الوركين',
+    imageKey:'w-glute-bridge', target:'الأرداف · الوركين',
     instructions:'استلقِ وضع ساقك على ركبتك',
     steps:['استلقِ على ظهرك وثنِ ركبتيك','ضع كاحل ساقك اليمنى على ركبتك اليسرى','شبّك يديك خلف فخذك اليسرى واسحب','ابقَ ١٠ ثوانٍ ثم غيّر الجانب'],
   },
@@ -403,7 +403,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     nutrition_reminder: nutrition,
     estimated_duration_min: duration,
     sex,
-    v: 4, // bump when workout structure changes — triggers cache bust in frontend
+    v: 5, // bump when workout structure changes — triggers cache bust in frontend
   }
 }
 

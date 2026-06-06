@@ -815,7 +815,7 @@ export default function Program() {
         setDayRecords(dr.days||[])
         const cached=sr.todayDay?.daily_workout
         // Use cache only if it has current version (v:4 = images + steps). Otherwise regenerate.
-        if(cached&&cached.v===4){
+        if(cached&&cached.v===5){
           setWorkout(cached)
         }else if(!sr.todayDay?.checkin_status){
           autoGenerate(sr.program,dr.days||[])
