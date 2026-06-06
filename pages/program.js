@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 import { BottomTabs } from '../components/Nav'
+import { calcNutrientGoals } from '../lib/nutrition'
 
 const G = '#CBA23B', F = "'Tajawal',sans-serif"
 
@@ -779,6 +780,7 @@ export default function Program() {
   const { tab: tabQuery } = router.query
   const [tab, setTab] = useState('workout')
   const [checkinDone, setCheckinDone] = useState(false)
+  const [mealPlan, setMealPlan] = useState(null)
 
   useEffect(()=>{
     supabase.auth.getSession().then(async({data:{session}})=>{
@@ -791,6 +793,14 @@ export default function Program() {
 
   useEffect(()=>{ if(tabQuery&&tabQuery==='workout') setTab(tabQuery) },[tabQuery])
   useEffect(()=>{if(user)loadAll()},[user])
+
+  useEffect(()=>{
+    if(!user?.id) return
+    fetch('/api/packages/meal-plan?userId='+user.id)
+      .then(r=>r.json())
+      .then(d=>{ if(d?.plan) setMealPlan(d) })
+      .catch(()=>{})
+  },[user?.id])
 
   useEffect(()=>{
     if(!user?.id) return
@@ -892,194 +902,272 @@ const B={minHeight:'100vh',background:'#09090B',color:'#ECE3CF',fontFamily:F,dir
   )
 
   // ── Main overview ──
+  const goals = profile ? calcNutrientGoals(profile) : null
+
   return(
     <div style={B}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} .fu{animation:fu .3s ease}`}</style>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .fu{animation:fu .35s ease}
+        .prog-card:active{transform:scale(.985)}
+      `}</style>
 
-      {/* Top bar */}
-      <div style={{background:'linear-gradient(180deg,rgba(10,8,5,0.95) 0%,rgba(10,8,5,0.8) 100%)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(203,162,59,0.15)',padding:'13px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
+      {/* ── Sticky top bar ── */}
+      <div style={{background:'rgba(9,9,11,0.92)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(203,162,59,0.12)',padding:'12px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
         <div>
           <div style={{fontWeight:800,fontSize:'.88rem'}}>{program.roadmap?.program_name||program.package_name}</div>
-          <div style={{fontSize:'.65rem',color:'rgba(255,255,255,0.35)'}}>اليوم {currentDay} من {totalDays}</div>
+          <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.3)'}}>اليوم {currentDay} من {totalDays}</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:8}}>
-          {generating&&<div style={{width:14,height:14,border:'2px solid rgba(203,162,59,0.2)',borderTopColor:G,borderRadius:'50%',animation:'spin .8s linear infinite'}}/>}
-          <div style={{height:4,width:60,background:'rgba(255,255,255,0.08)',borderRadius:10,overflow:'hidden'}}>
-            <div style={{height:'100%',width:pct+'%',background:G,borderRadius:10,transition:'width .5s'}}/>
+          {generating&&<div style={{width:12,height:12,border:'2px solid rgba(203,162,59,0.15)',borderTopColor:G,borderRadius:'50%',animation:'spin .8s linear infinite'}}/>}
+          <div style={{height:3,width:54,background:'rgba(255,255,255,0.07)',borderRadius:10,overflow:'hidden'}}>
+            <div style={{height:'100%',width:pct+'%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10,transition:'width .6s'}}/>
           </div>
-          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.92rem',color:G}}>{pct}%</div>
+          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.88rem',color:G}}>{pct}%</div>
         </div>
       </div>
 
-      <div style={{maxWidth:480,margin:'0 auto',padding:'16px 16px 100px'}}>
+      <div style={{maxWidth:480,margin:'0 auto',padding:'14px 14px 100px'}}>
         <div className="fu">
-            {/* Today card */}
-            <div style={{background:isRest?'linear-gradient(135deg,rgba(59,130,246,0.07),rgba(59,130,246,0.02))':'linear-gradient(135deg,rgba(203,162,59,0.08),rgba(203,162,59,0.02))',border:`1px solid ${isRest?'rgba(59,130,246,0.2)':`${G}28`}`,borderRadius:20,padding:'20px',marginBottom:14,boxShadow:isRest?'none':'0 4px 24px rgba(203,162,59,0.06)'}}>
-              <div style={{fontSize:'.62rem',fontWeight:700,color:isRest?'#3b82f6':G,letterSpacing:1.5,marginBottom:5,textTransform:'uppercase'}}>اليوم {currentDay} — {todayTarget.day_type||'تمرين'}</div>
-              <div style={{fontWeight:800,fontSize:'1rem',marginBottom:8}}>{todayTarget.daily_focus||'ركّز على الأداء الصحيح'}</div>
-              {!isRest&&(
-                <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}>
-                  {[[todayTarget.session_type||'لياقة','النوع'],[(todayTarget.intensity_target||5)+'/10','الشدة'],[(todayTarget.estimated_duration_min||30)+' د','المدة'],[(todayTarget.sets_target||10)+' مجموعة','الحجم']].map(([v,l])=>(
-                    <div key={l} style={{background:'rgba(0,0,0,0.3)',borderRadius:9,padding:'6px 10px',textAlign:'center'}}>
-                      <div style={{fontWeight:800,fontSize:'.82rem',color:G}}>{v}</div>
-                      <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {todayTarget.coach_tip&&<div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.5)',background:'rgba(0,0,0,0.2)',borderRadius:9,padding:'9px 12px',marginBottom:12,lineHeight:1.6}}>💬 {todayTarget.coach_tip}</div>}
 
-              {checkinDone?(
-                <div style={{background:'rgba(34,197,94,0.1)',border:'1px solid rgba(34,197,94,0.25)',borderRadius:11,padding:'12px',textAlign:'center',color:'#22c55e',fontWeight:700}}>
-                  ✅ أكملت اليوم — ممتاز! تعال غداً 💪
-                </div>
-              ):isRest?(
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.5)',marginBottom:12,lineHeight:1.7}}>يوم راحة — جسمك يبني نفسه الآن.<br/>نم جيداً واشرب ماء.</div>
-                  <button onClick={async()=>{await fetch('/api/packages/checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:user.id,programId:program.id,dayNumber:currentDay,status:'rest',energyLevel:'normal'})});setCheckinDone(true);await loadAll()}}
-                    style={{background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.25)',color:'#3b82f6',borderRadius:11,padding:'11px 24px',fontFamily:F,fontWeight:700,cursor:'pointer',fontSize:'.88rem'}}>
-                    ✓ سجّل يوم الراحة
-                  </button>
-                </div>
-              ):generating?(
-                <div style={{display:'flex',alignItems:'center',gap:10,padding:'12px',background:'rgba(203,162,59,0.06)',borderRadius:11}}>
-                  <div style={{width:16,height:16,border:'2px solid rgba(203,162,59,0.2)',borderTopColor:G,borderRadius:'50%',animation:'spin .8s linear infinite',flexShrink:0}}/>
-                  <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.6)'}}>المدرب يحضّر تمريني اليوم...</div>
-                </div>
-              ):(
-                <button onClick={()=>setView('workout_detail')} disabled={!workout}
-                  style={{width:'100%',background:workout?`linear-gradient(135deg,${G},#8B6914)`:'rgba(255,255,255,0.06)',color:workout?'#09090B':'rgba(255,255,255,0.3)',border:'none',borderRadius:12,padding:'14px',fontFamily:F,fontWeight:900,fontSize:'.95rem',cursor:workout?'pointer':'not-allowed',boxShadow:workout?`0 4px 18px rgba(203,162,59,0.3)`:'none'}}>
-                  {workout?'🏋️ ابدأ تمريني اليوم':'⏳ جاري تحضير التمرين...'}
-                </button>
-              )}
+          {/* ══════════════════════════════════════════
+              SECTION 1 — HERO: Today's Mission
+          ══════════════════════════════════════════ */}
+          <div style={{
+            background:isRest
+              ?'linear-gradient(135deg,rgba(59,130,246,0.12) 0%,rgba(59,130,246,0.02) 100%)'
+              :'linear-gradient(135deg,rgba(203,162,59,0.16) 0%,rgba(203,162,59,0.04) 55%,transparent 100%)',
+            border:`1px solid ${isRest?'rgba(59,130,246,0.28)':'rgba(203,162,59,0.32)'}`,
+            borderRadius:22,padding:'20px 18px',marginBottom:10,position:'relative',overflow:'hidden',
+          }}>
+            {/* ambient glow */}
+            <div style={{position:'absolute',top:-60,right:-20,width:200,height:200,background:isRest?'rgba(59,130,246,0.07)':'rgba(203,162,59,0.08)',borderRadius:'50%',filter:'blur(55px)',pointerEvents:'none'}}/>
+
+            {/* Day header */}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
+              <div style={{fontSize:'.58rem',fontWeight:700,color:isRest?'rgba(59,130,246,0.9)':G,letterSpacing:2.5,textTransform:'uppercase'}}>◆ اليوم {currentDay}</div>
+              <div style={{background:isRest?'rgba(59,130,246,0.14)':'rgba(203,162,59,0.13)',border:`1px solid ${isRest?'rgba(59,130,246,0.28)':'rgba(203,162,59,0.25)'}`,borderRadius:20,padding:'3px 11px',fontSize:'.6rem',fontWeight:700,color:isRest?'#60a5fa':G}}>
+                {todayTarget.day_type||'تمرين'}
+              </div>
             </div>
 
-            {/* ── Exercises preview card ── */}
-            {workout?.exercises?.length > 0 && !checkinDone && !isRest && (
-              <div onClick={() => setView('workout_detail')}
-                style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'18px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
-                onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
-                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                  <div style={{fontSize:'.6rem',fontWeight:700,color:`rgba(203,162,59,0.65)`,letterSpacing:1.5,textTransform:'uppercase'}}>تمارين اليوم</div>
-                  <div style={{fontSize:'.68rem',color:G,fontWeight:700,fontFamily:F}}>ابدأ التمرين ←</div>
-                </div>
-                {workout.exercises.slice(0,4).map((ex,i)=>(
-                  <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderBottom:i < Math.min(3,workout.exercises.length-1)?'1px solid rgba(255,255,255,0.04)':'none'}}>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:'.85rem',fontWeight:700,color:'#ECE3CF',fontFamily:F}}>{ex.name}</div>
-                      <div style={{fontSize:'.65rem',color:'rgba(255,255,255,0.35)',marginTop:2,fontFamily:F}}>{ex.muscle}</div>
-                    </div>
-                    <div style={{fontFamily:'monospace',fontSize:'.78rem',color:G,fontWeight:900,flexShrink:0}}>{ex.sets}×{ex.reps}</div>
+            {/* Focus phrase */}
+            <div style={{fontWeight:900,fontSize:'1.08rem',marginBottom:11,lineHeight:1.45}}>
+              {todayTarget.daily_focus||(isRest?'يوم راحة — جسمك يبني نفسه':'ركّز على الأداء الصحيح')}
+            </div>
+
+            {/* Session metrics chips */}
+            {!isRest&&(
+              <div style={{display:'flex',gap:6,marginBottom:11,overflowX:'auto',scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}}>
+                {[[todayTarget.session_type||'لياقة','النوع'],[(todayTarget.intensity_target||5)+'/10','الشدة'],[(todayTarget.estimated_duration_min||30)+' د','المدة'],[(todayTarget.sets_target||10)+' مج','الحجم']].map(([v,l])=>(
+                  <div key={l} style={{background:'rgba(0,0,0,0.32)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10,padding:'7px 11px',textAlign:'center',flexShrink:0}}>
+                    <div style={{fontFamily:'monospace',fontWeight:800,fontSize:'.8rem',color:G,lineHeight:1}}>{v}</div>
+                    <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.28)',marginTop:3}}>{l}</div>
                   </div>
                 ))}
-                {workout.exercises.length > 4 && (
-                  <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginTop:10,textAlign:'center',fontFamily:F}}>+ {workout.exercises.length - 4} تمارين أخرى</div>
-                )}
               </div>
             )}
 
-            {/* ── Scientific metrics card ── */}
-            {!isRest&&(()=>{
-              const BigR=34,BigC=2*Math.PI*BigR
-              const smR=18,smC=2*Math.PI*smR
-              const rings=[
-                {label:'الشدة', display:(todayTarget.intensity_target||5)+'/10', pct:((todayTarget.intensity_target||5)/10)*100,                          color:'#ef4444'},
-                {label:'المدة', display:(todayTarget.estimated_duration_min||30)+'د', pct:Math.min(100,((todayTarget.estimated_duration_min||30)/60)*100), color:'#3b82f6'},
-                {label:'الحجم', display:(todayTarget.sets_target||10)+'م',           pct:Math.min(100,((todayTarget.sets_target||10)/24)*100),            color:G},
-              ]
-              return(
-                <div style={{background:'rgba(255,255,255,0.02)',border:`1px solid rgba(203,162,59,0.1)`,borderRadius:20,padding:'16px 14px',marginBottom:14}}>
-                  <div style={{fontSize:'.58rem',fontWeight:700,color:`rgba(203,162,59,0.55)`,letterSpacing:2,textTransform:'uppercase',textAlign:'center',marginBottom:14}}>مؤشرات اليوم</div>
-                  <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    {/* Big program progress ring */}
-                    <div style={{textAlign:'center',flexShrink:0}}>
-                      <div style={{position:'relative',width:80,height:80}}>
-                        <svg width="80" height="80" viewBox="0 0 80 80" style={{transform:'rotate(-90deg)'}}>
-                          <circle cx="40" cy="40" r={BigR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6"/>
-                          <circle cx="40" cy="40" r={BigR} fill="none" stroke={G} strokeWidth="6"
-                            strokeDasharray={`${(pct/100)*BigC} ${BigC}`} strokeLinecap="round"
-                            style={{filter:`drop-shadow(0 0 7px rgba(203,162,59,0.5))`,transition:'stroke-dasharray 1s ease'}}/>
-                        </svg>
-                        <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
-                          <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'1rem',color:G,lineHeight:1}}>{pct}%</span>
-                          <span style={{fontSize:'.48rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>إنجاز</span>
+            {/* Coach tip */}
+            {todayTarget.coach_tip&&(
+              <div style={{fontSize:'.74rem',color:'rgba(255,255,255,0.42)',background:'rgba(0,0,0,0.28)',borderRadius:10,padding:'8px 12px',marginBottom:12,lineHeight:1.65,fontStyle:'italic'}}>
+                💬 {todayTarget.coach_tip}
+              </div>
+            )}
+
+            {/* CTA */}
+            {checkinDone?(
+              <div style={{background:'rgba(34,197,94,0.1)',border:'1px solid rgba(34,197,94,0.22)',borderRadius:12,padding:'13px',textAlign:'center',color:'#22c55e',fontWeight:700,fontSize:'.88rem'}}>
+                ✅ أكملت اليوم — ممتاز! تعال غداً 💪
+              </div>
+            ):isRest?(
+              <div style={{textAlign:'center'}}>
+                <div style={{fontSize:'.82rem',color:'rgba(255,255,255,0.42)',marginBottom:12,lineHeight:1.7}}>يوم راحة — جسمك يبني نفسه الآن.<br/>نم جيداً واشرب ماء.</div>
+                <button onClick={async()=>{await fetch('/api/packages/checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:user.id,programId:program.id,dayNumber:currentDay,status:'rest',energyLevel:'normal'})});setCheckinDone(true);await loadAll()}}
+                  style={{background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.25)',color:'#60a5fa',borderRadius:11,padding:'11px 26px',fontFamily:F,fontWeight:700,cursor:'pointer',fontSize:'.85rem'}}>
+                  ✓ سجّل يوم الراحة
+                </button>
+              </div>
+            ):generating?(
+              <div style={{display:'flex',alignItems:'center',gap:10,padding:'12px 14px',background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:11}}>
+                <div style={{width:15,height:15,border:'2px solid rgba(203,162,59,0.2)',borderTopColor:G,borderRadius:'50%',animation:'spin .8s linear infinite',flexShrink:0}}/>
+                <div style={{fontSize:'.82rem',color:'rgba(255,255,255,0.5)'}}>المدرب يحضّر تمريني اليوم...</div>
+              </div>
+            ):(
+              <button onClick={()=>setView('workout_detail')} disabled={!workout}
+                style={{width:'100%',background:workout?`linear-gradient(135deg,${G} 0%,#9a7220 100%)`:'rgba(255,255,255,0.05)',color:workout?'#09090B':'rgba(255,255,255,0.22)',border:workout?'none':'1px solid rgba(255,255,255,0.07)',borderRadius:13,padding:'15px',fontFamily:F,fontWeight:900,fontSize:'1rem',cursor:workout?'pointer':'not-allowed',boxShadow:workout?`0 6px 28px rgba(203,162,59,0.38)`:'none',transition:'all .2s'}}>
+                {workout?'🏋️  ابدأ تمريني اليوم':'⏳ جاري تحضير التمرين...'}
+              </button>
+            )}
+          </div>
+
+          {/* ══════════════════════════════════════════
+              SECTION 2 — WORKOUT + NUTRITION (2-col)
+          ══════════════════════════════════════════ */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+
+            {/* Workout card */}
+            <div
+              onClick={()=>workout&&!isRest&&!checkinDone&&setView('workout_detail')}
+              style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'15px 13px',cursor:workout&&!isRest&&!checkinDone?'pointer':'default',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden'}}
+              onTouchStart={e=>{if(workout&&!isRest&&!checkinDone)e.currentTarget.style.transform='scale(.97)'}}
+              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{position:'absolute',bottom:-18,left:-18,width:70,height:70,background:'rgba(203,162,59,0.05)',borderRadius:'50%'}}/>
+              <div style={{fontSize:'.56rem',fontWeight:700,color:'rgba(203,162,59,0.6)',letterSpacing:1.5,textTransform:'uppercase',marginBottom:9}}>تمارين اليوم</div>
+              {isRest?(
+                <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:5}}>
+                  <div style={{fontSize:'1.8rem'}}>🛌</div>
+                  <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.28)',textAlign:'center'}}>يوم راحة</div>
+                </div>
+              ):checkinDone?(
+                <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:5}}>
+                  <div style={{fontSize:'1.8rem'}}>✅</div>
+                  <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:'#22c55e'}}>{workout?.exercises?.length||'—'}</div>
+                  <div style={{fontSize:'.65rem',color:'rgba(255,255,255,0.35)'}}>تمرين أكملته</div>
+                </div>
+              ):workout?.exercises?(
+                <>
+                  <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:2}}>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.55rem',color:G,lineHeight:1}}>{workout.exercises.length}</div>
+                    <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)'}}>تمرين</div>
+                  </div>
+                  <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.28)',marginBottom:9}}>{workout.estimated_duration_min||35} دقيقة</div>
+                  <div style={{flex:1,display:'flex',flexDirection:'column',gap:5}}>
+                    {workout.exercises.slice(0,4).map((ex,i)=>(
+                      <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBottom:i<Math.min(3,workout.exercises.length-1)?5:0,borderBottom:i<Math.min(3,workout.exercises.length-1)?'1px solid rgba(255,255,255,0.04)':'none'}}>
+                        <div style={{fontSize:'.66rem',color:'rgba(255,255,255,0.58)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,paddingLeft:4}}>{ex.name}</div>
+                        <div style={{fontFamily:'monospace',fontSize:'.6rem',color:G,fontWeight:700,flexShrink:0}}>{ex.sets}×{ex.reps}</div>
+                      </div>
+                    ))}
+                    {workout.exercises.length>4&&<div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.2)',marginTop:2}}>+{workout.exercises.length-4} أخرى</div>}
+                  </div>
+                  <div style={{marginTop:9,fontSize:'.66rem',color:G,fontWeight:700}}>ابدأ ←</div>
+                </>
+              ):(
+                <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.7rem',color:'rgba(255,255,255,0.22)'}}>جاري التحضير...</div>
+              )}
+            </div>
+
+            {/* Nutrition / Meal plan card */}
+            <div
+              onClick={()=>router.push('/meals')}
+              style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'15px 13px',cursor:'pointer',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden'}}
+              onTouchStart={e=>e.currentTarget.style.transform='scale(.97)'}
+              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{position:'absolute',bottom:-18,left:-18,width:70,height:70,background:'rgba(34,197,94,0.04)',borderRadius:'50%'}}/>
+              <div style={{fontSize:'.56rem',fontWeight:700,color:'rgba(34,197,94,0.65)',letterSpacing:1.5,textTransform:'uppercase',marginBottom:9}}>خطة التغذية</div>
+              {mealPlan?.plan?(
+                <>
+                  <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:2}}>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.55rem',color:'#22c55e',lineHeight:1}}>{mealPlan.total_calories}</div>
+                    <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)'}}>سعرة</div>
+                  </div>
+                  <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.28)',marginBottom:9}}>{mealPlan.total_protein}g بروتين</div>
+                  <div style={{flex:1,display:'flex',flexDirection:'column',gap:5}}>
+                    {mealPlan.plan.map((m,i)=>(
+                      <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBottom:i<mealPlan.plan.length-1?5:0,borderBottom:i<mealPlan.plan.length-1?'1px solid rgba(255,255,255,0.04)':'none'}}>
+                        <div style={{fontSize:'.64rem',color:'rgba(255,255,255,0.55)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,paddingLeft:3}}>{m.food?.name_ar||m.meal_time}</div>
+                        <div style={{fontFamily:'monospace',fontSize:'.58rem',color:'#22c55e',fontWeight:700,flexShrink:0}}>{m.actual_calories}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{marginTop:9,fontSize:'.66rem',color:'#22c55e',fontWeight:700}}>التغذية ←</div>
+                </>
+              ):goals?(
+                <>
+                  <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:2}}>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.55rem',color:'#22c55e',lineHeight:1}}>{goals.calories}</div>
+                    <div style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)'}}>سعرة</div>
+                  </div>
+                  <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.28)',marginBottom:9}}>هدفك اليومي</div>
+                  <div style={{flex:1,display:'flex',flexDirection:'column',gap:7}}>
+                    {[['بروتين','#3b82f6',goals.protein_g],['كارب','#f97316',goals.carbs_g],['دهن','#a855f7',goals.fat_g]].map(([l,c,v])=>(
+                      <div key={l}>
+                        <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
+                          <div style={{fontSize:'.6rem',color:c,fontWeight:700}}>{l}</div>
+                          <div style={{fontFamily:'monospace',fontSize:'.56rem',color:'rgba(255,255,255,0.38)'}}>{v}g</div>
+                        </div>
+                        <div style={{height:3,background:'rgba(255,255,255,0.06)',borderRadius:2}}>
+                          <div style={{height:'100%',width:'62%',background:c,borderRadius:2,opacity:.8}}/>
                         </div>
                       </div>
-                      <div style={{fontSize:'.56rem',color:'rgba(255,255,255,0.3)',marginTop:5}}>البرنامج</div>
-                    </div>
-                    {/* Divider */}
-                    <div style={{width:1,height:72,background:'rgba(255,255,255,0.06)',flexShrink:0}}/>
-                    {/* 3 smaller rings */}
-                    <div style={{flex:1,display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4}}>
-                      {rings.map(({label,display,pct:p,color})=>(
-                        <div key={label} style={{textAlign:'center'}}>
-                          <div style={{position:'relative',width:52,height:52,margin:'0 auto 4px'}}>
-                            <svg width="52" height="52" viewBox="0 0 52 52" style={{transform:'rotate(-90deg)'}}>
-                              <circle cx="26" cy="26" r={smR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="4.5"/>
-                              <circle cx="26" cy="26" r={smR} fill="none" stroke={color} strokeWidth="4.5"
-                                strokeDasharray={`${(p/100)*smC} ${p/100*smC+smC}`} strokeLinecap="round"
-                                style={{filter:`drop-shadow(0 0 5px ${color}55)`,transition:'stroke-dasharray .8s ease'}}/>
-                            </svg>
-                            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                              <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'.6rem',color,lineHeight:1}}>{display}</span>
-                            </div>
-                          </div>
-                          <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.4)',fontWeight:600}}>{label}</div>
+                    ))}
+                  </div>
+                  <div style={{marginTop:9,fontSize:'.66rem',color:'#22c55e',fontWeight:700}}>التغذية ←</div>
+                </>
+              ):(
+                <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.7rem',color:'rgba(255,255,255,0.22)'}}>جاري التحميل...</div>
+              )}
+            </div>
+          </div>
+
+          {/* ══════════════════════════════════════════
+              SECTION 3 — PROGRESS
+          ══════════════════════════════════════════ */}
+          {(()=>{
+            const R=32, C=2*Math.PI*R
+            return(
+              <div
+                onClick={()=>router.push('/progress')}
+                className="prog-card"
+                style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'17px 17px',marginBottom:10,cursor:'pointer',WebkitTapHighlightColor:'transparent',transition:'transform .15s'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:13}}>
+                  <div style={{fontSize:'.58rem',fontWeight:700,color:'rgba(203,162,59,0.6)',letterSpacing:1.5,textTransform:'uppercase'}}>تقدمي في البرنامج</div>
+                  <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.28)'}}>التفاصيل ←</div>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:13}}>
+                  {/* Progress ring */}
+                  <svg width={76} height={76} style={{flexShrink:0}}>
+                    <circle cx={38} cy={38} r={R} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={5}/>
+                    <circle cx={38} cy={38} r={R} fill="none" stroke={G} strokeWidth={5}
+                      strokeDasharray={`${(pct/100)*C} ${C}`} strokeLinecap="round"
+                      transform="rotate(-90 38 38)"
+                      style={{filter:`drop-shadow(0 0 8px rgba(203,162,59,0.55))`,transition:'stroke-dasharray 1.2s ease'}}/>
+                    <text x={38} y={43} textAnchor="middle" fill={G} fontSize={13} fontWeight="900" fontFamily="monospace">{pct}%</text>
+                  </svg>
+                  {/* Stats */}
+                  <div style={{flex:1,display:'flex',flexDirection:'column',gap:9}}>
+                    <div style={{display:'flex',gap:0}}>
+                      {[[completedCount,'مكتمل','#22c55e'],[totalDays-completedCount,'متبقي','rgba(255,255,255,0.35)']].map(([v,l,c],i)=>(
+                        <div key={l} style={{flex:1,paddingRight:i===0?12:0,paddingLeft:i===1?12:0,borderLeft:i===1?'1px solid rgba(255,255,255,0.06)':undefined,textAlign:i===0?'right':'left'}}>
+                          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.35rem',color:c,lineHeight:1}}>{v}</div>
+                          <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.28)',marginTop:3}}>{l}</div>
                         </div>
                       ))}
                     </div>
+                    <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:pct+'%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10,transition:'width .7s ease'}}/>
+                    </div>
                   </div>
                 </div>
-              )
-            })()}
+                {/* Day dots */}
+                <div style={{display:'flex',gap:2.5}}>
+                  {Array.from({length:Math.min(totalDays,30)},(_,i)=>{
+                    const dayNum=i+1, rec=dayRecords.find(d=>d.day_number===dayNum), s=rec?.checkin_status, isCur=dayNum===currentDay
+                    return <div key={i} style={{flex:1,height:5,borderRadius:3,background:s==='completed'?'#22c55e':s==='partial'?'#f97316':s==='missed'?'rgba(239,68,68,0.4)':isCur?G:'rgba(255,255,255,0.06)',transition:'background .3s',boxShadow:isCur?`0 0 8px ${G}bb`:s==='completed'?'0 0 4px rgba(34,197,94,0.5)':'none'}}/>
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
-            {/* ── Progress card ── */}
-            <div onClick={()=>router.push('/progress')}
-              style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'18px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
-              onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
-              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                <div style={{fontSize:'.6rem',fontWeight:700,color:`rgba(203,162,59,0.65)`,letterSpacing:1.5,textTransform:'uppercase'}}>تقدمي في البرنامج</div>
-                <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.35)',fontFamily:F}}>التفاصيل ←</div>
+          {/* ══════════════════════════════════════════
+              SECTION 4 — WEEK GOAL
+          ══════════════════════════════════════════ */}
+          {program.roadmap?.weekly_overview?.length>0&&(()=>{
+            const w=program.roadmap.weekly_overview[Math.min(Math.ceil(currentDay/7)-1,program.roadmap.weekly_overview.length-1)]
+            return w?(
+              <div style={{background:'rgba(255,255,255,0.015)',border:'1px solid rgba(255,255,255,0.055)',borderRadius:15,padding:'13px 16px'}}>
+                <div style={{fontSize:'.56rem',fontWeight:700,color:'rgba(255,255,255,0.22)',letterSpacing:2,textTransform:'uppercase',marginBottom:6}}>هدف هذا الأسبوع</div>
+                <div style={{fontWeight:800,fontSize:'.88rem',color:G,marginBottom:4}}>{w.theme}</div>
+                <div style={{fontSize:'.74rem',color:'rgba(255,255,255,0.38)',lineHeight:1.65}}>{w.key_objective}</div>
               </div>
-              {/* Stats row */}
-              <div style={{display:'flex',gap:8,marginBottom:14}}>
-                {[[completedCount,'يوم مكتمل',G],[(totalDays-completedCount),'يوم متبقي','#3b82f6'],[pct+'%','إنجاز','#22c55e']].map(([v,l,c])=>(
-                  <div key={l} style={{flex:1,background:'rgba(0,0,0,0.25)',borderRadius:12,padding:'10px 6px',textAlign:'center'}}>
-                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:c,lineHeight:1}}>{v}</div>
-                    <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.35)',marginTop:4,fontFamily:F}}>{l}</div>
-                  </div>
-                ))}
-              </div>
-              {/* Progress bar */}
-              <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:8}}>
-                <div style={{height:'100%',width:pct+'%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10,transition:'width .6s ease'}}/>
-              </div>
-              {/* Day dots */}
-              <div style={{display:'flex',gap:2.5}}>
-                {Array.from({length:Math.min(totalDays,28)},(_,i)=>{
-                  const dayNum=i+1
-                  const rec=dayRecords.find(d=>d.day_number===dayNum)
-                  const s=rec?.checkin_status
-                  const isCur=dayNum===currentDay
-                  return <div key={i} style={{flex:1,height:4,borderRadius:2,background:s==='completed'?'#22c55e':s==='partial'?'#f97316':s==='missed'?'rgba(239,68,68,0.5)':isCur?G:'rgba(255,255,255,0.06)',transition:'background .3s'}}/>
-                })}
-              </div>
-            </div>
+            ):null
+          })()}
 
-            {/* Week goal */}
-            {program.roadmap?.weekly_overview?.length>0&&(()=>{
-              const w=program.roadmap.weekly_overview[Math.min(Math.ceil(currentDay/7)-1,program.roadmap.weekly_overview.length-1)]
-              return w?(<div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:'14px 16px'}}>
-                <div style={{fontWeight:700,fontSize:'.78rem',color:'rgba(255,255,255,0.4)',marginBottom:6}}>هدف هذا الأسبوع</div>
-                <div style={{fontWeight:800,fontSize:'.92rem',color:G,marginBottom:3}}>{w.theme}</div>
-                <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.45)'}}>{w.key_objective}</div>
-              </div>):null
-            })()}
-          </div>
+        </div>
       </div>
-
       <BottomTabs active="program"/>
     </div>
   )
