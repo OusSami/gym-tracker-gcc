@@ -1297,7 +1297,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             const r = 19, circ = 2 * Math.PI * r
             return (
               <div onClick={() => router.push('/meals')}
-                style={{background:'rgba(4,4,7,0.95)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:18,padding:'12px 11px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:8,boxShadow:'0 4px 20px rgba(0,0,0,0.5)'}}
+                style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'12px 11px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:8}}
                 onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
                 onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
                 {/* Top glow line */}
