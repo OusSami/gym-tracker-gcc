@@ -2,65 +2,72 @@ import { supabaseAdmin } from '../../../lib/supabase'
 
 // ── Exercise library ───────────────────────────────────────────────
 // Names always "عربي | English" so keyword filtering works on both.
+// level: 'beginner' = suitable for 30-40yo who never trained
+//        'intermediate' = requires some base fitness
+//        'advanced' = requires existing training background
 const EXERCISES = {
   'البطن': [
-    {name:'كرانش | Crunch',                sets:3,reps:'15-20',rest:45,tip:'ارفع الكتفين فقط، لا تشد رقبتك'},
-    {name:'بلانك | Plank',                 sets:3,reps:'30 ثانية',rest:45,tip:'ظهرك مستقيم، شد البطن طوال الوقت'},
-    {name:'رفع الساقين | Leg Raise',       sets:3,reps:'12-15',rest:45,tip:'ظهرك ثابت تماماً على الأرض'},
-    {name:'جبل تسلق | Mountain Climber',   sets:3,reps:'20 ثانية',rest:40,tip:'الحركة سريعة والبطن مشدود'},
-    {name:'كرانش جانبي | Side Crunch',     sets:3,reps:'15 لكل جانب',rest:40,tip:'دوّر الجذع نحو الركبة'},
-    {name:'بلانك جانبي | Side Plank',      sets:3,reps:'20 ثانية لكل جانب',rest:40,tip:'جسمك مستقيم كخط'},
-    {name:'كرانش عكسي | Reverse Crunch',   sets:3,reps:'12-15',rest:45,tip:'ارفع الحوض نحو الصدر'},
-    {name:'دراجة | Bicycle Crunch',        sets:3,reps:'20 ثانية',rest:40,tip:'الكوع يلمس الركبة المعاكسة'},
-    {name:'في أب | V-Up',                  sets:3,reps:'10-12',rest:50,tip:'ارفع الجذع والساقين في نفس الوقت'},
-    {name:'ميت باق | Dead Bug',            sets:3,reps:'10 لكل جانب',rest:40,tip:'ظهرك ثابت على الأرض، تحرك ببطء'},
+    {name:'لمس الكعب | Heel Touch',        sets:3,reps:'20 لكل جانب',rest:35,level:'beginner',    tip:'استلقِ وانزل يدك ببطء نحو كعبك'},
+    {name:'كرانش جانبي | Side Crunch',     sets:3,reps:'15 لكل جانب',rest:40,level:'beginner',    tip:'دوّر الجذع نحو الركبة'},
+    {name:'ميت باق | Dead Bug',            sets:3,reps:'10 لكل جانب',rest:40,level:'beginner',    tip:'ظهرك ثابت على الأرض، تحرك ببطء'},
+    {name:'كرانش | Crunch',                sets:3,reps:'15-20',       rest:45,level:'beginner',    tip:'ارفع الكتفين فقط، لا تشد رقبتك'},
+    {name:'كرانش عكسي | Reverse Crunch',   sets:3,reps:'12-15',       rest:45,level:'intermediate',tip:'ارفع الحوض نحو الصدر'},
+    {name:'دراجة | Bicycle Crunch',        sets:3,reps:'20 ثانية',    rest:40,level:'intermediate',tip:'الكوع يلمس الركبة المعاكسة'},
+    {name:'بلانك | Plank',                 sets:3,reps:'20-30 ثانية', rest:45,level:'intermediate',tip:'ظهرك مستقيم، شد البطن طوال الوقت'},
+    {name:'بلانك جانبي | Side Plank',      sets:3,reps:'20 ثانية لكل جانب',rest:40,level:'intermediate',tip:'جسمك مستقيم كخط'},
+    {name:'رفع الساقين | Leg Raise',       sets:3,reps:'12-15',       rest:45,level:'intermediate',tip:'ظهرك ثابت تماماً على الأرض'},
+    {name:'جبل تسلق | Mountain Climber',   sets:3,reps:'20 ثانية',    rest:40,level:'intermediate',tip:'الحركة سريعة والبطن مشدود'},
+    {name:'في أب | V-Up',                  sets:3,reps:'10-12',       rest:50,level:'advanced',    tip:'ارفع الجذع والساقين في نفس الوقت'},
   ],
   'الأرجل': [
-    {name:'قرفصاء | Squat',                sets:3,reps:'15-20',rest:60,tip:'ركبتك لا تتجاوز أصابع قدمك'},
-    {name:'طعنة أمامية | Lunge',           sets:3,reps:'12 لكل ساق',rest:60,tip:'ظهرك مستقيم، الركبة الخلفية قريبة من الأرض'},
-    {name:'جسر الأرداف | Glute Bridge',    sets:3,reps:'15-20',rest:45,tip:'اضغط المؤخرة في الأعلى وثبّت ثانيتين'},
-    {name:'كيك باك | Donkey Kick',         sets:3,reps:'15 لكل ساق',rest:40,tip:'ثبّت الورك، حرّك الساق فقط'},
-    {name:'رفع الكعب | Calf Raise',        sets:3,reps:'20-25',rest:30,tip:'ارفع ببطء وانزل ببطء'},
-    {name:'قرفصاء سومو | Sumo Squat',      sets:3,reps:'15',rest:50,tip:'قدماك متباعدتان، أصابعك للخارج'},
-    {name:'طعنة جانبية | Side Lunge',      sets:3,reps:'12 لكل ساق',rest:50,tip:'الساق المستقيمة تبقى ثابتة'},
-    {name:'جسر أحادي | Single Leg Bridge', sets:3,reps:'12 لكل ساق',rest:45,tip:'ارفع ساقاً واحدة وحافظ على التوازن'},
-    {name:'قرفصاء قفز | Jump Squat',       sets:3,reps:'10-12',rest:60,tip:'اهبط بلطف على الكعبين مع ثني الركبتين'},
+    {name:'قرفصاء بالكرسي | Chair Squat',  sets:3,reps:'12-15',rest:45,level:'beginner',    tip:'انزل ببطء كأنك ستجلس على الكرسي ثم قف'},
+    {name:'جسر الأرداف | Glute Bridge',    sets:3,reps:'15-20',rest:45,level:'beginner',    tip:'اضغط المؤخرة في الأعلى وثبّت ثانيتين'},
+    {name:'كيك باك | Donkey Kick',         sets:3,reps:'15 لكل ساق',rest:40,level:'beginner',tip:'ثبّت الورك، حرّك الساق فقط'},
+    {name:'رفع الكعب | Calf Raise',        sets:3,reps:'20-25',rest:30,level:'beginner',    tip:'ارفع ببطء وانزل ببطء'},
+    {name:'قرفصاء | Squat',                sets:3,reps:'15-20',rest:60,level:'beginner',    tip:'ركبتك لا تتجاوز أصابع قدمك'},
+    {name:'قرفصاء سومو | Sumo Squat',      sets:3,reps:'15',   rest:50,level:'beginner',    tip:'قدماك متباعدتان، أصابعك للخارج'},
+    {name:'طعنة أمامية | Lunge',           sets:3,reps:'12 لكل ساق',rest:60,level:'intermediate',tip:'ظهرك مستقيم، الركبة الخلفية قريبة من الأرض'},
+    {name:'طعنة جانبية | Side Lunge',      sets:3,reps:'12 لكل ساق',rest:50,level:'intermediate',tip:'الساق المستقيمة تبقى ثابتة'},
+    {name:'جسر أحادي | Single Leg Bridge', sets:3,reps:'12 لكل ساق',rest:45,level:'intermediate',tip:'ارفع ساقاً واحدة وحافظ على التوازن'},
+    {name:'قرفصاء قفز | Jump Squat',       sets:3,reps:'10-12',rest:60,level:'advanced',    tip:'اهبط بلطف على الكعبين مع ثني الركبتين'},
   ],
   'الجسم كامل': [
-    {name:'بيربي | Burpee',                sets:3,reps:'8-10',rest:60,tip:'اجمع بين القفز والضغط بحركة سلسة'},
-    {name:'قفز النجمة | Jumping Jack',     sets:3,reps:'30 ثانية',rest:40,tip:'حافظ على إيقاع ثابت'},
-    {name:'ركض في المكان | High Knee',     sets:3,reps:'30 ثانية',rest:40,tip:'الركبة ترتفع لمستوى الخصر'},
-    {name:'بيربي معدّل | Modified Burpee', sets:3,reps:'10-12',rest:60,tip:'بدون قفز — أبطأ وأكثر تحكماً'},
-    {name:'تمرين الدب | Bear Crawl',       sets:3,reps:'20 ثانية',rest:45,tip:'حافظ على ظهر مسطح موازٍ للأرض'},
-    {name:'ضغط قفز | Plyometric Push Up',  sets:3,reps:'8-10',rest:60,tip:'ادفع يديك عن الأرض بقوة'},
+    {name:'مشي في المكان | March In Place', sets:3,reps:'45 ثانية',rest:30,level:'beginner',    tip:'ارفع ركبتيك ببطء ومنتظم وحرّك ذراعيك'},
+    {name:'بيربي معدّل | Modified Burpee',  sets:3,reps:'10-12',   rest:60,level:'intermediate',tip:'بدون قفز — أبطأ وأكثر تحكماً'},
+    {name:'قفز النجمة | Jumping Jack',      sets:3,reps:'30 ثانية', rest:40,level:'intermediate',tip:'حافظ على إيقاع ثابت'},
+    {name:'ركض في المكان | High Knee',      sets:3,reps:'30 ثانية', rest:40,level:'intermediate',tip:'الركبة ترتفع لمستوى الخصر'},
+    {name:'تمرين الدب | Bear Crawl',        sets:3,reps:'20 ثانية', rest:45,level:'intermediate',tip:'حافظ على ظهر مسطح موازٍ للأرض'},
+    {name:'بيربي | Burpee',                 sets:3,reps:'8-10',     rest:60,level:'advanced',    tip:'اجمع بين القفز والضغط بحركة سلسة'},
+    {name:'ضغط قفز | Plyometric Push Up',   sets:3,reps:'8-10',     rest:60,level:'advanced',    tip:'ادفع يديك عن الأرض بقوة'},
   ],
   'الصدر والكتفين': [
-    {name:'ضغط | Push Up',                 sets:3,reps:'10-15',rest:60,tip:'جسمك مستقيم من الرأس للكعب'},
-    {name:'ضغط معدّل | Modified Push Up',  sets:3,reps:'12-15',rest:60,tip:'على الركبتين — مناسب للمبتدئين'},
-    {name:'ضغط واسع | Wide Push Up',       sets:3,reps:'10-12',rest:60,tip:'يدان واسعتان يركّز على الصدر'},
-    {name:'ضغط مثلث | Diamond Push Up',    sets:3,reps:'8-10',rest:60,tip:'يدان متقاربتان يركّز على الثلاثي'},
-    {name:'ضغط انحداري | Decline Push Up', sets:3,reps:'10-12',rest:60,tip:'قدماك مرفوعتان يركّز على الصدر العلوي'},
-    {name:'بايك بوش أب | Pike Push Up',    sets:3,reps:'10-12',rest:60,tip:'جسمك بزاوية V يركّز على الكتفين'},
+    {name:'ضغط الجدار | Wall Push Up',      sets:3,reps:'12-15',rest:45,level:'beginner',    tip:'وجهك للجدار وجسمك مائل، ادفع وارجع'},
+    {name:'ضغط معدّل | Modified Push Up',   sets:3,reps:'12-15',rest:60,level:'beginner',    tip:'على الركبتين — مناسب للمبتدئين'},
+    {name:'ضغط | Push Up',                  sets:3,reps:'10-15',rest:60,level:'intermediate',tip:'جسمك مستقيم من الرأس للكعب'},
+    {name:'ضغط واسع | Wide Push Up',        sets:3,reps:'10-12',rest:60,level:'intermediate',tip:'يدان واسعتان يركّز على الصدر'},
+    {name:'بايك بوش أب | Pike Push Up',     sets:3,reps:'10-12',rest:60,level:'intermediate',tip:'جسمك بزاوية V يركّز على الكتفين'},
+    {name:'ضغط مثلث | Diamond Push Up',     sets:3,reps:'8-10', rest:60,level:'advanced',    tip:'يدان متقاربتان يركّز على الثلاثي'},
+    {name:'ضغط انحداري | Decline Push Up',  sets:3,reps:'10-12',rest:60,level:'advanced',    tip:'قدماك مرفوعتان يركّز على الصدر العلوي'},
   ],
   'الظهر': [
-    {name:'سوبرمان | Superman',            sets:3,reps:'12-15',rest:45,tip:'ارفع ذراعيك وساقيك معاً، ثبّت ثانيتين'},
-    {name:'سحب بالطاولة | Table Row',      sets:3,reps:'10-12',rest:60,tip:'استخدم طاولة ثابتة وشد نفسك للأعلى'},
-    {name:'بيرد دوج | Bird Dog',           sets:3,reps:'12 لكل جانب',rest:40,tip:'ذراع وساق معاكسة في نفس الوقت'},
-    {name:'سوبرمان أحادي | Single Superman',sets:3,reps:'12 لكل جانب',rest:40,tip:'ارفع ذراعاً واحدة وساقاً معاكسة'},
+    {name:'سوبرمان | Superman',             sets:3,reps:'12-15',         rest:45,level:'beginner',    tip:'ارفع ذراعيك وساقيك معاً، ثبّت ثانيتين'},
+    {name:'بيرد دوج | Bird Dog',            sets:3,reps:'12 لكل جانب',  rest:40,level:'beginner',    tip:'ذراع وساق معاكسة في نفس الوقت'},
+    {name:'سوبرمان أحادي | Single Superman',sets:3,reps:'12 لكل جانب',  rest:40,level:'beginner',    tip:'ارفع ذراعاً واحدة وساقاً معاكسة'},
+    {name:'سحب بالطاولة | Table Row',       sets:3,reps:'10-12',         rest:60,level:'intermediate',tip:'استخدم طاولة ثابتة وشد نفسك للأعلى'},
   ],
   'المؤخرة': [
-    {name:'جسر الأرداف | Glute Bridge',    sets:3,reps:'15-20',rest:45,tip:'اضغط المؤخرة في الأعلى'},
-    {name:'رفع الورك | Hip Thrust',        sets:3,reps:'15-20',rest:45,tip:'ظهرك على الأرض، ارفع الحوض عالياً'},
-    {name:'كيك باك | Donkey Kick',         sets:3,reps:'15 لكل ساق',rest:40,tip:'ثبّت الورك، حرّك الساق فقط'},
-    {name:'قرفصاء سومو | Sumo Squat',      sets:3,reps:'15',rest:50,tip:'تركيز على المؤخرة والداخلية'},
-    {name:'جسر أحادي | Single Leg Bridge', sets:3,reps:'12 لكل ساق',rest:45,tip:'تحدٍّ للتوازن والمؤخرة'},
-    {name:'طعنة خلفية | Reverse Lunge',    sets:3,reps:'12 لكل ساق',rest:50,tip:'اخطُ للخلف، ركبة خلفية قريبة من الأرض'},
+    {name:'جسر الأرداف | Glute Bridge',    sets:3,reps:'15-20',       rest:45,level:'beginner',    tip:'اضغط المؤخرة في الأعلى'},
+    {name:'كيك باك | Donkey Kick',         sets:3,reps:'15 لكل ساق', rest:40,level:'beginner',    tip:'ثبّت الورك، حرّك الساق فقط'},
+    {name:'قرفصاء سومو | Sumo Squat',      sets:3,reps:'15',          rest:50,level:'beginner',    tip:'تركيز على المؤخرة والداخلية'},
+    {name:'رفع الورك | Hip Thrust',        sets:3,reps:'15-20',       rest:45,level:'intermediate',tip:'ظهرك على الأرض، ارفع الحوض عالياً'},
+    {name:'جسر أحادي | Single Leg Bridge', sets:3,reps:'12 لكل ساق', rest:45,level:'intermediate',tip:'تحدٍّ للتوازن والمؤخرة'},
+    {name:'طعنة خلفية | Reverse Lunge',    sets:3,reps:'12 لكل ساق', rest:50,level:'intermediate',tip:'اخطُ للخلف، ركبة خلفية قريبة من الأرض'},
   ],
   'الجانبين': [
-    {name:'كرانش جانبي | Side Crunch',     sets:3,reps:'15 لكل جانب',rest:40,tip:'دوّر الجذع نحو الركبة'},
-    {name:'بلانك جانبي | Side Plank',      sets:3,reps:'20 ثانية لكل جانب',rest:40,tip:'جسمك مستقيم'},
-    {name:'طعنة جانبية | Side Lunge',      sets:3,reps:'12 لكل ساق',rest:50,tip:'اضغط المؤخرة والداخلية'},
-    {name:'رفع الورك الجانبي | Clamshell', sets:3,reps:'15 لكل جانب',rest:35,tip:'استلقِ جانباً وارفع الركبة العليا'},
+    {name:'كرانش جانبي | Side Crunch',     sets:3,reps:'15 لكل جانب',      rest:40,level:'beginner',    tip:'دوّر الجذع نحو الركبة'},
+    {name:'رفع الورك الجانبي | Clamshell', sets:3,reps:'15 لكل جانب',      rest:35,level:'beginner',    tip:'استلقِ جانباً وارفع الركبة العليا'},
+    {name:'بلانك جانبي | Side Plank',      sets:3,reps:'20 ثانية لكل جانب',rest:40,level:'intermediate',tip:'جسمك مستقيم'},
+    {name:'طعنة جانبية | Side Lunge',      sets:3,reps:'12 لكل ساق',       rest:50,level:'intermediate',tip:'اضغط المؤخرة والداخلية'},
   ],
 }
 
@@ -202,52 +209,105 @@ function adjustReps(baseReps, variant, energyLevel) {
 // ── Exercise metadata: image key + step-by-step instructions ─────────
 // Keys are lowercase English substrings that match the English part of "عربي | English" names.
 const EXERCISE_META = {
+  // ── Core ────────────────────────────────────────────────────────────
+  'heel touch':       { imageKey:'h-crunch',          steps:['استلقِ على ظهرك وثنِ ركبتيك مع ثبات القدمين','يداك ممدودتان على جانبي جسمك','شد البطن وانزل يدك اليمنى نحو كعبك الأيمن','ارجع للوسط وكرر اليسار — هذا تكرار واحد'] },
+  'reverse crunch':   { imageKey:'h-crunch',          steps:['استلقِ مع وضع يديك أسفل الظهر','ثنِ ركبتيك وارفعهما نحو صدرك','ارفع الحوض عن الأرض','انزل ببطء وكرر'] },
+  'side crunch':      { imageKey:'h-crunch',          steps:['استلقِ مع إمالة الركبتين لأحد الجانبين','يد واحدة خلف الرأس والأخرى على البطن','ارفع الجذع نحو الركبة المثنية','انزل ببطء وكرر ثم غيّر الجانب'] },
   'crunch':           { imageKey:'h-crunch',          steps:['استلقِ وثنِ ركبتيك مع وضع يديك خلف رأسك','شد عضلات البطن وارفع الكتفين فقط','لا تشد رقبتك بيديك','انزل ببطء وكرر'] },
   'bicycle':          { imageKey:'h-bicycle-crunch',  steps:['استلقِ وضع يديك خلف رأسك','ارفع كتفيك عن الأرض','اجلب كوعك الأيمن نحو ركبتك اليسرى','بدّل الجانبين بحركة دراجة منتظمة'] },
-  'plank':            { imageKey:'h-plank',            steps:['ابدأ على المرفقين أو اليدين','المرفقان أسفل الكتفين مباشرة','جسمك مستقيم من الرأس للكعبين','شد البطن وتنفس بانتظام'] },
-  'side plank':       { imageKey:'h-plank',            steps:['استلقِ على الجانب وارفع جسمك على المرفق','جسمك مستقيم كخط من الرأس للكعبين','شد الجانب وحافظ على التوازن','تنفس بانتظام ولا تنهار الوركين'] },
-  'leg raise':        { imageKey:'h-leg-raise-floor',  steps:['استلقِ على ظهرك مع وضع يديك أسفل الظهر','أبقِ الساقين مستقيمتين ومتلاصقتين','ارفعهما حتى 90 درجة ببطء','انزل ببطء دون لمس الأرض'] },
-  'mountain climber': { imageKey:'h-mountain-climber', steps:['ابدأ في وضع البلانك العالي على اليدين','اجلب ركبتك اليمنى بسرعة نحو صدرك','مدّها للخلف وبدّل مع اليسرى','حافظ على ظهر مسطح طوال التمرين'] },
-  'dead bug':         { imageKey:'w-dead-bug',         steps:['استلقِ مع رفع ذراعيك للأعلى','ركبتاك مرفوعتان بزاوية 90 درجة','مدّ ذراعك اليمنى وساقك اليسرى ببطء','عد للبداية وكرر الجانب الآخر'] },
-  'reverse crunch':   { imageKey:null,                 steps:['استلقِ مع وضع يديك أسفل الظهر','ثنِ ركبتيك وارفعهما نحو صدرك','ارفع الحوض عن الأرض','انزل ببطء وكرر'] },
-  'side crunch':      { imageKey:null,                 steps:['استلقِ مع إمالة الركبتين لأحد الجانبين','يد واحدة خلف الرأس والأخرى على البطن','ارفع الجذع نحو الركبة المثنية','انزل ببطء وكرر ثم غيّر الجانب'] },
-  'v-up':             { imageKey:null,                 steps:['استلقِ مع مد الذراعين للخلف','ارفع ذراعيك وساقيك معاً في نفس الوقت','حاول لمس قدميك بيديك','انزل ببطء وكرر'] },
-  'squat':            { imageKey:'h-squat',            steps:['قف مع مسافة الكتفين بين قدميك','أخفض نفسك ببطء حتى تتوازى الفخذان مع الأرض','ركبتاك في اتجاه أصابع القدم','ادفع بالكعبين وارجع للوقوف'] },
-  'lunge':            { imageKey:'h-lunge',            steps:['قف مستقيماً مع القدمين معاً','اخطُ خطوة كبيرة للأمام بالقدم اليمنى','أخفض الركبة الخلفية نحو الأرض','ادفع بالقدم الأمامية وعد ثم غيّر الجانب'] },
-  'reverse lunge':    { imageKey:'h-lunge',            steps:['قف مستقيماً','اخطُ خطوة كبيرة للخلف','أخفض الركبة الخلفية نحو الأرض','ادفع للأمام وعد ثم غيّر الساق'] },
-  'side lunge':       { imageKey:'h-side-lunge',       steps:['قف مع تباعد القدمين','اخطُ خطوة كبيرة للجانب الأيمن','أخفض نفسك مع إبقاء الساق الأخرى مستقيمة','ادفع وعد ثم كرر اليسار'] },
-  'glute bridge':     { imageKey:'h-glute-bridge',     steps:['استلقِ وثنِ ركبتيك مع ثبات القدمين','ارفع الحوض للأعلى بضغط المؤخرة','ثبّت في الأعلى لثانيتين','انزل ببطء وكرر'] },
-  'single leg bridge':{ imageKey:'h-glute-bridge',     steps:['استلقِ وثنِ ركبتيك','ارفع قدماً واحدة للأعلى','ارفع الحوض بضغط المؤخرة','انزل ببطء وكرر ثم غيّر الساق'] },
-  'hip thrust':       { imageKey:'h-glute-bridge',     steps:['ضع كتفيك على سطح مرتفع','ثنِ ركبتيك مع وضع القدمين على الأرض','ارفع الحوض للأعلى باستخدام المؤخرة','اضغط في الأعلى ثم انزل ببطء'] },
-  'donkey kick':      { imageKey:'h-donkey-kick',      steps:['ابدأ على الأربع (ركبة ويد)','ثبّت الظهر أفقياً','ارفع ساقك للخلف حتى تتوازى مع الظهر','اضغط المؤخرة ثم انزل وكرر'] },
-  'calf raise':       { imageKey:'h-calf-raise-home',  steps:['قف مع محاذاة القدمين للكتفين','ارفع كعبيك للأعلى ببطء','ثبّت في الأعلى لثانية','انزل ببطء دون لمس الكعب الأرض'] },
-  'jump squat':       { imageKey:'h-squat',            steps:['قف مع مسافة الكتفين بين قدميك','انزل في وضع القرفصاء','اقفز للأعلى بقوة','اهبط بلطف على الكعبين مع ثني الركبتين'] },
-  'burpee':           { imageKey:'h-burpee',           steps:['قف ثم اقفز لأسفل على يديك','مدّ ساقيك للخلف لوضع البلانك','اجلب ساقيك للأمام نحو يديك','انهض واقفز للأعلى بقوة'] },
-  'jumping jack':     { imageKey:'h-jumping-jack',     steps:['قف مع القدمين متلاصقتين والذراعين جانباً','اقفز مع فتح القدمين ورفع اليدين للأعلى','اقفز مرة أخرى وعد للوضع الأول','حافظ على إيقاع ثابت ومنتظم'] },
-  'high knee':        { imageKey:null,                 steps:['قف مستقيماً مع إرخاء الكتفين','ارفع ركبتك اليمنى لمستوى الخصر','بدّل مع الركبة اليسرى بسرعة','حرّك ذراعيك بشكل طبيعي مع الحركة'] },
-  'push up':          { imageKey:'h-push-up',          steps:['ابدأ في وضع البلانك العالي على اليدين','يداك أعرض من الكتفين قليلاً','أخفض صدرك ببطء نحو الأرض','ادفع وارجع مع إبقاء ظهرك مستقيماً'] },
-  'wide push':        { imageKey:'h-wide-push-up',     steps:['يداك أوسع من العرض العادي بشكل ملحوظ','أصابعك للخارج قليلاً','أخفض الصدر ببطء ويركّز على الصدر الخارجي','ادفع وارفع الجسم'] },
-  'diamond push':     { imageKey:'h-diamond-push-up',  steps:['يداك تحت الصدر بشكل مثلث (الإبهامان يلتقيان)','أخفض ببطء حتى تلمس الأرض','ركّز على الإحساس في الثلاثي','ادفع وارجع وظهرك مستقيم'] },
-  'decline push':     { imageKey:'h-decline-push-up',  steps:['ضع قدميك على سطح مرتفع (كرسي أو حافة)','يداك على الأرض في وضع البلانك','أخفض صدرك ببطء نحو الأرض','يركّز على الصدر العلوي والكتفين الأمامية'] },
-  'pike push':        { imageKey:'h-pike-push-up',     steps:['ضع جسمك بشكل V مقلوب (وركيك عاليان)','يداك أعرض من الكتفين قليلاً','أخفض رأسك بين يديك ببطء','ادفع وركّز على الإحساس في الكتفين'] },
-  'superman':         { imageKey:'h-superman',         steps:['استلقِ على بطنك مع مد الذراعين للأمام','شد عضلات الظهر وارفع ذراعيك وساقيك معاً','ثبّت لثانيتين وشد المؤخرة','انزل ببطء وكرر'] },
-  'single superman':  { imageKey:'h-superman',         steps:['استلقِ على بطنك','ارفع ذراعك اليمنى وساقك اليسرى معاً','ثبّت لثانيتين','انزل وكرر الجانب الآخر'] },
-  'bird dog':         { imageKey:'h-bird-dog',         steps:['ابدأ على الأربع (ركبة ويد) مع ظهر مسطح','مدّ ذراعك اليمنى وساقك اليسرى ببطء','حافظ على الظهر مستقيماً وتجنب الالتواء','عد وكرر الجانب الآخر'] },
-  'table row':        { imageKey:'h-chair-dip',        steps:['ضع يديك على حافة طاولة ثابتة من الأسفل','جسمك مستقيم وبطنك للأعلى','اسحب صدرك نحو الطاولة','انزل ببطء وكرر'] },
-  'clamshell':        { imageKey:null,                 steps:['استلقِ على جانبك مع ثني الركبتين بزاوية 90°','ضع قدمك على قدمك (متلاصقتان)','ارفع الركبة العليا دون تحريك القدمين','انزل ببطء وكرر ثم غيّر الجانب'] },
-  'bear crawl':       { imageKey:null,                 steps:['ابدأ على الأربع ثم ارفع الركبتين عن الأرض','حافظ على ظهر مسطح موازٍ للأرض','تحرّك للأمام بيد وساق معاكسة','حافظ على البطن مشدوداً'] },
-  'modified burpee':  { imageKey:'h-burpee',           steps:['قف ثم انزل على يديك ببطء','أخرج ساقيك للخلف (بدون قفز)','أعد ساقيك للأمام','انهض وارفع يديك للأعلى'] },
-  'shoulder tap':     { imageKey:'h-shoulder-tap',     steps:['ابدأ في وضع البلانك العالي','البلانك مستقيم وبطنك مشدود','الم يدك اليمنى كتفك الأيسر','بدّل الجانبين بانتظام دون تأرجح الوركين'] },
-  'wall sit':         { imageKey:'h-wall-sit',         steps:['قف بظهرك لجدار ثم انزل ببطء','ساقاك بزاوية 90 درجة وفخذاك موازيان للأرض','ظهرك مسطح على الجدار','ثبّت الوضع وتنفس بانتظام'] },
+  'v-up':             { imageKey:'h-leg-raise-floor', steps:['استلقِ مع مد الذراعين للخلف','ارفع ذراعيك وساقيك معاً في نفس الوقت','حاول لمس قدميك بيديك','انزل ببطء وكرر'] },
+  'leg raise':        { imageKey:'h-leg-raise-floor', steps:['استلقِ على ظهرك مع وضع يديك أسفل الظهر','أبقِ الساقين مستقيمتين ومتلاصقتين','ارفعهما حتى 90 درجة ببطء','انزل ببطء دون لمس الأرض'] },
+  'dead bug':         { imageKey:'w-dead-bug',        steps:['استلقِ مع رفع ذراعيك للأعلى','ركبتاك مرفوعتان بزاوية 90 درجة','مدّ ذراعك اليمنى وساقك اليسرى ببطء','عد للبداية وكرر الجانب الآخر'] },
+  'mountain climber': { imageKey:'h-mountain-climber',steps:['ابدأ في وضع البلانك العالي على اليدين','اجلب ركبتك اليمنى بسرعة نحو صدرك','مدّها للخلف وبدّل مع اليسرى','حافظ على ظهر مسطح طوال التمرين'] },
+  'side plank':       { imageKey:'h-plank',           steps:['استلقِ على الجانب وارفع جسمك على المرفق','جسمك مستقيم كخط من الرأس للكعبين','شد الجانب وحافظ على التوازن','تنفس بانتظام ولا تنهار الوركين'] },
+  'plank':            { imageKey:'h-plank',           steps:['ابدأ على المرفقين أو اليدين','المرفقان أسفل الكتفين مباشرة','جسمك مستقيم من الرأس للكعبين','شد البطن وتنفس بانتظام'] },
   'russian twist':    { imageKey:'h-russian-twist-home',steps:['اجلس مع ثني ركبتيك قليلاً ورفع الصدر','أمسك ثقلاً أو شبّك يديك','دوّر الجذع يميناً','دوّر يساراً — هذا تكرار واحد'] },
-  'march in place':   { imageKey:'w-march-in-place',   steps:['قف مستقيماً','ارفع ركبتك اليمنى لمستوى الخصر','انزل وارفع اليسرى','حرّك ذراعيك بشكل طبيعي'] },
-  'deep breathing':   { imageKey:null,                 steps:['اجلس أو قف بوضع مريح','خذ نفساً عميقاً من الأنف (4 ثوانٍ)','ثبّت النفس (2 ثانية)','أخرج الهواء ببطء من الفم (6 ثوانٍ)'] },
+  // ── Lower body ──────────────────────────────────────────────────────
+  'chair squat':      { imageKey:'h-squat',           steps:['قف أمام كرسي بالقدمين بعرض الكتفين','أخفض نفسك ببطء كأنك ستجلس عليه','الْمس الكرسي بخفة دون أن تجلس تماماً','ادفع بالكعبين وارجع للوقوف'] },
+  'sumo squat':       { imageKey:'h-squat',           steps:['قف مع تباعد القدمين أكثر من الكتفين','أصابع القدم للخارج بزاوية 45 درجة','أخفض نفسك ببطء مع الظهر المستقيم','اضغط الداخلية والمؤخرة عند الصعود'] },
+  'jump squat':       { imageKey:'h-squat',           steps:['قف مع مسافة الكتفين بين قدميك','انزل في وضع القرفصاء','اقفز للأعلى بقوة','اهبط بلطف على الكعبين مع ثني الركبتين'] },
+  'squat':            { imageKey:'h-squat',           steps:['قف مع مسافة الكتفين بين قدميك','أخفض نفسك ببطء حتى تتوازى الفخذان مع الأرض','ركبتاك في اتجاه أصابع القدم','ادفع بالكعبين وارجع للوقوف'] },
+  'reverse lunge':    { imageKey:'h-lunge',           steps:['قف مستقيماً','اخطُ خطوة كبيرة للخلف','أخفض الركبة الخلفية نحو الأرض','ادفع للأمام وعد ثم غيّر الساق'] },
+  'side lunge':       { imageKey:'h-side-lunge',      steps:['قف مع تباعد القدمين','اخطُ خطوة كبيرة للجانب الأيمن','أخفض نفسك مع إبقاء الساق الأخرى مستقيمة','ادفع وعد ثم كرر اليسار'] },
+  'lunge':            { imageKey:'h-lunge',           steps:['قف مستقيماً مع القدمين معاً','اخطُ خطوة كبيرة للأمام بالقدم اليمنى','أخفض الركبة الخلفية نحو الأرض','ادفع بالقدم الأمامية وعد ثم غيّر الجانب'] },
+  'single leg bridge':{ imageKey:'h-glute-bridge',   steps:['استلقِ وثنِ ركبتيك','ارفع قدماً واحدة للأعلى','ارفع الحوض بضغط المؤخرة','انزل ببطء وكرر ثم غيّر الساق'] },
+  'hip thrust':       { imageKey:'h-glute-bridge',   steps:['ضع كتفيك على سطح مرتفع','ثنِ ركبتيك مع وضع القدمين على الأرض','ارفع الحوض للأعلى باستخدام المؤخرة','اضغط في الأعلى ثم انزل ببطء'] },
+  'glute bridge':     { imageKey:'h-glute-bridge',   steps:['استلقِ وثنِ ركبتيك مع ثبات القدمين','ارفع الحوض للأعلى بضغط المؤخرة','ثبّت في الأعلى لثانيتين','انزل ببطء وكرر'] },
+  'clamshell':        { imageKey:'w-glute-bridge',   steps:['استلقِ على جانبك مع ثني الركبتين بزاوية 90°','ضع قدمك على قدمك (متلاصقتان)','ارفع الركبة العليا دون تحريك القدمين','انزل ببطء وكرر ثم غيّر الجانب'] },
+  'donkey kick':      { imageKey:'h-donkey-kick',    steps:['ابدأ على الأربع (ركبة ويد)','ثبّت الظهر أفقياً','ارفع ساقك للخلف حتى تتوازى مع الظهر','اضغط المؤخرة ثم انزل وكرر'] },
+  'calf raise':       { imageKey:'h-calf-raise-home',steps:['قف مع محاذاة القدمين للكتفين','ارفع كعبيك للأعلى ببطء','ثبّت في الأعلى لثانية','انزل ببطء دون لمس الكعب الأرض'] },
+  'wall sit':         { imageKey:'h-wall-sit',        steps:['قف بظهرك لجدار ثم انزل ببطء','ساقاك بزاوية 90 درجة وفخذاك موازيان للأرض','ظهرك مسطح على الجدار','ثبّت الوضع وتنفس بانتظام'] },
+  // ── Upper body ──────────────────────────────────────────────────────
+  'wall push':        { imageKey:'w-slow-push-up',   steps:['قف أمام الجدار على مسافة ذراع ممدودة','ضع يديك على الجدار بعرض الكتفين','أخفض صدرك ببطء نحو الجدار مع ثني الكوعين','ادفع بقوة وارجع للوضع الأول'] },
+  'modified push':    { imageKey:'w-slow-push-up',   steps:['ابدأ على ركبتيك مع وضع يديك أعرض من الكتفين','جسمك من الركبتين للرأس مستقيم','أخفض صدرك ببطء نحو الأرض','ادفع وارجع — مثالي لبناء القوة تدريجياً'] },
+  'wide push':        { imageKey:'h-wide-push-up',   steps:['يداك أوسع من العرض العادي بشكل ملحوظ','أصابعك للخارج قليلاً','أخفض الصدر ببطء ويركّز على الصدر الخارجي','ادفع وارفع الجسم'] },
+  'diamond push':     { imageKey:'h-diamond-push-up',steps:['يداك تحت الصدر بشكل مثلث (الإبهامان يلتقيان)','أخفض ببطء حتى تلمس الأرض','ركّز على الإحساس في الثلاثي','ادفع وارجع وظهرك مستقيم'] },
+  'decline push':     { imageKey:'h-decline-push-up',steps:['ضع قدميك على سطح مرتفع (كرسي أو حافة)','يداك على الأرض في وضع البلانك','أخفض صدرك ببطء نحو الأرض','يركّز على الصدر العلوي والكتفين الأمامية'] },
+  'pike push':        { imageKey:'h-pike-push-up',   steps:['ضع جسمك بشكل V مقلوب (وركيك عاليان)','يداك أعرض من الكتفين قليلاً','أخفض رأسك بين يديك ببطء','ادفع وركّز على الإحساس في الكتفين'] },
+  'push up':          { imageKey:'h-push-up',        steps:['ابدأ في وضع البلانك العالي على اليدين','يداك أعرض من الكتفين قليلاً','أخفض صدرك ببطء نحو الأرض','ادفع وارجع مع إبقاء ظهرك مستقيماً'] },
+  'shoulder tap':     { imageKey:'h-shoulder-tap',   steps:['ابدأ في وضع البلانك العالي','البلانك مستقيم وبطنك مشدود','الم يدك اليمنى كتفك الأيسر','بدّل الجانبين بانتظام دون تأرجح الوركين'] },
+  // ── Back ────────────────────────────────────────────────────────────
+  'single superman':  { imageKey:'h-superman',       steps:['استلقِ على بطنك','ارفع ذراعك اليمنى وساقك اليسرى معاً','ثبّت لثانيتين','انزل وكرر الجانب الآخر'] },
+  'superman':         { imageKey:'h-superman',       steps:['استلقِ على بطنك مع مد الذراعين للأمام','شد عضلات الظهر وارفع ذراعيك وساقيك معاً','ثبّت لثانيتين وشد المؤخرة','انزل ببطء وكرر'] },
+  'bird dog':         { imageKey:'h-bird-dog',       steps:['ابدأ على الأربع (ركبة ويد) مع ظهر مسطح','مدّ ذراعك اليمنى وساقك اليسرى ببطء','حافظ على الظهر مستقيماً وتجنب الالتواء','عد وكرر الجانب الآخر'] },
+  'bear crawl':       { imageKey:'h-bird-dog',       steps:['ابدأ على الأربع ثم ارفع الركبتين عن الأرض','حافظ على ظهر مسطح موازٍ للأرض','تحرّك للأمام بيد وساق معاكسة','حافظ على البطن مشدوداً'] },
+  'table row':        { imageKey:'h-chair-dip',      steps:['ضع يديك على حافة طاولة ثابتة من الأسفل','جسمك مستقيم وبطنك للأعلى','اسحب صدرك نحو الطاولة','انزل ببطء وكرر'] },
+  // ── Cardio / full body ───────────────────────────────────────────────
+  'march in place':   { imageKey:'w-march-in-place', steps:['قف مستقيماً مع إرخاء الكتفين','ارفع ركبتك اليمنى لمستوى الخصر','انزل وارفع اليسرى بإيقاع ثابت','حرّك ذراعيك بشكل طبيعي مع الحركة'] },
+  'high knee':        { imageKey:'w-high-knees',     steps:['قف مستقيماً مع إرخاء الكتفين','ارفع ركبتك اليمنى لمستوى الخصر','بدّل مع الركبة اليسرى بسرعة','حرّك ذراعيك بشكل طبيعي مع الحركة'] },
+  'jumping jack':     { imageKey:'h-jumping-jack',   steps:['قف مع القدمين متلاصقتين والذراعين جانباً','اقفز مع فتح القدمين ورفع اليدين للأعلى','اقفز مرة أخرى وعد للوضع الأول','حافظ على إيقاع ثابت ومنتظم'] },
+  'modified burpee':  { imageKey:'h-burpee',         steps:['قف ثم انزل على يديك ببطء','أخرج ساقيك للخلف (بدون قفز)','أعد ساقيك للأمام','انهض وارفع يديك للأعلى'] },
+  'burpee':           { imageKey:'h-burpee',         steps:['قف ثم اقفز لأسفل على يديك','مدّ ساقيك للخلف لوضع البلانك','اجلب ساقيك للأمام نحو يديك','انهض واقفز للأعلى بقوة'] },
+  'deep breathing':   { imageKey:null,               steps:['اجلس أو قف بوضع مريح','خذ نفساً عميقاً من الأنف (4 ثوانٍ)','ثبّت النفس (2 ثانية)','أخرج الهواء ببطء من الفم (6 ثوانٍ)'] },
 }
 
 function enrichExercise(ex) {
   const engPart = (ex.name.split('|')[1] || ex.name).toLowerCase().trim()
-  const meta = Object.entries(EXERCISE_META).find(([k]) => engPart.includes(k))?.[1] || {}
-  return { ...ex, imageKey: meta.imageKey ?? null, steps: meta.steps ?? null }
+  const meta = Object.entries(EXERCISE_META).find(([k]) => engPart.includes(k))?.[1]
+
+  // Keyword-based image fallback for exercises not in EXERCISE_META
+  let fallbackImage = null
+  if (!meta?.imageKey) {
+    if (engPart.includes('squat') || engPart.includes('lunge'))            fallbackImage = 'h-squat'
+    else if (engPart.includes('push'))                                      fallbackImage = 'h-push-up'
+    else if (engPart.includes('bridge') || engPart.includes('hip thrust')) fallbackImage = 'h-glute-bridge'
+    else if (engPart.includes('plank'))                                     fallbackImage = 'h-plank'
+    else if (engPart.includes('crunch') || engPart.includes('sit up'))     fallbackImage = 'h-crunch'
+    else if (engPart.includes('leg raise') || engPart.includes('raise'))   fallbackImage = 'h-leg-raise-floor'
+    else if (engPart.includes('row') || engPart.includes('pull'))          fallbackImage = 'h-bird-dog'
+    else if (engPart.includes('kick') || engPart.includes('donkey'))       fallbackImage = 'h-donkey-kick'
+    else if (engPart.includes('jump') || engPart.includes('jack'))         fallbackImage = 'h-jumping-jack'
+    else if (engPart.includes('march') || engPart.includes('knee'))        fallbackImage = 'w-high-knees'
+    else if (engPart.includes('superman') || engPart.includes('back'))     fallbackImage = 'h-superman'
+    else if (engPart.includes('stretch') || engPart.includes('twist'))     fallbackImage = 'w-cat-cow'
+  }
+
+  // Keyword-based steps fallback for exercises not in EXERCISE_META
+  let fallbackSteps = null
+  if (!meta?.steps) {
+    if (engPart.includes('squat'))
+      fallbackSteps = ['قف مع مسافة الكتفين بين قدميك','أخفض نفسك ببطء مع الظهر المستقيم','ركبتاك في اتجاه أصابع القدم','ادفع بالكعبين وارجع للوقوف']
+    else if (engPart.includes('push'))
+      fallbackSteps = ['ابدأ في وضع البلانك على اليدين','يداك بعرض الكتفين','أخفض صدرك ببطء نحو الأرض','ادفع وارجع مع إبقاء ظهرك مستقيماً']
+    else if (engPart.includes('plank'))
+      fallbackSteps = ['ابدأ على المرفقين أو اليدين','المرفقان أسفل الكتفين مباشرة','جسمك مستقيم من الرأس للكعبين','شد البطن وتنفس بانتظام']
+    else if (engPart.includes('crunch') || engPart.includes('sit up'))
+      fallbackSteps = ['استلقِ وثنِ ركبتيك مع يديك خلف رأسك برفق','شد عضلات البطن وارفع الكتفين فقط','لا تشد رقبتك بيديك','انزل ببطء وكرر']
+    else if (engPart.includes('lunge'))
+      fallbackSteps = ['قف مستقيماً','اخطُ خطوة كبيرة للأمام','أخفض الركبة الخلفية نحو الأرض','ادفع وارجع ثم غيّر الجانب']
+    else if (engPart.includes('bridge') || engPart.includes('glute'))
+      fallbackSteps = ['استلقِ وثنِ ركبتيك مع ثبات القدمين','ارفع الحوض للأعلى بضغط المؤخرة','ثبّت لثانيتين','انزل ببطء وكرر']
+    else if (engPart.includes('stretch') || engPart.includes('hold'))
+      fallbackSteps = ['ضع جسمك في وضع التمديد','تنفس بعمق وأرخِ العضلة','ثبّت الوضع طوال المدة المحددة','انزل ببطء وتنفس بانتظام']
+    else
+      fallbackSteps = ['جهّز نفسك وتنفس بانتظام','تحكم بالحركة ولا تتسرع','ركّز على الإحساس في العضلة المستهدفة','أنهِ العدد المطلوب بشكل صحيح']
+  }
+
+  return {
+    ...ex,
+    imageKey: meta?.imageKey ?? fallbackImage,
+    steps:    meta?.steps    ?? fallbackSteps,
+  }
 }
 
 function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumber) {
@@ -291,6 +351,12 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
   })
   // Deduplicate
   exercisePool = exercisePool.filter((ex, idx, arr) => arr.findIndex(e => e.name === ex.name) === idx)
+
+  // ── Level filter: weeks 1-2 beginners only get beginner-tagged exercises ──
+  if (fitnessLevel === 'beginner' && weekNum <= 2) {
+    const beginnerPool = exercisePool.filter(ex => !ex.level || ex.level === 'beginner')
+    if (beginnerPool.length >= 2) exercisePool = beginnerPool
+  }
 
   // Fallback if all blocked by conditions
   if (!exercisePool.length) {
@@ -403,7 +469,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     nutrition_reminder: nutrition,
     estimated_duration_min: duration,
     sex,
-    v: 5, // bump when workout structure changes — triggers cache bust in frontend
+    v: 6, // bump when workout structure changes — triggers cache bust in frontend
   }
 }
 

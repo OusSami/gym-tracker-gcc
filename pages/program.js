@@ -814,8 +814,8 @@ export default function Program() {
         const dr=await fetch('/api/packages/days?programId='+sr.program.id).then(r=>r.json()).catch(()=>({days:[]}))
         setDayRecords(dr.days||[])
         const cached=sr.todayDay?.daily_workout
-        // Use cache only if it has current version (v:4 = images + steps). Otherwise regenerate.
-        if(cached&&cached.v===5){
+        // Use cache only if it has current version (v:6 = beginner level filter + enrichExercise fallbacks). Otherwise regenerate.
+        if(cached&&cached.v===6){
           setWorkout(cached)
         }else if(!sr.todayDay?.checkin_status){
           autoGenerate(sr.program,dr.days||[])
