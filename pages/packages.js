@@ -128,16 +128,7 @@ export default function Packages() {
         <div className="fu">
 
           {/* Decorative top border */}
-          <div style={{ height:2, background:`linear-gradient(90deg,transparent,${G}60,transparent)`, borderRadius:1, marginBottom:20 }}/>
-
-          {/* Lifestyle hero image */}
-          <div style={{ position:'relative', borderRadius:20, overflow:'hidden', marginBottom:28, height:200 }}>
-            <img src="/lifestyle-hero.png" alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 30%' }}/>
-            {/* bottom fade to match page background */}
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(to top, #09090B, transparent)' }}/>
-            {/* subtle golden tint overlay */}
-            <div style={{ position:'absolute', inset:0, background:'rgba(203,162,59,0.06)' }}/>
-          </div>
+          <div style={{ height:2, background:`linear-gradient(90deg,transparent,${G}60,transparent)`, borderRadius:1, marginBottom:28 }}/>
 
           {/* Program name */}
           <div style={{ textAlign:'center', marginBottom:28 }}>
@@ -152,6 +143,74 @@ export default function Packages() {
                 <span>{ic}</span><span>{lbl}</span>
               </div>
             ))}
+          </div>
+
+          {/* ── PROGRESS INFOGRAPHIC ── */}
+          <div style={{ background:'rgba(255,255,255,0.02)', border:`1px solid rgba(203,162,59,0.12)`, borderRadius:20, padding:'18px 16px', marginBottom:14 }}>
+            <div style={{ fontSize:'.63rem', fontWeight:700, color:`rgba(203,162,59,0.7)`, letterSpacing:2, marginBottom:16, textTransform:'uppercase', textAlign:'center' }}>مسار تحولك المتوقع</div>
+
+            {/* Progress curve chart */}
+            <svg width="100%" viewBox="0 0 340 90" xmlns="http://www.w3.org/2000/svg" style={{ display:'block', marginBottom:4 }}>
+              <defs>
+                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#CBA23B" stopOpacity="0.22"/>
+                  <stop offset="100%" stopColor="#CBA23B" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              {/* grid */}
+              {[22,44,66].map(y=>(
+                <line key={y} x1="0" y1={y} x2="340" y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="5,5"/>
+              ))}
+              {/* fill */}
+              <path d="M 0,82 C 50,80 100,68 170,44 S 285,14 340,8 L 340,90 L 0,90 Z" fill="url(#cg)"/>
+              {/* line */}
+              <path d="M 0,82 C 50,80 100,68 170,44 S 285,14 340,8" fill="none" stroke="#CBA23B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* milestone dots */}
+              {[[0,82],[113,62],[227,28],[340,8]].map(([x,y],i)=>(
+                <circle key={i} cx={x} cy={y} r={i===0?3:5} fill="#CBA23B" opacity={i===0?0.5:1}/>
+              ))}
+              {/* goal flag at end */}
+              <line x1="340" y1="8" x2="340" y2="3" stroke="#CBA23B" strokeWidth="1.5"/>
+              <polygon points="340,3 348,6 340,9" fill="#CBA23B"/>
+            </svg>
+
+            {/* x-axis labels */}
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.62rem', color:'rgba(255,255,255,0.3)', marginBottom:16, padding:'0 2px' }}>
+              <span>البداية</span>
+              <span>أسبوع 1</span>
+              <span>أسبوع 2</span>
+              <span style={{ color:G, fontWeight:700 }}>اليوم {prog.days} 🏁</span>
+            </div>
+
+            {/* Phase cards */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:16 }}>
+              {[
+                { icon:'🔥', week:'الأسبوع 1', title:'تكيّف',  desc:'جسمك يدخل وضع الحرق' },
+                { icon:'📈', week:'الأسبوع 2', title:'نتائج',  desc:'الفرق يبدأ يظهر'       },
+                { icon:'✨', week:'الأسبوع 3+', title:'تحوّل', desc:'جسم جديد يتشكّل'       },
+              ].map(p=>(
+                <div key={p.title} style={{ background:'rgba(203,162,59,0.04)', border:`1px solid rgba(203,162,59,0.1)`, borderRadius:12, padding:'10px 8px', textAlign:'center' }}>
+                  <div style={{ fontSize:'1.1rem', marginBottom:3 }}>{p.icon}</div>
+                  <div style={{ fontSize:'.58rem', color:'rgba(255,255,255,0.28)', marginBottom:2 }}>{p.week}</div>
+                  <div style={{ fontSize:'.72rem', fontWeight:800, color:G, marginBottom:3 }}>{p.title}</div>
+                  <div style={{ fontSize:'.59rem', color:'rgba(255,255,255,0.38)', lineHeight:1.4 }}>{p.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Key stats */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:0, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+              {[
+                [prog.days + '+',      'تمرين مخصص'  ],
+                [prog.days * 3 + '+',  'وجبة خليجية' ],
+                ['∞',                  'تعديل ذكي'   ],
+              ].map(([val,lbl])=>(
+                <div key={lbl} style={{ textAlign:'center' }}>
+                  <div style={{ fontWeight:900, fontSize:'1.2rem', color:G, fontFamily:'monospace', lineHeight:1 }}>{val}</div>
+                  <div style={{ fontSize:'.62rem', color:'rgba(255,255,255,0.35)', marginTop:4 }}>{lbl}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* What you get */}
