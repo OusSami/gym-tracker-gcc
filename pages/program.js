@@ -80,7 +80,7 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
         {/* Steps list */}
         {exercise.steps?.length > 0 ? (
           <div style={{textAlign:'right',margin:'10px 0 14px',display:'flex',flexDirection:'column',gap:5}}>
-            {exercise.steps.map((s,i)=>(
+            {(sex==='female'?(exercise.femaleSteps??exercise.steps):exercise.steps).map((s,i)=>(
               <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,fontSize:'.78rem',color:'rgba(255,255,255,0.55)',lineHeight:1.5}}>
                 <span style={{color:c2,fontWeight:900,fontSize:'.72rem',minWidth:18,marginTop:1}}>{i+1}.</span>
                 <span>{s}</span>
@@ -703,7 +703,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
           {/* Steps */}
           {ex.steps?.length>0&&(
             <div style={{background:'rgba(0,0,0,0.2)',borderRadius:10,padding:'10px 12px',marginBottom:10}}>
-              {ex.steps.map((s,i)=>(
+              {(sex==='female'?(ex.femaleSteps??ex.steps):ex.steps).map((s,i)=>(
                 <div key={i} style={{display:'flex',gap:8,alignItems:'flex-start',marginBottom:i<ex.steps.length-1?6:0,fontSize:'.76rem',color:'rgba(255,255,255,0.55)',lineHeight:1.5}}>
                   <span style={{color:G,fontWeight:900,fontSize:'.7rem',minWidth:16,marginTop:1}}>{i+1}.</span>
                   <span>{s}</span>

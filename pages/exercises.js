@@ -255,6 +255,10 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
   const color = mc(ex.category)
   const [showStretch, setShowStretch] = useState(false)
   const stretches = STRETCHING[ex.category] || []
+  const isFemale = sex === 'female'
+  const steps = isFemale ? (ex.female?.steps ?? ex.steps) : ex.steps
+  const tips  = isFemale ? (ex.female?.tips  ?? ex.tips)  : ex.tips
+  const cues  = isFemale ? (ex.female?.cues  ?? ex.cues)  : ex.cues
   return (
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.96)',zIndex:300,overflowY:'auto',backdropFilter:'blur(12px)'}}>
       <div style={{maxWidth:540,margin:'0 auto',padding:'16px 16px calc(80px + env(safe-area-inset-bottom))'}}>
@@ -330,7 +334,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
         {/* Step by step */}
         <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,padding:'14px 16px',marginBottom:12}}>
           <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:14}}>طريقة الأداء الصحيحة</div>
-          {ex.steps.map((step,i)=>(
+          {steps.map((step,i)=>(
             <div key={i} style={{display:'flex',gap:12,marginBottom:12,alignItems:'flex-start'}}>
               <div style={{width:24,height:24,borderRadius:'50%',background:`${color}20`,border:`1px solid ${color}44`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
                 <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.7rem',color}}>{i+1}</span>
@@ -352,14 +356,14 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
         </div>
 
         {/* Pro tip */}
-        {ex.tips&&<div style={{background:`${color}0c`,border:`1px solid ${color}28`,borderRadius:14,padding:'14px 16px',marginBottom:12}}>
+        {tips&&<div style={{background:`${color}0c`,border:`1px solid ${color}28`,borderRadius:14,padding:'14px 16px',marginBottom:12}}>
           <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:`${color}99`,marginBottom:8}}>💡 PRO TIP</div>
-          <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>{ex.tips}</div>
+          <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>{tips}</div>
         </div>}
 
         {/* Form cues */}
-        {ex.cues?.length>0&&<div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>
-          {ex.cues.map((cue,i)=><span key={i} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',padding:'5px 13px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>"{cue}"</span>)}
+        {cues?.length>0&&<div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>
+          {cues.map((cue,i)=><span key={i} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',padding:'5px 13px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>"{cue}"</span>)}
         </div>}
 
         {/* Stretching section */}
@@ -376,7 +380,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
                   <span style={{background:'rgba(129,140,248,0.15)',color:'#818cf8',padding:'2px 8px',borderRadius:20,fontSize:'.65rem',fontWeight:700}}>{s.duration}</span>
                 </div>
                 <div style={{fontSize:'.72rem',color:'rgba(129,140,248,0.7)',marginBottom:6}}>Targets: {s.muscles}</div>
-                {s.steps.map((step,j)=>(
+                {(isFemale ? (s.femaleSteps ?? s.steps) : s.steps).map((step,j)=>(
                   <div key={j} style={{display:'flex',gap:7,marginBottom:5}}>
                     <span style={{color:'#818cf8',fontSize:'.7rem',flexShrink:0,minWidth:14}}>{j+1}.</span>
                     <span style={{fontSize:'.8rem',color:'rgba(255,255,255,0.55)',lineHeight:1.4}}>{step}</span>
@@ -526,7 +530,7 @@ export default function Exercises() {
                         <span style={{background:mc(muscle)+'18',border:`1px solid ${mc(muscle)}33`,color:mc(muscle),padding:'3px 9px',borderRadius:20,fontSize:'.65rem',fontWeight:700,whiteSpace:'nowrap',marginLeft:8,flexShrink:0}}>{s.duration}</span>
                       </div>
                       <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginBottom:8}}>Targets: {s.muscles}</div>
-                      {s.steps.map((step,j)=>(
+                      {(sex==='female'?(s.femaleSteps??s.steps):s.steps).map((step,j)=>(
                         <div key={j} style={{display:'flex',gap:8,marginBottom:5}}>
                           <span style={{color:mc(muscle),fontSize:'.7rem',flexShrink:0,minWidth:16,fontWeight:700}}>{j+1}.</span>
                           <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
@@ -562,7 +566,7 @@ export default function Exercises() {
                         </div>
                       </div>
                       {r.why && <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginBottom:8,lineHeight:1.4,fontStyle:'italic'}}>Why: {r.why}</div>}
-                      {r.steps.map((step,j) => (
+                      {(sex==='female'?(r.femaleSteps??r.steps):r.steps).map((step,j) => (
                         <div key={j} style={{display:'flex',gap:8,marginBottom:5}}>
                           <span style={{color:mc(muscle),fontSize:'.7rem',flexShrink:0,minWidth:16,fontWeight:700}}>{j+1}.</span>
                           <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
