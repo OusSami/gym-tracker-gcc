@@ -804,12 +804,14 @@ export default function Program() {
       ])
       if(sr.program){
         setProgram(sr.program)
-        if(sr.todayDay?.daily_workout)setWorkout(sr.todayDay.daily_workout)
         if(sr.todayDay?.checkin_status)setCheckinDone(true)
         const dr=await fetch('/api/packages/days?programId='+sr.program.id).then(r=>r.json()).catch(()=>({days:[]}))
         setDayRecords(dr.days||[])
-        // Auto-generate today's workout if not yet done
-        if(!sr.todayDay?.daily_workout&&!sr.todayDay?.checkin_status){
+        const cached=sr.todayDay?.daily_workout
+        // Use cache only if it has current version (v:4 = images + steps). Otherwise regenerate.
+        if(cached&&cached.v===4){
+          setWorkout(cached)
+        }else if(!sr.todayDay?.checkin_status){
           autoGenerate(sr.program,dr.days||[])
         }
       }

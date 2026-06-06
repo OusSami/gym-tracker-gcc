@@ -403,6 +403,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     nutrition_reminder: nutrition,
     estimated_duration_min: duration,
     sex,
+    v: 4, // bump when workout structure changes — triggers cache bust in frontend
   }
 }
 
