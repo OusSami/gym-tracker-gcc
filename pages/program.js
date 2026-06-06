@@ -159,6 +159,8 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
   const [registering, setRegistering] = useState(false)
   const [liveSessionId, setLiveSessionId] = useState(null)
   const [exerciseRowIds, setExerciseRowIds] = useState({})
+  const [coachBanner, setCoachBanner] = useState(null)       // {msg, color, isMedical}
+  const [healthSuggest, setHealthSuggest] = useState(null)   // {condition, userId}
   const inputRef = useRef(null)
 
   // Save a single set to DB immediately (fire and forget)
@@ -213,16 +215,109 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
     }
   }
 
-  const submitWhy = () => {
+  const submitWhy = async () => {
     const wasSkip = whyModal?.isSkip
+    const cat = whyCat
+    const txt = whyText.trim()
+    const exName = whyModal?.exerciseName
     setWhyModal(null); setWhyCat(null); setWhyText('')
+
+    // Map UI category to API category
+    const apiCategory = cat === 'pain' ? 'pain'
+      : cat === 'time' ? 'time'
+      : cat === 'heavy' || cat === 'fatigue' || cat === 'form' ? 'difficulty'
+      : 'mental'
+
+    // Navigate immediately — don't block the workout on API call
     if (wasSkip) {
       setRegistering(false)
       const nextIdx = exIdx + 1
       if (nextIdx >= exercises.length || !exercises[nextIdx]) setPhase('done')
       else { setExIdx(nextIdx); setSetIdx(0); setPhase('exercise') }
     }
+
+    // Send analysis in background
+    try {
+      const r = await fetch('/api/packages/analyze-reason', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ userId, programId, dayNumber, category: apiCategory, reasonText: txt, exerciseName: exName })
+      })
+      const d = await r.json()
+      if (!r.ok || !d.analysis) return
+
+      const a = d.analysis
+
+      // Show coach reply
+      if (a.coach_reply) {
+        const isMedical = a.medical_warning || a.severity === 'urgent'
+        setCoachBanner({
+          msg: a.coach_reply,
+          color: isMedical ? '#ef4444' : a.type === 'pain' ? '#f97316' : '#22c55e',
+          isMedical,
+        })
+        setTimeout(() => setCoachBanner(null), isMedical ? 0 : 8000)
+      }
+
+      // If AI suggests adding a health condition → ask user to confirm
+      if (a.suggest_health_condition && userId) {
+        setHealthSuggest({ condition: a.suggest_health_condition, userId })
+      }
+    } catch (e) {
+      console.error('analyze-reason error:', e)
+    }
   }
+
+  // ── Coach reply banner ──────────────────────────────────────────
+  const coachBannerUI = coachBanner && (
+    <div style={{position:'fixed',top:64,right:0,left:0,zIndex:400,padding:'0 16px'}}>
+      <div style={{maxWidth:480,margin:'0 auto',background:coachBanner.isMedical?'rgba(239,68,68,0.15)':'rgba(0,0,0,0.92)',border:`1px solid ${coachBanner.color}44`,borderRadius:16,padding:'14px 16px',boxShadow:'0 8px 32px rgba(0,0,0,0.5)',backdropFilter:'blur(12px)'}}>
+        <div style={{display:'flex',gap:10,alignItems:'flex-start'}}>
+          <span style={{fontSize:'1.1rem',flexShrink:0}}>{coachBanner.isMedical?'🚨':'🏋️'}</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'.7rem',fontWeight:700,color:coachBanner.color,letterSpacing:1,marginBottom:4,textTransform:'uppercase'}}>رد المدرب</div>
+            <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.9)',lineHeight:1.6}}>{coachBanner.msg}</div>
+          </div>
+          {!coachBanner.isMedical && (
+            <button onClick={()=>setCoachBanner(null)} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',cursor:'pointer',fontSize:'1rem',flexShrink:0,padding:4}}>✕</button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  // ── Health condition suggestion ─────────────────────────────────
+  const CONDITION_LABELS = {
+    knee_pain:'ألم الركبة', back_pain:'ألم الظهر', shoulder_pain:'ألم الكتف',
+  }
+  const healthSuggestUI = healthSuggest && (
+    <div style={{position:'fixed',bottom:100,right:0,left:0,zIndex:400,padding:'0 16px'}}>
+      <div style={{maxWidth:480,margin:'0 auto',background:'rgba(15,14,11,0.97)',border:`1px solid ${G}40`,borderRadius:18,padding:'16px',boxShadow:'0 8px 32px rgba(0,0,0,0.6)',backdropFilter:'blur(12px)'}}>
+        <div style={{fontSize:'.75rem',fontWeight:700,color:G,marginBottom:6}}>💡 اقتراح المدرب</div>
+        <div style={{fontSize:'.84rem',color:'rgba(255,255,255,0.85)',lineHeight:1.6,marginBottom:14}}>
+          لاحظ المدرب أعراض <strong style={{color:G}}>{CONDITION_LABELS[healthSuggest.condition]||healthSuggest.condition}</strong>. هل نضيفها لملفك الصحي لتعديل التمارين القادمة؟
+        </div>
+        <div style={{display:'flex',gap:8}}>
+          <button onClick={async()=>{
+            try {
+              await fetch('/api/profile', {
+                method:'PATCH',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({userId:healthSuggest.userId, addHealthCondition: healthSuggest.condition})
+              })
+            } catch(e){ console.error(e) }
+            setHealthSuggest(null)
+          }} style={{flex:1,background:G,color:'#09090B',border:'none',borderRadius:11,padding:'11px',fontFamily:F,fontWeight:900,cursor:'pointer',fontSize:'.85rem'}}>
+            نعم، أضف للملف ✓
+          </button>
+          <button onClick={()=>setHealthSuggest(null)}
+            style={{flex:1,background:'rgba(255,255,255,0.05)',color:'rgba(255,255,255,0.5)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:11,padding:'11px',fontFamily:F,fontWeight:700,cursor:'pointer',fontSize:'.85rem'}}>
+            لا، شكراً
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 
   const whyOverlay = whyModal && (
         <div style={{position:'fixed',inset:0,zIndex:300,background:'rgba(0,0,0,0.8)',backdropFilter:'blur(6px)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}} onClick={()=>{ if(!whyModal.isSkip){ setWhyModal(null);setWhyCat(null);setWhyText('') } }}>
@@ -413,7 +508,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
   // ── REST ──
   if(phase==='rest') return (
     <div>
-      {whyOverlay}
+      {coachBannerUI}{healthSuggestUI}{whyOverlay}
       <div style={{textAlign:'center',marginBottom:12,fontSize:'.8rem',color:'rgba(255,255,255,0.4)'}}>
         {ex.name?.split('|')[1]?.trim()||ex.name||''} · مجموعة {setIdx+1} من {ex.sets} ✓
       </div>
@@ -549,7 +644,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
   // ── EXERCISE ──
   return (
     <div>
-      {whyOverlay}
+      {coachBannerUI}{healthSuggestUI}{whyOverlay}
       {/* Progress bar */}
       <div style={{display:'flex',gap:4,marginBottom:14}}>
         {exercises.map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<exIdx?'#22c55e':i===exIdx?G:'rgba(255,255,255,0.08)',transition:'all .3s'}}/>)}

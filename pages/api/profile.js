@@ -31,8 +31,20 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST' || req.method === 'PATCH') {
-    const { userId, ...fields } = req.body
+    const { userId, addHealthCondition, ...fields } = req.body
     if (!userId) return res.status(400).json({ error: 'Missing userId' })
+
+    // Special case: add a single health condition to the array safely
+    if (addHealthCondition) {
+      const { data: cur } = await sb.from('profiles').select('health_conditions').eq('id', userId).single()
+      const existing = Array.isArray(cur?.health_conditions) ? cur.health_conditions : []
+      if (!existing.includes(addHealthCondition)) {
+        const updated = [...existing, addHealthCondition]
+        const { error: hErr } = await sb.from('profiles').update({ health_conditions: updated }).eq('id', userId)
+        if (hErr) return res.status(500).json({ error: hErr.message })
+      }
+      return res.status(200).json({ success: true })
+    }
 
     const allowed = ['unit_system','birthday','fitness_level','weight_kg','height_cm','goal','onboarded','full_name','email','sex']
     const updates = {}
