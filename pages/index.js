@@ -957,6 +957,7 @@ function AuthScreen() {
 function HomeScreen({ user, quote, onStart, router }) {
   const [homeData, setHomeData] = React.useState(null)
   const [activeProgram, setActiveProgram] = React.useState(null)
+  const [todayMeals, setTodayMeals] = React.useState(null)
   const hour = new Date().getHours()
 
   const greeting = hour < 5  ? 'المنضبط يفرق 🔥' :
@@ -1053,22 +1054,24 @@ function HomeScreen({ user, quote, onStart, router }) {
       const fatTarget = nutriGoals?.fat_g || 65
       setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, proteinTarget, carbsTarget, fatTarget, bfPct, bmi, dailyPhrase, sex, todayCalories: 0, todayProtein: 0, todayCarbs: 0, todayFat: 0 })
 
-      // Fetch meals directly via Supabase client (user is authenticated at this point)
-      const todayDate = new Date().toISOString().split('T')[0]
-      supabase
-        .from('meals')
-        .select('total_calories,protein_g,carbs_g,fat_g')
-        .eq('user_id', uid)
-        .eq('meal_date', todayDate)
-        .then(({ data: meals, error }) => {
-          if (error || !meals) return
-          const todayCalories = meals.reduce((s, m) => s + (m.total_calories || 0), 0)
-          const todayProtein = Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0))
-          const todayCarbs = Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0))
-          const todayFat = Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0))
-          setHomeData(prev => prev ? { ...prev, todayCalories, todayProtein, todayCarbs, todayFat } : prev)
-        })
     }).catch(() => {})
+  }, [user?.id])
+
+  // Separate effect — fetches today's meals independently via admin API (bypasses RLS)
+  React.useEffect(() => {
+    if (!user?.id) return
+    const todayDate = new Date().toISOString().split('T')[0]
+    fetch('/api/meals?userId=' + user.id + '&date=' + todayDate)
+      .then(r => r.json())
+      .then(({ meals = [] }) => {
+        setTodayMeals({
+          calories: meals.reduce((s, m) => s + (m.total_calories || 0), 0),
+          protein: Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0)),
+          carbs: Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0)),
+          fat: Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0)),
+        })
+      })
+      .catch(() => {})
   }, [user?.id])
 
   const d = homeData
@@ -1287,7 +1290,7 @@ function HomeScreen({ user, quote, onStart, router }) {
           ))}
           {/* Calories card — futuristic HUD */}
           {(() => {
-            const cal = d?.todayCalories || 0
+            const cal = todayMeals?.calories ?? 0
             const target = d?.calorieTarget || 2000
             const pct = Math.min(1, cal / target)
             const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.7 ? '#f97316' : '#CBA23B'
@@ -1304,7 +1307,7 @@ function HomeScreen({ user, quote, onStart, router }) {
                 {/* Ring + number */}
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <div>
-                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:arcColor,textShadow:`0 0 14px ${arcColor}66`,lineHeight:1}}>{cal}</div>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:arcColor,textShadow:`0 0 14px ${arcColor}66`,lineHeight:1}}>{todayMeals === null ? '...' : cal}</div>
                     <div style={{fontSize:'.5rem',color:'rgba(255,255,255,0.2)',marginTop:3,fontFamily:"'DM Sans',sans-serif",letterSpacing:1}}>/ {target} KCAL</div>
                   </div>
                   <svg width={46} height={46}>
@@ -1318,7 +1321,7 @@ function HomeScreen({ user, quote, onStart, router }) {
                 </div>
                 {/* Macro bars */}
                 <div style={{display:'flex',flexDirection:'column',gap:3}}>
-                  {[['P','#3b82f6',d?.todayProtein||0],['C','#f97316',d?.todayCarbs||0],['F','#a855f7',d?.todayFat||0]].map(([l,c,v])=>(
+                  {[['P','#3b82f6',todayMeals?.protein||0],['C','#f97316',todayMeals?.carbs||0],['F','#a855f7',todayMeals?.fat||0]].map(([l,c,v])=>(
                     <div key={l} style={{display:'flex',alignItems:'center',gap:5}}>
                       <div style={{width:12,fontSize:'.48rem',fontWeight:900,color:c,fontFamily:'monospace',flexShrink:0,textShadow:`0 0 6px ${c}88`}}>{l}</div>
                       <div style={{flex:1,height:3,background:'rgba(255,255,255,0.05)',borderRadius:2,overflow:'hidden'}}>
