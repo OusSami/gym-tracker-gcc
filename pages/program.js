@@ -38,7 +38,7 @@ function buildCooldown(muscles=[]) {
 }
 
 // ── Timed exercise (warmup & cooldown) ───────────────────────────
-function TimedExercise({exercise, index, total, label, color, onDone}) {
+function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
   const dur = exercise.duration_seconds || exercise.dur || 30
   const [left, setLeft] = useState(dur)
   const ref = useRef(null)
@@ -56,30 +56,60 @@ function TimedExercise({exercise, index, total, label, color, onDone}) {
 
   const pct=((dur-left)/dur)*100
   const c2=color||G
+  const imgSex = sex === 'female' ? 'female' : 'male'
+  const imgSrc = exercise.imageKey ? `/exercises/${exercise.imageKey}-${imgSex}.png` : null
 
   return (
-    <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${c2}22`,borderRadius:18,padding:'20px',textAlign:'center'}}>
-      <div style={{fontSize:'.65rem',fontWeight:700,color:c2,letterSpacing:2,marginBottom:10,textTransform:'uppercase'}}>
-        {label} · {index+1} من {total}
-      </div>
-      <div style={{fontWeight:800,fontSize:'1.05rem',color:'#ECE3CF',marginBottom:6}}>{exercise.name}</div>
-      {exercise.instructions && <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.45)',marginBottom:14,lineHeight:1.5}}>{exercise.instructions}</div>}
-      {exercise.target && <div style={{fontSize:'.75rem',color:c2,marginBottom:14}}>{exercise.target}</div>}
-
-      <div style={{position:'relative',width:96,height:96,margin:'0 auto 16px'}}>
-        <svg width="96" height="96" viewBox="0 0 96 96" style={{transform:'rotate(-90deg)'}}>
-          <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8"/>
-          <circle cx="48" cy="48" r="42" fill="none" stroke={c2} strokeWidth="8"
-            strokeDasharray={`${pct/100*2*Math.PI*42} ${2*Math.PI*42}`} strokeLinecap="round"
-            style={{transition:'stroke-dasharray .9s linear'}}/>
-        </svg>
-        <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
-          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.8rem',color:c2,lineHeight:1}}>{left}</div>
-          <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>ثانية</div>
+    <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${c2}22`,borderRadius:18,overflow:'hidden'}}>
+      {/* Exercise image */}
+      {imgSrc && (
+        <div style={{position:'relative',width:'100%',height:180,background:'rgba(0,0,0,0.4)',overflow:'hidden'}}>
+          <img src={imgSrc} alt={exercise.name} onError={e=>{e.target.parentNode.style.display='none'}}
+            style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',opacity:.85}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom, transparent 50%, rgba(9,9,11,0.9))'}}/>
+          {exercise.target && (
+            <div style={{position:'absolute',bottom:10,right:14,fontSize:'.7rem',fontWeight:700,color:c2,background:'rgba(0,0,0,0.5)',padding:'3px 10px',borderRadius:20,backdropFilter:'blur(4px)'}}>
+              {exercise.target}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      <div style={{display:'flex',gap:8,justifyContent:'center'}}>
+      <div style={{padding:'16px 20px',textAlign:'center'}}>
+        <div style={{fontSize:'.65rem',fontWeight:700,color:c2,letterSpacing:2,marginBottom:8,textTransform:'uppercase'}}>
+          {label} · {index+1} من {total}
+        </div>
+        <div style={{fontWeight:800,fontSize:'1.05rem',color:'#ECE3CF',marginBottom:4}}>{exercise.name}</div>
+        {!imgSrc && exercise.target && <div style={{fontSize:'.72rem',color:c2,marginBottom:8}}>{exercise.target}</div>}
+
+        {/* Steps list */}
+        {exercise.steps?.length > 0 ? (
+          <div style={{textAlign:'right',margin:'10px 0 14px',display:'flex',flexDirection:'column',gap:5}}>
+            {exercise.steps.map((s,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,fontSize:'.78rem',color:'rgba(255,255,255,0.55)',lineHeight:1.5}}>
+                <span style={{color:c2,fontWeight:900,fontSize:'.72rem',minWidth:18,marginTop:1}}>{i+1}.</span>
+                <span>{s}</span>
+              </div>
+            ))}
+          </div>
+        ) : exercise.instructions ? (
+          <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.45)',marginBottom:14,lineHeight:1.5}}>{exercise.instructions}</div>
+        ) : null}
+
+        {/* Timer ring */}
+        <div style={{position:'relative',width:84,height:84,margin:'0 auto 14px'}}>
+          <svg width="84" height="84" viewBox="0 0 84 84" style={{transform:'rotate(-90deg)'}}>
+            <circle cx="42" cy="42" r="36" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7"/>
+            <circle cx="42" cy="42" r="36" fill="none" stroke={c2} strokeWidth="7"
+              strokeDasharray={`${pct/100*2*Math.PI*36} ${2*Math.PI*36}`} strokeLinecap="round"
+              style={{transition:'stroke-dasharray .9s linear'}}/>
+          </svg>
+          <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+            <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.6rem',color:c2,lineHeight:1}}>{left}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>ثانية</div>
+          </div>
+        </div>
+
         <button onClick={()=>{clearInterval(ref.current);onDone()}}
           style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',borderRadius:10,padding:'8px 18px',fontFamily:F,cursor:'pointer',fontSize:'.8rem'}}>
           التالي →
@@ -483,7 +513,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       </div>
       <TimedExercise key={'wu-'+wuIdx}
         exercise={warmup[wuIdx]} index={wuIdx} total={warmup.length}
-        label="الإحماء" color="#3b82f6"
+        label="الإحماء" color="#3b82f6" sex={workout.sex}
         onDone={()=>{
           if(wuIdx<warmup.length-1){setWuIdx(i=>i+1)}
           else{setPhase('warmup_done')}
@@ -526,7 +556,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       </div>
       <TimedExercise key={'cd-'+cdIdx}
         exercise={cooldown[cdIdx]} index={cdIdx} total={cooldown.length}
-        label="تبريد وتمديد" color="#22c55e"
+        label="تبريد وتمديد" color="#22c55e" sex={workout.sex}
         onDone={()=>{
           if(cdIdx<cooldown.length-1){setCdIdx(i=>i+1)}
           else{setPhase('cooldown_done')}

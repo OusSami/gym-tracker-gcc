@@ -66,20 +66,75 @@ const EXERCISES = {
 
 // ── Warmup (will be filtered by conditions) ───────────────────────
 const WARMUP_ALL = [
-  {name:'رقبة وكتفين | Neck Rolls',     duration_seconds:30, instructions:'دوّر رقبتك ببطء يميناً ويساراً'},
-  {name:'تدوير الذراعين | Arm Circles', duration_seconds:30, instructions:'دوائر كبيرة للأمام والخلف'},
-  {name:'تدوير الخصر | Hip Circles',    duration_seconds:30, instructions:'دوائر بالخصر يميناً ويساراً'},
-  {name:'قرفصاء خفيف | Air Squat',     duration_seconds:40, instructions:'10 قرفصاءات بطيئة للإحماء'},
-  {name:'ركض خفيف | Light March',      duration_seconds:60, instructions:'ارفع ركبتيك ببطء في مكانك'},
-  {name:'مط الجانب | Side Stretch',    duration_seconds:30, instructions:'مدّ يديك للأعلى وانحنِ يميناً ويساراً'},
+  {
+    name:'رقبة وكتفين | Neck Rolls', duration_seconds:30,
+    imageKey:'w-shoulder-swing', target:'الرقبة · الكتفين',
+    instructions:'دوّر رقبتك ببطء يميناً ويساراً',
+    steps:['قف أو اجلس بوضع مستقيم','أمِل رأسك ببطء نحو اليمين','دوّره للأمام ثم لليسار','٥ دوائر كاملة ثم عكس الاتجاه'],
+  },
+  {
+    name:'تدوير الذراعين | Arm Circles', duration_seconds:30,
+    imageKey:'w-arm-circles', target:'الكتفين · الذراعين',
+    instructions:'دوائر كبيرة للأمام والخلف',
+    steps:['ابسط ذراعيك للجانبين على مستوى الكتف','ابدأ بدوائر صغيرة وكبّرها تدريجياً','١٠ دوائر للأمام ثم ١٠ للخلف','حافظ على الكتفين مسترخيين'],
+  },
+  {
+    name:'تدوير الخصر | Hip Circles', duration_seconds:30,
+    imageKey:null, target:'الخصر · الوركين',
+    instructions:'دوائر بالخصر يميناً ويساراً',
+    steps:['قف مع مسافة الكتفين بين قدميك','ضع يديك على خصرك','دوّر الخصر بدوائر كبيرة يميناً','١٠ دوائر ثم عكس الاتجاه'],
+  },
+  {
+    name:'قرفصاء خفيف | Air Squat', duration_seconds:40,
+    imageKey:'w-slow-squat', target:'الأرجل · المؤخرة',
+    instructions:'١٠ قرفصاءات بطيئة للإحماء',
+    steps:['قف مع مسافة الكتفين بين قدميك','أخفض نفسك ببطء حتى تكون الفخذان موازيين للأرض','أبقِ ظهرك مستقيماً والصدر مرتفعاً','ارجع للوقوف ببطء — ١٠ تكرارات'],
+  },
+  {
+    name:'ركض خفيف | Light March', duration_seconds:60,
+    imageKey:'w-march-in-place', target:'الجسم كامل · القلب',
+    instructions:'ارفع ركبتيك ببطء في مكانك',
+    steps:['قف بوضع مستقيم مع إرخاء الكتفين','ارفع ركبتك اليمنى ببطء حتى مستوى الخصر','بدّل مع الركبة اليسرى بإيقاع هادئ','حرّك ذراعيك بشكل طبيعي مع الحركة'],
+  },
+  {
+    name:'مط الجانب | Side Stretch', duration_seconds:30,
+    imageKey:null, target:'الجانبين · الظهر',
+    instructions:'مدّ يديك للأعلى وانحنِ يميناً ويساراً',
+    steps:['قف مستقيماً مع قدمين متباعدتين','ارفع يدك اليمنى للأعلى','انحنِ ببطء نحو اليسار حتى تشعر بالمط','عد واكرر الجانب الآخر — ٣ مرات لكل جانب'],
+  },
 ]
 
 const COOLDOWN = [
-  {name:'تمديد البطن | Cobra Stretch', duration_seconds:35, target:'البطن والظهر السفلي'},
-  {name:'تمديد الأرجل | Hamstring',    duration_seconds:35, target:'أوتار الركبة'},
-  {name:'تمديد الكتفين | Shoulder',    duration_seconds:30, target:'الكتفين والصدر'},
-  {name:'وضع الطفل | Child Pose',      duration_seconds:45, target:'الظهر الكامل والكتفين'},
-  {name:'تمديد الأرداف | Pigeon Pose', duration_seconds:30, target:'الأرداف والوركين'},
+  {
+    name:'تمديد البطن | Cobra Stretch', duration_seconds:35,
+    imageKey:null, target:'البطن · الظهر السفلي',
+    instructions:'استلقِ وارفع صدرك للأعلى',
+    steps:['استلقِ على بطنك مع وضع يديك أسفل كتفيك','ارفع صدرك للأعلى ببطء مع تمديد الظهر','حافظ على الحوض في الأرض','ابقَ ٥ ثوانٍ ثم خفّض واكرر'],
+  },
+  {
+    name:'تمديد الأرجل | Hamstring Stretch', duration_seconds:35,
+    imageKey:null, target:'أوتار الركبة · الفخذين',
+    instructions:'مدّ ساقيك وانحنِ للأمام',
+    steps:['اجلس على الأرض مع مد ساقيك للأمام','انحنِ ببطء نحو قدميك دون تقوس الركبة','حافظ على الظهر مستقيماً','ابقَ في هذا الوضع ١٠ ثوانٍ وكرر'],
+  },
+  {
+    name:'تمديد الكتفين | Shoulder Stretch', duration_seconds:30,
+    imageKey:null, target:'الكتفين · الصدر',
+    instructions:'شبّك يديك خلف ظهرك وارفعهما',
+    steps:['قف مستقيماً وشبّك أصابع يديك خلف ظهرك','ارفع يديك ببطء حتى تشعر بتمديد في الصدر','أبقِ الذقن مرتفعاً والكتفين متراجعين','ابقَ ١٠ ثوانٍ ثم أرخِ واكرر'],
+  },
+  {
+    name:'وضع الطفل | Child Pose', duration_seconds:45,
+    imageKey:null, target:'الظهر الكامل · الكتفين',
+    instructions:'اجلس على كعبيك ومدّ يديك للأمام',
+    steps:['ابدأ في وضع الركوع على ركبتيك','اجلس للخلف على كعبيك','مدّ يديك للأمام واخفض جبهتك للأرض','تنفس ببطء وابقَ في هذا الوضع'],
+  },
+  {
+    name:'تمديد الأرداف | Glute Stretch', duration_seconds:30,
+    imageKey:null, target:'الأرداف · الوركين',
+    instructions:'استلقِ وضع ساقك على ركبتك',
+    steps:['استلقِ على ظهرك وثنِ ركبتيك','ضع كاحل ساقك اليمنى على ركبتك اليسرى','شبّك يديك خلف فخذك اليسرى واسحب','ابقَ ١٠ ثوانٍ ثم غيّر الجانب'],
+  },
 ]
 
 // ── Health condition → blocked exercise keywords ──────────────────
@@ -296,6 +351,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     cooldown,
     nutrition_reminder: nutrition,
     estimated_duration_min: duration,
+    sex,
   }
 }
 
