@@ -722,7 +722,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
           {/* Steps */}
           {ex.steps?.length>0&&(
             <div style={{background:'rgba(0,0,0,0.2)',borderRadius:10,padding:'10px 12px',marginBottom:10}}>
-              {(sex==='female'?(ex.femaleSteps??ex.steps):ex.steps).map((s,i)=>(
+              {(workout.sex==='female'?(ex.femaleSteps??ex.steps):ex.steps).map((s,i)=>(
                 <div key={i} style={{display:'flex',gap:8,alignItems:'flex-start',marginBottom:i<ex.steps.length-1?6:0,fontSize:'.76rem',color:'rgba(255,255,255,0.55)',lineHeight:1.5}}>
                   <span style={{color:G,fontWeight:900,fontSize:'.7rem',minWidth:16,marginTop:1}}>{i+1}.</span>
                   <span>{s}</span>
@@ -838,12 +838,13 @@ export default function Program() {
         if(sr.todayDay?.checkin_status)setCheckinDone(true)
         const dr=await fetch('/api/packages/days?programId='+sr.program.id).then(r=>r.json()).catch(()=>({days:[]}))
         setDayRecords(dr.days||[])
-        const cached=sr.todayDay?.daily_workout
-        // Use cache only if it has current version (v:7 = female Arabic steps added). Otherwise regenerate.
-        if(cached&&cached.v===7){
-          setWorkout(cached)
-        }else if(!sr.todayDay?.checkin_status){
+        // Always regenerate if not checked in yet — ensures fresh profile.sex from DB every load
+        if(!sr.todayDay?.checkin_status){
           autoGenerate(sr.program,dr.days||[])
+        }else{
+          // Already checked in — show the cached workout from that session
+          const cached=sr.todayDay?.daily_workout
+          if(cached)setWorkout(cached)
         }
       }
 
