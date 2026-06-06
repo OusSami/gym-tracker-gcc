@@ -76,7 +76,7 @@ export default function Packages() {
       const d = await r.json()
       if (!r.ok) { setError(d.error || 'صار خطأ'); setGenerating(false); return }
       router.push('/program')
-    } catch(e) { setError('تعذر الاتصال'); setGenerating(false) }
+    } catch(e) { console.error('packages start error:', e); setError('تعذر الاتصال — ' + (e?.message || e)); setGenerating(false) }
   }
 
   if (loading) return (
@@ -202,7 +202,7 @@ export default function Packages() {
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:0, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
               {[
                 [prog.days + '+',      'تمرين مخصص'  ],
-                [prog.days * 3 + '+',  'وجبة خليجية' ],
+                ['250+',               'وجبة خليجية' ],
                 ['∞',                  'تعديل ذكي'   ],
               ].map(([val,lbl])=>(
                 <div key={lbl} style={{ textAlign:'center' }}>

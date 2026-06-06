@@ -107,57 +107,62 @@ function buildRoadmap(profile, totalDays) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { userId, packageId, packageName, totalDays, profile } = req.body
-  if (!userId || !profile) return res.status(400).json({ error: 'Missing fields' })
+  try {
+    const { userId, packageId, packageName, totalDays, profile } = req.body
+    if (!userId || !profile) return res.status(400).json({ error: 'Missing fields' })
 
-  const sb = supabaseAdmin()
+    const sb = supabaseAdmin()
 
-  // Pause existing active program
-  await sb.from('user_programs')
-    .update({ status: 'paused' })
-    .eq('user_id', userId)
-    .eq('status', 'active')
+    // Pause existing active program
+    await sb.from('user_programs')
+      .update({ status: 'paused' })
+      .eq('user_id', userId)
+      .eq('status', 'active')
 
-  // Build roadmap locally — instant, never fails
-  const days = totalDays || 21
-  const roadmap = buildRoadmap(profile, days)
+    // Build roadmap locally — instant, never fails
+    const days = totalDays || 21
+    const roadmap = buildRoadmap(profile, days)
 
-  const endDate = new Date()
-  endDate.setDate(endDate.getDate() + days - 1)
+    const endDate = new Date()
+    endDate.setDate(endDate.getDate() + days - 1)
 
-  const { data: program, error } = await sb.from('user_programs').insert({
-    user_id: userId,
-    package_id: packageId || 'transform',
-    package_name: packageName || roadmap.program_name,
-    total_days: days,
-    current_day: 1,
-    status: 'active',
-    roadmap,
-    end_date: endDate.toISOString().split('T')[0],
-  }).select().single()
-
-  if (error) {
-    console.error('DB insert error:', error)
-    return res.status(500).json({ error: 'تعذر حفظ البرنامج: ' + error.message })
-  }
-
-  // Insert day records
-  const dayRows = roadmap.days.map((d, i) => {
-    const date = new Date(); date.setDate(date.getDate() + i)
-    return {
-      program_id: program.id,
+    const { data: program, error } = await sb.from('user_programs').insert({
       user_id: userId,
-      day_number: i + 1,
-      planned_date: date.toISOString().split('T')[0],
-      roadmap_target: d,
+      package_id: packageId || 'transform',
+      package_name: packageName || roadmap.program_name,
+      total_days: days,
+      current_day: 1,
+      status: 'active',
+      roadmap,
+      end_date: endDate.toISOString().split('T')[0],
+    }).select().single()
+
+    if (error) {
+      console.error('DB insert error:', error)
+      return res.status(500).json({ error: 'تعذر حفظ البرنامج: ' + error.message })
     }
-  })
 
-  const { error: daysError } = await sb.from('program_days').insert(dayRows)
-  if (daysError) console.error('Days insert error:', daysError)
+    // Insert day records
+    const dayRows = roadmap.days.map((d, i) => {
+      const date = new Date(); date.setDate(date.getDate() + i)
+      return {
+        program_id: program.id,
+        user_id: userId,
+        day_number: i + 1,
+        planned_date: date.toISOString().split('T')[0],
+        roadmap_target: d,
+      }
+    })
 
-  // Log (no API cost — local generation)
-  logApiUsage(userId, 'program_gen', 0, 0)
+    const { error: daysError } = await sb.from('program_days').insert(dayRows)
+    if (daysError) console.error('Days insert error:', daysError)
 
-  return res.json({ program, roadmap })
+    // Log (no API cost — local generation)
+    logApiUsage(userId, 'program_gen', 0, 0)
+
+    return res.json({ program, roadmap })
+  } catch (e) {
+    console.error('generate handler crash:', e)
+    return res.status(500).json({ error: 'خطأ في الخادم: ' + (e?.message || e) })
+  }
 }
