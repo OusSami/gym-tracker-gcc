@@ -801,6 +801,61 @@ export default function Program() {
               )}
             </div>
 
+            {/* ── Scientific metrics card ── */}
+            {!isRest&&(()=>{
+              const BigR=34,BigC=2*Math.PI*BigR
+              const smR=18,smC=2*Math.PI*smR
+              const rings=[
+                {label:'الشدة', display:(todayTarget.intensity_target||5)+'/10', pct:((todayTarget.intensity_target||5)/10)*100,                          color:'#ef4444'},
+                {label:'المدة', display:(todayTarget.estimated_duration_min||30)+'د', pct:Math.min(100,((todayTarget.estimated_duration_min||30)/60)*100), color:'#3b82f6'},
+                {label:'الحجم', display:(todayTarget.sets_target||10)+'م',           pct:Math.min(100,((todayTarget.sets_target||10)/24)*100),            color:G},
+              ]
+              return(
+                <div style={{background:'rgba(255,255,255,0.02)',border:`1px solid rgba(203,162,59,0.1)`,borderRadius:20,padding:'16px 14px',marginBottom:14}}>
+                  <div style={{fontSize:'.58rem',fontWeight:700,color:`rgba(203,162,59,0.55)`,letterSpacing:2,textTransform:'uppercase',textAlign:'center',marginBottom:14}}>مؤشرات اليوم</div>
+                  <div style={{display:'flex',alignItems:'center',gap:12}}>
+                    {/* Big program progress ring */}
+                    <div style={{textAlign:'center',flexShrink:0}}>
+                      <div style={{position:'relative',width:80,height:80}}>
+                        <svg width="80" height="80" viewBox="0 0 80 80" style={{transform:'rotate(-90deg)'}}>
+                          <circle cx="40" cy="40" r={BigR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6"/>
+                          <circle cx="40" cy="40" r={BigR} fill="none" stroke={G} strokeWidth="6"
+                            strokeDasharray={`${(pct/100)*BigC} ${BigC}`} strokeLinecap="round"
+                            style={{filter:`drop-shadow(0 0 7px rgba(203,162,59,0.5))`,transition:'stroke-dasharray 1s ease'}}/>
+                        </svg>
+                        <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+                          <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'1rem',color:G,lineHeight:1}}>{pct}%</span>
+                          <span style={{fontSize:'.48rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>إنجاز</span>
+                        </div>
+                      </div>
+                      <div style={{fontSize:'.56rem',color:'rgba(255,255,255,0.3)',marginTop:5}}>البرنامج</div>
+                    </div>
+                    {/* Divider */}
+                    <div style={{width:1,height:72,background:'rgba(255,255,255,0.06)',flexShrink:0}}/>
+                    {/* 3 smaller rings */}
+                    <div style={{flex:1,display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4}}>
+                      {rings.map(({label,display,pct:p,color})=>(
+                        <div key={label} style={{textAlign:'center'}}>
+                          <div style={{position:'relative',width:52,height:52,margin:'0 auto 4px'}}>
+                            <svg width="52" height="52" viewBox="0 0 52 52" style={{transform:'rotate(-90deg)'}}>
+                              <circle cx="26" cy="26" r={smR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="4.5"/>
+                              <circle cx="26" cy="26" r={smR} fill="none" stroke={color} strokeWidth="4.5"
+                                strokeDasharray={`${(p/100)*smC} ${p/100*smC+smC}`} strokeLinecap="round"
+                                style={{filter:`drop-shadow(0 0 5px ${color}55)`,transition:'stroke-dasharray .8s ease'}}/>
+                            </svg>
+                            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'.6rem',color,lineHeight:1}}>{display}</span>
+                            </div>
+                          </div>
+                          <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.4)',fontWeight:600}}>{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
             {/* Week goal */}
             {program.roadmap?.weekly_overview?.length>0&&(()=>{
               const w=program.roadmap.weekly_overview[Math.min(Math.ceil(currentDay/7)-1,program.roadmap.weekly_overview.length-1)]
@@ -1178,6 +1233,61 @@ export default function Program() {
                 </button>
               )}
             </div>
+
+            {/* ── Scientific metrics card ── */}
+            {!isRest&&(()=>{
+              const BigR=34,BigC=2*Math.PI*BigR
+              const smR=18,smC=2*Math.PI*smR
+              const rings=[
+                {label:'الشدة', display:(todayTarget.intensity_target||5)+'/10', pct:((todayTarget.intensity_target||5)/10)*100,                          color:'#ef4444'},
+                {label:'المدة', display:(todayTarget.estimated_duration_min||30)+'د', pct:Math.min(100,((todayTarget.estimated_duration_min||30)/60)*100), color:'#3b82f6'},
+                {label:'الحجم', display:(todayTarget.sets_target||10)+'م',           pct:Math.min(100,((todayTarget.sets_target||10)/24)*100),            color:G},
+              ]
+              return(
+                <div style={{background:'rgba(255,255,255,0.02)',border:`1px solid rgba(203,162,59,0.1)`,borderRadius:20,padding:'16px 14px',marginBottom:14}}>
+                  <div style={{fontSize:'.58rem',fontWeight:700,color:`rgba(203,162,59,0.55)`,letterSpacing:2,textTransform:'uppercase',textAlign:'center',marginBottom:14}}>مؤشرات اليوم</div>
+                  <div style={{display:'flex',alignItems:'center',gap:12}}>
+                    {/* Big program progress ring */}
+                    <div style={{textAlign:'center',flexShrink:0}}>
+                      <div style={{position:'relative',width:80,height:80}}>
+                        <svg width="80" height="80" viewBox="0 0 80 80" style={{transform:'rotate(-90deg)'}}>
+                          <circle cx="40" cy="40" r={BigR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6"/>
+                          <circle cx="40" cy="40" r={BigR} fill="none" stroke={G} strokeWidth="6"
+                            strokeDasharray={`${(pct/100)*BigC} ${BigC}`} strokeLinecap="round"
+                            style={{filter:`drop-shadow(0 0 7px rgba(203,162,59,0.5))`,transition:'stroke-dasharray 1s ease'}}/>
+                        </svg>
+                        <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+                          <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'1rem',color:G,lineHeight:1}}>{pct}%</span>
+                          <span style={{fontSize:'.48rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>إنجاز</span>
+                        </div>
+                      </div>
+                      <div style={{fontSize:'.56rem',color:'rgba(255,255,255,0.3)',marginTop:5}}>البرنامج</div>
+                    </div>
+                    {/* Divider */}
+                    <div style={{width:1,height:72,background:'rgba(255,255,255,0.06)',flexShrink:0}}/>
+                    {/* 3 smaller rings */}
+                    <div style={{flex:1,display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4}}>
+                      {rings.map(({label,display,pct:p,color})=>(
+                        <div key={label} style={{textAlign:'center'}}>
+                          <div style={{position:'relative',width:52,height:52,margin:'0 auto 4px'}}>
+                            <svg width="52" height="52" viewBox="0 0 52 52" style={{transform:'rotate(-90deg)'}}>
+                              <circle cx="26" cy="26" r={smR} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="4.5"/>
+                              <circle cx="26" cy="26" r={smR} fill="none" stroke={color} strokeWidth="4.5"
+                                strokeDasharray={`${(p/100)*smC} ${p/100*smC+smC}`} strokeLinecap="round"
+                                style={{filter:`drop-shadow(0 0 5px ${color}55)`,transition:'stroke-dasharray .8s ease'}}/>
+                            </svg>
+                            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <span style={{fontFamily:'monospace',fontWeight:900,fontSize:'.6rem',color,lineHeight:1}}>{display}</span>
+                            </div>
+                          </div>
+                          <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.4)',fontWeight:600}}>{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Week goal */}
             {program.roadmap?.weekly_overview?.length>0&&(()=>{
