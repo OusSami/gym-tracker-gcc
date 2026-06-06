@@ -63,15 +63,9 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
     <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${c2}22`,borderRadius:18,overflow:'hidden'}}>
       {/* Exercise image */}
       {imgSrc && (
-        <div style={{position:'relative',width:'100%',height:180,background:'rgba(0,0,0,0.4)',overflow:'hidden'}}>
+        <div style={{width:'100%',height:220,background:'#0d0d0a',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',borderBottom:`1px solid ${c2}18`}}>
           <img src={imgSrc} alt={exercise.name} onError={e=>{e.target.parentNode.style.display='none'}}
-            style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',opacity:.85}}/>
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom, transparent 50%, rgba(9,9,11,0.9))'}}/>
-          {exercise.target && (
-            <div style={{position:'absolute',bottom:10,right:14,fontSize:'.7rem',fontWeight:700,color:c2,background:'rgba(0,0,0,0.5)',padding:'3px 10px',borderRadius:20,backdropFilter:'blur(4px)'}}>
-              {exercise.target}
-            </div>
-          )}
+            style={{height:'100%',width:'100%',objectFit:'contain',objectPosition:'center'}}/>
         </div>
       )}
 
@@ -80,7 +74,7 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
           {label} · {index+1} من {total}
         </div>
         <div style={{fontWeight:800,fontSize:'1.05rem',color:'#ECE3CF',marginBottom:4}}>{exercise.name}</div>
-        {!imgSrc && exercise.target && <div style={{fontSize:'.72rem',color:c2,marginBottom:8}}>{exercise.target}</div>}
+        {exercise.target && <div style={{fontSize:'.72rem',color:c2,marginBottom:8,fontWeight:600}}>{exercise.target}</div>}
 
         {/* Steps list */}
         {exercise.steps?.length > 0 ? (
@@ -685,16 +679,12 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}22`,borderRadius:18,marginBottom:12,overflow:'hidden'}}>
         {/* Exercise image */}
         {ex.imageKey && (
-          <div style={{position:'relative',width:'100%',height:170,background:'rgba(0,0,0,0.5)',overflow:'hidden'}}>
+          <div style={{width:'100%',height:220,background:'#0d0d0a',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',borderBottom:`1px solid ${G}18`}}>
             <img
               src={`/exercises/${ex.imageKey}-${workout.sex==='female'?'female':'male'}.png`}
               alt={ex.name}
               onError={e=>{e.target.parentNode.style.display='none'}}
-              style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',opacity:.85}}/>
-            <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent 40%,rgba(9,9,11,0.95))'}}/>
-            <div style={{position:'absolute',bottom:10,right:14,display:'flex',gap:6,alignItems:'center'}}>
-              <span style={{fontSize:'.68rem',fontWeight:700,color:G,background:'rgba(0,0,0,0.55)',padding:'3px 10px',borderRadius:20,backdropFilter:'blur(4px)'}}>{ex.muscle}</span>
-            </div>
+              style={{height:'100%',width:'100%',objectFit:'contain',objectPosition:'center'}}/>
           </div>
         )}
         <div style={{padding:'14px 16px'}}>
@@ -702,7 +692,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             <div>
               <div style={{fontWeight:900,fontSize:'1rem',marginBottom:1}}>{(ex.name||'').split('|')[0].trim()}</div>
               {ex.name?.includes('|')&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginBottom:3}}>{ex.name.split('|')[1]?.trim()}</div>}
-              {!ex.imageKey&&<div style={{fontSize:'.72rem',color:G}}>{ex.muscle}</div>}
+              <div style={{fontSize:'.72rem',color:G,fontWeight:600}}>{ex.muscle}</div>
             </div>
             <div style={{background:`${G}18`,borderRadius:10,padding:'6px 12px',textAlign:'center',flexShrink:0}}>
               <div style={{fontWeight:900,fontSize:'.95rem',color:G,fontFamily:'monospace'}}>{ex.sets}×{ex.reps}</div>
