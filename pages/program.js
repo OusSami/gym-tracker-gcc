@@ -260,6 +260,31 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
         <div style={{fontSize:'.82rem',color:'rgba(255,255,255,0.45)',fontFamily:F}}>{phrase.sub}</div>
       </div>
 
+      {/* Stats strip */}
+      {(()=>{
+        const totalSec=warmup.reduce((a,w)=>a+(w.duration_seconds||30),0)
+        const warmupMin=Math.round(totalSec/60)
+        const totalMin=(workout.estimated_duration_min||30)+warmupMin
+        const calories=Math.round(0.08*(profile?.weight_kg||75)*totalMin)
+        const muscles=[...new Set(exercises.map(e=>e.muscle).filter(Boolean))]
+        return(
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:14}}>
+            {[
+              {icon:'⏱️', val:totalMin+'د',   lbl:'المدة الكلية'},
+              {icon:'💪', val:exercises.length+'', lbl:'تمرين رئيسي'},
+              {icon:'🔥', val:calories+'',    lbl:'سعرة متوقعة'},
+              {icon:'🎯', val:muscles.length+'', lbl:'مجموعة عضلية'},
+            ].map(({icon,val,lbl})=>(
+              <div key={lbl} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}18`,borderRadius:13,padding:'10px 6px',textAlign:'center'}}>
+                <div style={{fontSize:'.9rem',marginBottom:3}}>{icon}</div>
+                <div style={{fontWeight:900,fontSize:'.95rem',color:G,fontFamily:'monospace',lineHeight:1}}>{val}</div>
+                <div style={{fontSize:'.52rem',color:'rgba(255,255,255,0.3)',marginTop:3,lineHeight:1.3}}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+        )
+      })()}
+
       {/* Session overview - compact cards */}
       <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
         {/* Warmup */}
@@ -287,15 +312,17 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
             <div style={{marginRight:'auto',fontSize:'.7rem',color:`${G}88`,fontFamily:'monospace'}}>{workout.estimated_duration_min}د</div>
           </div>
           {exercises.map((e,i)=>(
-            <div key={i} style={{padding:'6px 0',borderTop:i>0?'1px solid rgba(255,255,255,0.04)':'none'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                <div>
-                  <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.8)',fontWeight:600}}>{(e.name||'').split('|')[0].trim()}</span>
-                  {e.name?.includes('|')&&<span style={{fontSize:'.68rem',color:'rgba(255,255,255,0.3)',marginRight:6}}>{e.name.split('|')[1]?.trim()}</span>}
+            <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 0',borderTop:i>0?'1px solid rgba(255,255,255,0.04)':'none'}}>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'.83rem',color:'rgba(255,255,255,0.88)',fontWeight:700,marginBottom:2}}>{(e.name||'').split('|')[0].trim()}</div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  {e.muscle&&<span style={{fontSize:'.6rem',color:`${G}80`,fontWeight:600}}>{e.muscle}</span>}
+                  {e.name?.includes('|')&&<span style={{fontSize:'.6rem',color:'rgba(255,255,255,0.22)'}}>{e.name.split('|')[1]?.trim()}</span>}
                 </div>
-                <span style={{fontFamily:'monospace',color:G,fontSize:'.78rem',fontWeight:700}}>{e.sets}×{e.reps}</span>
               </div>
-              {e.muscle&&<div style={{fontSize:'.65rem',color:`${G}77`,marginTop:2}}>{e.muscle}</div>}
+              <div style={{background:`${G}18`,border:`1px solid ${G}40`,borderRadius:9,padding:'5px 11px',textAlign:'center',flexShrink:0}}>
+                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.8rem',color:G,lineHeight:1}}>{e.sets}×{e.reps}</div>
+              </div>
             </div>
           ))}
         </div>
