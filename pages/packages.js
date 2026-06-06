@@ -175,7 +175,7 @@ export default function Packages() {
             </svg>
 
             {/* x-axis labels */}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.62rem', color:'rgba(255,255,255,0.3)', marginBottom:16, padding:'0 2px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.62rem', color:'rgba(255,255,255,0.3)', marginBottom:16, padding:'0 2px', direction:'ltr' }}>
               <span>البداية</span>
               <span>أسبوع 1</span>
               <span>أسبوع 2</span>
