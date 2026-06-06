@@ -26,12 +26,30 @@ const PHRASES_F=[
 // ── Cooldown — adapted to muscles trained ────────────────────────
 function buildCooldown(muscles=[]) {
   const all = [
-    {name:'تمديد البطن | Cobra Stretch', target:'البطن والظهر', muscles:['البطن','الظهر السفلي','Core'], dur:30},
-    {name:'تمديد الأرجل | Hamstring', target:'أوتار الركبة', muscles:['الأرجل','Legs'], dur:30},
-    {name:'تمديد الكتفين | Shoulder Cross', target:'الكتفين', muscles:['الصدر/الكتفين','Chest','Shoulders','Arms'], dur:30},
-    {name:'وضع الطفل | Child Pose', target:'الظهر والكتفين', muscles:['الظهر','Back','Core','الظهر السفلي'], dur:40},
-    {name:'تمديد الأرداف | Glute Stretch', target:'الأرداف', muscles:['الأرجل','Legs','المؤخرة'], dur:30},
-    {name:'تدوير الرقبة | Neck Roll', target:'الرقبة', muscles:['الجسم كامل','Shoulders'], dur:20},
+    {name:'تمديد البطن | Cobra Stretch', target:'البطن والظهر', muscles:['البطن','الظهر السفلي','Core'], dur:30,
+      imageKey:'w-cat-cow',
+      steps:['استلقِ على بطنك مع وضع يديك أسفل كتفيك','ارفع صدرك للأعلى ببطء مع تمديد الظهر','حافظ على الحوض في الأرض','ابقَ ٥ ثوانٍ ثم خفّض واكرر'],
+      femaleSteps:['استلقي على بطنكِ مع وضع يديكِ أسفل كتفيكِ','ارفعي صدركِ للأعلى ببطء مع تمديد الظهر','حافظي على الحوض في الأرض','ابقي ٥ ثوانٍ ثم خفّضي وكرّري']},
+    {name:'تمديد الأرجل | Hamstring', target:'أوتار الركبة', muscles:['الأرجل','Legs'], dur:30,
+      imageKey:'w-pelvic-tilt',
+      steps:['اجلس على الأرض مع مد ساقيك للأمام','انحنِ ببطء نحو قدميك دون تقوس الركبة','حافظ على الظهر مستقيماً','ابقَ في هذا الوضع ١٠ ثوانٍ وكرر'],
+      femaleSteps:['اجلسي على الأرض مع مدّ ساقيكِ للأمام','انحني ببطء نحو قدميكِ دون تقوّس الركبة','حافظي على الظهر مستقيماً','ابقي في هذا الوضع ١٠ ثوانٍ وكرّري']},
+    {name:'تمديد الكتفين | Shoulder Cross', target:'الكتفين', muscles:['الصدر/الكتفين','Chest','Shoulders','Arms'], dur:30,
+      imageKey:'w-shoulder-swing',
+      steps:['قف مستقيماً وشبّك أصابع يديك خلف ظهرك','ارفع يديك ببطء حتى تشعر بتمديد في الصدر','أبقِ الذقن مرتفعاً والكتفين متراجعين','ابقَ ١٠ ثوانٍ ثم أرخِ واكرر'],
+      femaleSteps:['قفي منتصبةً وشبّكي أصابع يديكِ خلف ظهركِ','ارفعي يديكِ ببطء حتى تحسّي بتمديد في الصدر','أبقي الذقن مرتفعاً والكتفين متراجعين','ابقي ١٠ ثوانٍ ثم أرخي وكرّري']},
+    {name:'وضع الطفل | Child Pose', target:'الظهر والكتفين', muscles:['الظهر','Back','Core','الظهر السفلي'], dur:40,
+      imageKey:'w-bird-dog',
+      steps:['ابدأ في وضع الركوع على ركبتيك','اجلس للخلف على كعبيك','مدّ يديك للأمام واخفض جبهتك للأرض','تنفس ببطء وابقَ في هذا الوضع'],
+      femaleSteps:['ابدئي في وضع الركوع على ركبتيكِ','اجلسي للخلف على كعبيكِ','مدّي يديكِ للأمام واخفضي جبهتكِ للأرض','تنفّسي ببطء وابقي في هذا الوضع']},
+    {name:'تمديد الأرداف | Glute Stretch', target:'الأرداف', muscles:['الأرجل','Legs','المؤخرة'], dur:30,
+      imageKey:'w-glute-bridge',
+      steps:['استلقِ على ظهرك وثنِ ركبتيك','ضع كاحل ساقك اليمنى على ركبتك اليسرى','شبّك يديك خلف فخذك اليسرى واسحب','ابقَ ١٠ ثوانٍ ثم غيّر الجانب'],
+      femaleSteps:['استلقي على ظهركِ وثني ركبتيكِ','ضعي كاحل ساقكِ اليمنى على ركبتكِ اليسرى','شبّكي يديكِ خلف فخذكِ اليسرى واسحبي','ابقي ١٠ ثوانٍ ثم غيّري الجانب']},
+    {name:'تدوير الرقبة | Neck Roll', target:'الرقبة', muscles:['الجسم كامل','Shoulders'], dur:20,
+      imageKey:'w-shoulder-swing',
+      steps:['قف أو اجلس بوضع مستقيم','أمِل رأسك ببطء نحو اليمين','دوّره للأمام ثم لليسار','٥ دوائر كاملة ثم عكس الاتجاه'],
+      femaleSteps:['قفي أو اجلسي بوضع مستقيم','أميلي رأسكِ ببطء نحو اليمين','دوّريه للأمام ثم لليسار','٥ دوائر كاملة ثم عكسي الاتجاه']},
   ]
   const flat = muscles.map(m=>m.toLowerCase())
   const relevant = all.filter(c=>c.muscles.some(cm=>flat.some(m=>m.includes(cm.toLowerCase())||cm.toLowerCase().includes(m))))
@@ -166,8 +184,9 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
   const warmup = workout.warmup || []
 
   // Cooldown adapted to today's muscles
+  // Prefer server-side cooldown (has femaleSteps); fall back to local only if missing
   const muscles = exercises.map(e=>e.muscle).filter(Boolean)
-  const cooldown = buildCooldown(muscles)
+  const cooldown = workout.cooldown?.length ? workout.cooldown : buildCooldown(muscles)
 
   const [phase, setPhase] = useState('intro')
   const [wuIdx, setWuIdx] = useState(0)
