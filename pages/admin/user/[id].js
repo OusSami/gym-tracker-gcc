@@ -626,6 +626,29 @@ export default function UserDetail() {
                     </button>
                   </div>
 
+                  {/* 5. Full reset — delete everything & restart onboarding */}
+                  <div style={{ ...card, border: '1px solid rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '.85rem', marginBottom: 4, color: '#a855f7' }}>🔁 إعادة تحليل كاملة من الصفر</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 6, lineHeight: 1.6 }}>
+                      يوقف جميع البرامج ويُعيد المستخدم لشاشة التهيئة من البداية — يُعيد تحليل بياناته وحالته الصحية واختيار البرنامج المناسب.
+                    </div>
+                    <div style={{ fontSize: '.72rem', color: 'rgba(168,85,247,0.7)', marginBottom: 14, padding: '6px 10px', background: 'rgba(168,85,247,0.08)', borderRadius: 7 }}>
+                      ⚠️ سيرى المستخدم شاشة التهيئة في المرة القادمة. بياناته الشخصية (الوزن، الطول) تبقى محفوظة.
+                    </div>
+                    <button
+                      disabled={busy === 'prog'}
+                      onClick={() => setConfirm({
+                        action: 'program_full_reset',
+                        payload: {},
+                        label: 'إعادة تحليل كاملة من الصفر',
+                        desc: 'سيتم إيقاف جميع البرامج وإعادة المستخدم لشاشة التهيئة لإعادة التحليل من البداية. البيانات الشخصية تبقى محفوظة.',
+                        successText: '✓ تمت إعادة التهيئة — سيرى المستخدم شاشة البداية',
+                      })}
+                      style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.35)', color: '#a855f7', borderRadius: 9, padding: '9px 18px', fontFamily: F, fontWeight: 700, fontSize: '.82rem', cursor: 'pointer' }}>
+                      إعادة تحليل من الصفر
+                    </button>
+                  </div>
+
                 </div>
               )}
 

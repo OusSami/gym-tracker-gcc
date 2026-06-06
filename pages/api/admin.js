@@ -424,6 +424,20 @@ export default async function handler(req, res) {
       return res.json({ success: true })
     }
 
+    // PROGRAM: full reset — delete all programs + reset onboarding so user starts from scratch
+    if (action === 'program_full_reset' && userId) {
+      // Pause all programs for this user
+      const { data: allProgs } = await sb.from('user_programs').select('id').eq('user_id', userId)
+      if (allProgs?.length) {
+        const ids = allProgs.map(p => p.id)
+        await sb.from('program_days').update({ checkin_status: null, daily_workout: null, actual_logs: null, incomplete_reason: null, session_id: null }).in('program_id', ids)
+        await sb.from('user_programs').update({ status: 'paused' }).in('id', ids)
+      }
+      // Reset profile so user goes through onboarding again
+      await sb.from('profiles').update({ onboarded: false, recommended_package: null, package_updated_at: null }).eq('id', userId)
+      return res.json({ success: true })
+    }
+
     if (action === 'updateProfile' && userId) {
       const allowed = ['full_name', 'goal', 'fitness_level', 'unit_system', 'waist_cm', 'height_cm', 'weight_kg']
       const numeric = ['waist_cm', 'height_cm', 'weight_kg']

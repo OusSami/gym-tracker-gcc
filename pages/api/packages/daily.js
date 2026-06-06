@@ -228,7 +228,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
   const maxExercises = Math.min(
     Math.floor(duration / 5),
     exercisePool.length,
-    isEarly ? 3 : 5
+    isEarly ? 5 : 7
   )
 
   // ── Day-based rotation for variety ───────────────────────────
