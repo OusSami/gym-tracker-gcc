@@ -128,7 +128,16 @@ export default function Packages() {
         <div className="fu">
 
           {/* Decorative top border */}
-          <div style={{ height:2, background:`linear-gradient(90deg,transparent,${G}60,transparent)`, borderRadius:1, marginBottom:28 }}/>
+          <div style={{ height:2, background:`linear-gradient(90deg,transparent,${G}60,transparent)`, borderRadius:1, marginBottom:20 }}/>
+
+          {/* Lifestyle hero image */}
+          <div style={{ position:'relative', borderRadius:20, overflow:'hidden', marginBottom:28, height:200 }}>
+            <img src="/lifestyle-hero.png" alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 30%' }}/>
+            {/* bottom fade to match page background */}
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(to top, #09090B, transparent)' }}/>
+            {/* subtle golden tint overlay */}
+            <div style={{ position:'absolute', inset:0, background:'rgba(203,162,59,0.06)' }}/>
+          </div>
 
           {/* Program name */}
           <div style={{ textAlign:'center', marginBottom:28 }}>
