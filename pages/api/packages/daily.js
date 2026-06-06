@@ -1,4 +1,13 @@
 import { supabaseAdmin } from '../../../lib/supabase'
+import { EXERCISE_DB } from '../../../lib/exercise-data'
+
+// Build lookup: lowercase English name → EXERCISE_DB entry
+// EXERCISE_DB names are "English | Arabic"; daily.js exercise names are "Arabic | English"
+const DB_BY_ENG = new Map()
+EXERCISE_DB.forEach(e => {
+  const eng = (e.name.split('|')[0] || e.name).toLowerCase().trim()
+  DB_BY_ENG.set(eng, e)
+})
 
 // ── Exercise library ───────────────────────────────────────────────
 // Names always "عربي | English" so keyword filtering works on both.
@@ -78,36 +87,42 @@ const WARMUP_ALL = [
     imageKey:'w-shoulder-swing', target:'الرقبة · الكتفين',
     instructions:'دوّر رقبتك ببطء يميناً ويساراً',
     steps:['قف أو اجلس بوضع مستقيم','أمِل رأسك ببطء نحو اليمين','دوّره للأمام ثم لليسار','٥ دوائر كاملة ثم عكس الاتجاه'],
+    femaleSteps:['قفي أو اجلسي بوضع مستقيم','أميلي رأسك ببطء نحو اليمين','دوّريه للأمام ثم لليسار','٥ دوائر كاملة ثم عكسي الاتجاه'],
   },
   {
     name:'تدوير الذراعين | Arm Circles', duration_seconds:30,
     imageKey:'w-arm-circles', target:'الكتفين · الذراعين',
     instructions:'دوائر كبيرة للأمام والخلف',
     steps:['ابسط ذراعيك للجانبين على مستوى الكتف','ابدأ بدوائر صغيرة وكبّرها تدريجياً','١٠ دوائر للأمام ثم ١٠ للخلف','حافظ على الكتفين مسترخيين'],
+    femaleSteps:['ابسطي ذراعيكِ للجانبين على مستوى الكتف','ابدئي بدوائر صغيرة وكبّريها تدريجياً','١٠ دوائر للأمام ثم ١٠ للخلف','حافظي على الكتفين مسترخيين'],
   },
   {
     name:'تدوير الخصر | Hip Circles', duration_seconds:30,
     imageKey:null, target:'الخصر · الوركين',
     instructions:'دوائر بالخصر يميناً ويساراً',
     steps:['قف مع مسافة الكتفين بين قدميك','ضع يديك على خصرك','دوّر الخصر بدوائر كبيرة يميناً','١٠ دوائر ثم عكس الاتجاه'],
+    femaleSteps:['قفي مع مسافة الكتفين بين قدميكِ','ضعي يديكِ على خصركِ','دوّري الخصر بدوائر كبيرة يميناً','١٠ دوائر ثم عكسي الاتجاه'],
   },
   {
     name:'قرفصاء خفيف | Air Squat', duration_seconds:40,
     imageKey:'w-slow-squat', target:'الأرجل · المؤخرة',
     instructions:'١٠ قرفصاءات بطيئة للإحماء',
     steps:['قف مع مسافة الكتفين بين قدميك','أخفض نفسك ببطء حتى تكون الفخذان موازيين للأرض','أبقِ ظهرك مستقيماً والصدر مرتفعاً','ارجع للوقوف ببطء — ١٠ تكرارات'],
+    femaleSteps:['قفي مع مسافة الكتفين بين قدميكِ','أخفضي نفسكِ ببطء حتى تكون الفخذان موازيتين للأرض','أبقي ظهركِ مستقيماً والصدر مرتفعاً','ارجعي للوقوف ببطء — ١٠ تكرارات'],
   },
   {
     name:'ركض خفيف | Light March', duration_seconds:60,
     imageKey:'w-march-in-place', target:'الجسم كامل · القلب',
     instructions:'ارفع ركبتيك ببطء في مكانك',
     steps:['قف بوضع مستقيم مع إرخاء الكتفين','ارفع ركبتك اليمنى ببطء حتى مستوى الخصر','بدّل مع الركبة اليسرى بإيقاع هادئ','حرّك ذراعيك بشكل طبيعي مع الحركة'],
+    femaleSteps:['قفي بوضع مستقيم مع إرخاء الكتفين','ارفعي ركبتكِ اليمنى ببطء حتى مستوى الخصر','بدّلي مع الركبة اليسرى بإيقاع هادئ','حرّكي ذراعيكِ بشكل طبيعي مع الحركة'],
   },
   {
     name:'مط الجانب | Side Stretch', duration_seconds:30,
     imageKey:null, target:'الجانبين · الظهر',
     instructions:'مدّ يديك للأعلى وانحنِ يميناً ويساراً',
     steps:['قف مستقيماً مع قدمين متباعدتين','ارفع يدك اليمنى للأعلى','انحنِ ببطء نحو اليسار حتى تشعر بالمط','عد واكرر الجانب الآخر — ٣ مرات لكل جانب'],
+    femaleSteps:['قفي منتصبةً مع قدمين متباعدتين','ارفعي يدكِ اليمنى للأعلى','انحني ببطء نحو اليسار حتى تحسّي بالمط','عودي وكرّري الجانب الآخر — ٣ مرات لكل جانب'],
   },
 ]
 
@@ -117,30 +132,35 @@ const COOLDOWN = [
     imageKey:'w-cat-cow', target:'البطن · الظهر السفلي',
     instructions:'استلقِ وارفع صدرك للأعلى',
     steps:['استلقِ على بطنك مع وضع يديك أسفل كتفيك','ارفع صدرك للأعلى ببطء مع تمديد الظهر','حافظ على الحوض في الأرض','ابقَ ٥ ثوانٍ ثم خفّض واكرر'],
+    femaleSteps:['استلقي على بطنكِ مع وضع يديكِ أسفل كتفيكِ','ارفعي صدركِ للأعلى ببطء مع تمديد الظهر','حافظي على الحوض في الأرض','ابقي ٥ ثوانٍ ثم خفّضي وكرّري'],
   },
   {
     name:'تمديد الأرجل | Hamstring Stretch', duration_seconds:35,
     imageKey:'w-pelvic-tilt', target:'أوتار الركبة · الفخذين',
     instructions:'مدّ ساقيك وانحنِ للأمام',
     steps:['اجلس على الأرض مع مد ساقيك للأمام','انحنِ ببطء نحو قدميك دون تقوس الركبة','حافظ على الظهر مستقيماً','ابقَ في هذا الوضع ١٠ ثوانٍ وكرر'],
+    femaleSteps:['اجلسي على الأرض مع مدّ ساقيكِ للأمام','انحني ببطء نحو قدميكِ دون تقوّس الركبة','حافظي على الظهر مستقيماً','ابقي في هذا الوضع ١٠ ثوانٍ وكرّري'],
   },
   {
     name:'تمديد الكتفين | Shoulder Stretch', duration_seconds:30,
     imageKey:'w-shoulder-swing', target:'الكتفين · الصدر',
     instructions:'شبّك يديك خلف ظهرك وارفعهما',
     steps:['قف مستقيماً وشبّك أصابع يديك خلف ظهرك','ارفع يديك ببطء حتى تشعر بتمديد في الصدر','أبقِ الذقن مرتفعاً والكتفين متراجعين','ابقَ ١٠ ثوانٍ ثم أرخِ واكرر'],
+    femaleSteps:['قفي منتصبةً وشبّكي أصابع يديكِ خلف ظهركِ','ارفعي يديكِ ببطء حتى تحسّي بتمديد في الصدر','أبقي الذقن مرتفعاً والكتفين متراجعين','ابقي ١٠ ثوانٍ ثم أرخي وكرّري'],
   },
   {
     name:'وضع الطفل | Child Pose', duration_seconds:45,
     imageKey:'w-bird-dog', target:'الظهر الكامل · الكتفين',
     instructions:'اجلس على كعبيك ومدّ يديك للأمام',
     steps:['ابدأ في وضع الركوع على ركبتيك','اجلس للخلف على كعبيك','مدّ يديك للأمام واخفض جبهتك للأرض','تنفس ببطء وابقَ في هذا الوضع'],
+    femaleSteps:['ابدئي في وضع الركوع على ركبتيكِ','اجلسي للخلف على كعبيكِ','مدّي يديكِ للأمام واخفضي جبهتكِ للأرض','تنفّسي ببطء وابقي في هذا الوضع'],
   },
   {
     name:'تمديد الأرداف | Glute Stretch', duration_seconds:30,
     imageKey:'w-glute-bridge', target:'الأرداف · الوركين',
     instructions:'استلقِ وضع ساقك على ركبتك',
     steps:['استلقِ على ظهرك وثنِ ركبتيك','ضع كاحل ساقك اليمنى على ركبتك اليسرى','شبّك يديك خلف فخذك اليسرى واسحب','ابقَ ١٠ ثوانٍ ثم غيّر الجانب'],
+    femaleSteps:['استلقي على ظهركِ وثني ركبتيكِ','ضعي كاحل ساقكِ اليمنى على ركبتكِ اليسرى','شبّكي يديكِ خلف فخذكِ اليسرى واسحبي','ابقي ١٠ ثوانٍ ثم غيّري الجانب'],
   },
 ]
 
@@ -261,8 +281,21 @@ const EXERCISE_META = {
   'deep breathing':   { imageKey:null,               steps:['اجلس أو قف بوضع مريح','خذ نفساً عميقاً من الأنف (4 ثوانٍ)','ثبّت النفس (2 ثانية)','أخرج الهواء ببطء من الفم (6 ثوانٍ)'] },
 }
 
-function enrichExercise(ex) {
+function enrichExercise(ex, sex = 'male') {
   const engPart = (ex.name.split('|')[1] || ex.name).toLowerCase().trim()
+
+  // Try EXERCISE_DB first (single source of truth — includes female steps)
+  const dbEntry = DB_BY_ENG.get(engPart)
+    || [...DB_BY_ENG.entries()].find(([k]) => engPart.includes(k) || k.includes(engPart))?.[1]
+  if (dbEntry) {
+    return {
+      ...ex,
+      imageKey:    dbEntry.id,
+      steps:       dbEntry.steps,
+      femaleSteps: dbEntry.female?.steps,
+    }
+  }
+
   const meta = Object.entries(EXERCISE_META).find(([k]) => engPart.includes(k))?.[1]
 
   // Keyword-based image fallback for exercises not in EXERCISE_META
@@ -416,7 +449,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     muscle: muscles[0] || 'البطن',
     sets: Math.max(1, Math.round(ex.sets * setsMultiplier)),
     reps: adjustReps(ex.reps, repsVariant, energyLevel),
-  }))
+  }, sex))
 
   // ── Adapted warmup (respect conditions) ──────────────────────
   const warmupBlockedTerms = new Set()
