@@ -108,22 +108,27 @@ export default function Progress() {
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px 100px' }} className="fu">
 
-        {/* Stats — compact 3-col grid */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '12px', marginBottom: 12 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-            {[
-              ['✓ مكتمل', completedCount, '#22c55e'],
-              ['اليوم', currentDay, '#3b82f6'],
-              ['متبقي', Math.max(0, totalDays - currentDay + 1), G],
-              [streak >= 7 ? '🔥 سلسلة' : streak >= 3 ? '⚡ سلسلة' : '💧 سلسلة', streak, streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.4)'],
-              ['هذا الأسبوع', `${weekCompleted}/${weekTotal}`, '#22c55e'],
-              ['الإجمالي', totalDays, 'rgba(255,255,255,0.35)'],
-            ].map(([l, v, c]) => (
-              <div key={l} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '8px 6px', textAlign: 'center' }}>
-                <div style={{ fontWeight: 900, fontSize: '1rem', color: c, fontFamily: 'monospace', lineHeight: 1 }}>{v}</div>
-                <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.28)', marginTop: 4, lineHeight: 1.2 }}>{l}</div>
-              </div>
-            ))}
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+          {[['أيام مكتملة', completedCount, '#22c55e', 'rgba(34,197,94,0.07)', 'rgba(34,197,94,0.2)'], ['أيام متبقية', Math.max(0, totalDays - currentDay + 1), G, 'rgba(203,162,59,0.07)', 'rgba(203,162,59,0.2)'], ['اليوم الحالي', currentDay, '#3b82f6', 'rgba(59,130,246,0.07)', 'rgba(59,130,246,0.2)'], ['إجمالي الأيام', totalDays, 'rgba(255,255,255,0.45)', 'rgba(255,255,255,0.03)', 'rgba(255,255,255,0.08)']].map(([l, v, c, bg, border]) => (
+            <div key={l} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '10px 12px', textAlign: 'center' }}>
+              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: c, fontFamily: 'monospace', lineHeight: 1 }}>{v}</div>
+              <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Streak + Weekly row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <div style={{ background: streak >= 3 ? 'rgba(251,146,60,0.08)' : 'rgba(255,255,255,0.03)', border: `1px solid ${streak >= 3 ? 'rgba(251,146,60,0.28)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, padding: '10px', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.3rem', lineHeight: 1, marginBottom: 3 }}>{streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'}</div>
+            <div style={{ fontWeight: 900, fontSize: '1.1rem', color: streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.5)', fontFamily: 'monospace', lineHeight: 1 }}>{streak}</div>
+            <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>سلسلة الأيام</div>
+          </div>
+          <div style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 12, padding: '10px', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.3rem', lineHeight: 1, marginBottom: 3 }}>📅</div>
+            <div style={{ fontWeight: 900, fontSize: '1.1rem', color: '#22c55e', fontFamily: 'monospace', lineHeight: 1 }}>{weekCompleted}<span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,0.3)' }}>/{weekTotal}</span></div>
+            <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>هذا الأسبوع</div>
           </div>
         </div>
 

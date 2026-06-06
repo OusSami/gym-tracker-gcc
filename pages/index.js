@@ -956,6 +956,21 @@ function AuthScreen() {
 function HomeScreen({ user, quote, onStart, router }) {
   const [homeData, setHomeData] = React.useState(null)
   const [activeProgram, setActiveProgram] = React.useState(null)
+  const [quickWeight, setQuickWeight] = React.useState('')
+  const [quickWeightSaving, setQuickWeightSaving] = React.useState(false)
+
+  const logQuickWeight = async () => {
+    const kg = parseFloat(quickWeight)
+    if (!kg || kg < 20 || kg > 300 || !user?.id) return
+    setQuickWeightSaving(true)
+    try {
+      const r = await fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, weight_kg: kg }) })
+      const d = await r.json()
+      if (d.entry) setHomeData(prev => prev ? { ...prev, latestW: d.entry } : prev)
+      setQuickWeight('')
+    } catch (e) {}
+    setQuickWeightSaving(false)
+  }
   const hour = new Date().getHours()
 
   const greeting = hour < 5  ? 'المنضبط يفرق 🔥' :
@@ -1263,6 +1278,24 @@ function HomeScreen({ user, quote, onStart, router }) {
               <div style={{fontSize:'.7rem',color:'var(--text-muted)',lineHeight:1.4,fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
           ))}
+        </div>
+
+        {/* ── QUICK WEIGHT LOG ── */}
+        <div style={{background:'rgba(168,85,247,0.05)',border:'1px solid rgba(168,85,247,0.15)',borderRadius:16,padding:'12px 14px',marginBottom:10,display:'flex',alignItems:'center',gap:10}}>
+          <div style={{flexShrink:0}}>
+            <div style={{fontSize:'.65rem',color:'rgba(168,85,247,0.8)',fontWeight:700,fontFamily:"'Tajawal',sans-serif",letterSpacing:1,marginBottom:2}}>⚖️ وزنك اليوم</div>
+            <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.92rem',color:d?.latestW?'#a855f7':'rgba(255,255,255,0.25)'}}>
+              {d?.latestW ? d.latestW.weight_kg + ' ' + (d.unit||'كجم') : '—'}
+            </div>
+          </div>
+          <div style={{flex:1,display:'flex',gap:6,alignItems:'center',justifyContent:'flex-end'}}>
+            <input value={quickWeight} onChange={e=>setQuickWeight(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logQuickWeight()} placeholder="أدخل وزنك" type="number" min="20" max="300" step="0.1"
+              style={{width:100,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(168,85,247,0.25)',borderRadius:10,padding:'7px 10px',color:'#ECE3CF',fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',outline:'none',textAlign:'right'}}/>
+            <button onClick={logQuickWeight} disabled={quickWeightSaving||!quickWeight}
+              style={{background:'rgba(168,85,247,0.15)',border:'1px solid rgba(168,85,247,0.3)',borderRadius:10,padding:'7px 14px',color:'#a855f7',cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.8rem',fontWeight:700,opacity:(!quickWeight||quickWeightSaving)?0.5:1,whiteSpace:'nowrap'}}>
+              {quickWeightSaving?'...':'سجّل'}
+            </button>
+          </div>
         </div>
 
         {/* ── EMPTY STATE (no sessions yet) ── */}
