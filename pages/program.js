@@ -954,6 +954,31 @@ const B={minHeight:'100vh',background:'#09090B',color:'#ECE3CF',fontFamily:F,dir
               )}
             </div>
 
+            {/* ── Exercises preview card ── */}
+            {workout?.exercises?.length > 0 && !checkinDone && !isRest && (
+              <div onClick={() => setView('workout_detail')}
+                style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'18px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
+                onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
+                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                  <div style={{fontSize:'.6rem',fontWeight:700,color:`rgba(203,162,59,0.65)`,letterSpacing:1.5,textTransform:'uppercase'}}>تمارين اليوم</div>
+                  <div style={{fontSize:'.68rem',color:G,fontWeight:700,fontFamily:F}}>ابدأ التمرين ←</div>
+                </div>
+                {workout.exercises.slice(0,4).map((ex,i)=>(
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderBottom:i < Math.min(3,workout.exercises.length-1)?'1px solid rgba(255,255,255,0.04)':'none'}}>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:'.85rem',fontWeight:700,color:'#ECE3CF',fontFamily:F}}>{ex.name}</div>
+                      <div style={{fontSize:'.65rem',color:'rgba(255,255,255,0.35)',marginTop:2,fontFamily:F}}>{ex.muscle}</div>
+                    </div>
+                    <div style={{fontFamily:'monospace',fontSize:'.78rem',color:G,fontWeight:900,flexShrink:0}}>{ex.sets}×{ex.reps}</div>
+                  </div>
+                ))}
+                {workout.exercises.length > 4 && (
+                  <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginTop:10,textAlign:'center',fontFamily:F}}>+ {workout.exercises.length - 4} تمارين أخرى</div>
+                )}
+              </div>
+            )}
+
             {/* ── Scientific metrics card ── */}
             {!isRest&&(()=>{
               const BigR=34,BigC=2*Math.PI*BigR
@@ -1008,6 +1033,40 @@ const B={minHeight:'100vh',background:'#09090B',color:'#ECE3CF',fontFamily:F,dir
                 </div>
               )
             })()}
+
+            {/* ── Progress card ── */}
+            <div onClick={()=>router.push('/progress')}
+              style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'18px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
+              onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
+              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                <div style={{fontSize:'.6rem',fontWeight:700,color:`rgba(203,162,59,0.65)`,letterSpacing:1.5,textTransform:'uppercase'}}>تقدمي في البرنامج</div>
+                <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.35)',fontFamily:F}}>التفاصيل ←</div>
+              </div>
+              {/* Stats row */}
+              <div style={{display:'flex',gap:8,marginBottom:14}}>
+                {[[completedCount,'يوم مكتمل',G],[(totalDays-completedCount),'يوم متبقي','#3b82f6'],[pct+'%','إنجاز','#22c55e']].map(([v,l,c])=>(
+                  <div key={l} style={{flex:1,background:'rgba(0,0,0,0.25)',borderRadius:12,padding:'10px 6px',textAlign:'center'}}>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:c,lineHeight:1}}>{v}</div>
+                    <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.35)',marginTop:4,fontFamily:F}}>{l}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Progress bar */}
+              <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:8}}>
+                <div style={{height:'100%',width:pct+'%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10,transition:'width .6s ease'}}/>
+              </div>
+              {/* Day dots */}
+              <div style={{display:'flex',gap:2.5}}>
+                {Array.from({length:Math.min(totalDays,28)},(_,i)=>{
+                  const dayNum=i+1
+                  const rec=dayRecords.find(d=>d.day_number===dayNum)
+                  const s=rec?.checkin_status
+                  const isCur=dayNum===currentDay
+                  return <div key={i} style={{flex:1,height:4,borderRadius:2,background:s==='completed'?'#22c55e':s==='partial'?'#f97316':s==='missed'?'rgba(239,68,68,0.5)':isCur?G:'rgba(255,255,255,0.06)',transition:'background .3s'}}/>
+                })}
+              </div>
+            </div>
 
             {/* Week goal */}
             {program.roadmap?.weekly_overview?.length>0&&(()=>{
