@@ -997,7 +997,7 @@ function HomeScreen({ user, quote, onStart, router }) {
       fetch('/api/weight?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/profile?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/packages/status?userId=' + uid).then(r => r.json()).catch(() => ({})),
-      fetch('/api/meals?userId=' + uid).then(r => r.json()).catch(() => ({})),
+      fetch('/api/meals?userId=' + uid + '&date=' + new Date().toLocaleDateString('en-CA')).then(r => r.json()).catch(() => ({})),
     ]).then(([sd, wd, pd, prog, md]) => {
       if (prog?.program) setActiveProgram(prog)
       const sessions = sd.sessions || []
