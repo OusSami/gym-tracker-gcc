@@ -140,6 +140,12 @@ export default function Dashboard() {
     })
   }, [])
 
+  useEffect(() => {
+    if (!user?.id) return
+    const start = Date.now()
+    return () => { const dur = Math.round((Date.now() - start) / 1000); if (dur >= 5) fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, page: 'dashboard', duration_seconds: dur }) }).catch(() => {}) }
+  }, [user?.id])
+
   // ── Period filter - must be defined FIRST ──
   const filterByPeriod = (sessionList) => {
     if (period === 'all') return sessionList

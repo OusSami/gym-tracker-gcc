@@ -130,6 +130,12 @@ export default function Meals() {
 
   useEffect(() => { if (user) loadDay(user.id, viewDate) }, [viewDate, user])
 
+  useEffect(() => {
+    if (!user?.id) return
+    const start = Date.now()
+    return () => { const dur = Math.round((Date.now() - start) / 1000); if (dur >= 5) fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, page: 'meals', duration_seconds: dur }) }).catch(() => {}) }
+  }, [user?.id])
+
   const copyFromDate = async (fromDate, mealTypeToCopy) => {
     if (!user) return
     try {

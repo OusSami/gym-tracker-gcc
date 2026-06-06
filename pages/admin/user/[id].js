@@ -9,6 +9,7 @@ const C = ['#CBA23B','#3b82f6','#22c55e','#a855f7','#ef4444','#06b6d4','#f97316'
 const GOAL_AR = {muscle:'أبي أبني عضل أكثر',weight:'أبي أنزل دهون وأشد جسمي',strength:'أبي أزيد قوتي',endurance:'أبي أرفع تحملي',general:'تحسين اللياقة العامة'}
 const ST = {approved:{l:'نشط',c:'#22c55e',b:'rgba(34,197,94,0.12)',br:'rgba(34,197,94,0.3)'},pending:{l:'انتظار',c:'#f97316',b:'rgba(251,146,60,0.12)',br:'rgba(251,146,60,0.3)'},suspended:{l:'موقوف',c:'#ef4444',b:'rgba(239,68,68,0.12)',br:'rgba(239,68,68,0.3)'}}
 const card = {background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.1)',borderRadius:16,padding:20}
+const MEAL_TYPE_AR = { breakfast:'فطور', lunch:'غداء', dinner:'عشاء', snack:'وجبة خفيفة', water:'ماء' }
 
 const Tip = ({active,payload,label}) => active&&payload?.length ? (
   <div style={{background:'#111009',border:'1px solid rgba(203,162,59,0.2)',borderRadius:10,padding:'10px 14px',fontSize:'.78rem',fontFamily:F,direction:'rtl'}}>
@@ -37,6 +38,10 @@ export default function UserDetail() {
   const [editForm, setEditForm] = useState({})
   const [editBusy, setEditBusy] = useState(false)
   const [editMsg, setEditMsg] = useState(null)
+
+  const [expandedSess, setExpandedSess] = useState(new Set())
+  const [sessDeleting, setSessDeleting] = useState(null)
+  const [mealDeleting, setMealDeleting] = useState(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -111,6 +116,24 @@ export default function UserDetail() {
     }
     setConfirm(null)
     setBusy(null)
+  }
+
+  const deleteMeal = async (mealId) => {
+    if (!window.confirm('حذف هذه الوجبة؟')) return
+    setMealDeleting(mealId)
+    await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete_meal', userId: id, mealId }) })
+    const r = await fetch(`/api/admin?action=user_full&userId=${id}`)
+    setD(await r.json())
+    setMealDeleting(null)
+  }
+
+  const deleteSession = async (sessionId) => {
+    if (!window.confirm('حذف هذا التمرين كاملاً؟ لا يمكن التراجع.')) return
+    setSessDeleting(sessionId)
+    await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete_session', userId: id, sessionId }) })
+    const r = await fetch(`/api/admin?action=user_full&userId=${id}`)
+    setD(await r.json())
+    setSessDeleting(null)
   }
 
   useEffect(() => { if (tab === 'program' && authed && id) loadProg() }, [tab, authed, id])
@@ -354,31 +377,68 @@ export default function UserDetail() {
                 )}
               </div>
 
-              {/* Recent sessions list */}
+              {/* Recent sessions list with exercise detail */}
               <div style={card}>
                 <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>آخر التمارين</div>
-                <div style={{ maxHeight: 400, overflowY: 'auto' }}>
-                  {(d.recentSessions || []).map(sess => (
-                    <div key={sess.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '12px 0' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <div style={{ fontWeight: 700, fontSize: '.88rem' }}>
-                          {new Date(sess.session_date + 'T12:00:00').toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric' })}
+                <div style={{ maxHeight: 560, overflowY: 'auto' }}>
+                  {(d.recentSessions || []).map(sess => {
+                    const isExpanded = expandedSess.has(sess.id)
+                    const totalSets = sess.exercises?.reduce((a, e) => a + (e.sets?.length || 0), 0) || 0
+                    return (
+                      <div key={sess.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '12px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <button
+                            onClick={() => setExpandedSess(prev => { const n = new Set(prev); n.has(sess.id) ? n.delete(sess.id) : n.add(sess.id); return n })}
+                            style={{ background: 'none', border: 'none', color: '#ECE3CF', cursor: 'pointer', textAlign: 'right', fontFamily: F, padding: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,0.3)' }}>{isExpanded ? '▲' : '▼'}</span>
+                            <span style={{ fontWeight: 700, fontSize: '.88rem' }}>
+                              {new Date(sess.session_date + 'T12:00:00').toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </span>
+                          </button>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,0.35)' }}>{sess.exercises?.length || 0} تمرين · {totalSets} مجموعة{sess.duration_seconds ? ` · ${Math.round(sess.duration_seconds/60)} د` : ''}</span>
+                            <button onClick={() => deleteSession(sess.id)} disabled={sessDeleting === sess.id}
+                              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: 6, padding: '3px 8px', cursor: 'pointer', fontSize: '.68rem', fontFamily: F }}>
+                              {sessDeleting === sess.id ? '...' : '🗑 حذف'}
+                            </button>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 8, fontSize: '.75rem', color: 'rgba(255,255,255,0.4)' }}>
-                          <span>{sess.exercises?.length || 0} تمرين</span>
-                          <span>{sess.exercises?.reduce((a, e) => a + (e.sets?.length || 0), 0) || 0} مجموعة</span>
-                          {sess.total_volume_kg && <span>{Math.round(sess.total_volume_kg)} كجم</span>}
-                        </div>
+
+                        {/* Muscle tags */}
+                        {sess.muscles_trained?.length > 0 && (
+                          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: isExpanded ? 10 : 0 }}>
+                            {sess.muscles_trained.map(m => (
+                              <span key={m} style={{ background: 'rgba(203,162,59,0.1)', color: G, border: '1px solid rgba(203,162,59,0.2)', padding: '2px 8px', borderRadius: 12, fontSize: '.65rem', fontWeight: 600 }}>{m}</span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Exercise detail (expandable) */}
+                        {isExpanded && (
+                          <div style={{ marginTop: 10, padding: '12px 14px', background: 'rgba(0,0,0,0.3)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.04)' }}>
+                            {(sess.exercises || []).length === 0 ? (
+                              <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: '.75rem', fontFamily: F }}>لا تمارين مسجلة لهذه الجلسة</div>
+                            ) : (sess.exercises || []).map((ex, ei) => (
+                              <div key={ex.id || ei} style={{ marginBottom: 12 }}>
+                                <div style={{ fontSize: '.82rem', fontWeight: 700, color: G, marginBottom: 5 }}>
+                                  {ex.name}
+                                  {ex.muscle && <span style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400, fontSize: '.72rem', marginRight: 6 }}>({ex.muscle})</span>}
+                                </div>
+                                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                                  {(ex.sets || []).map((set, si) => (
+                                    <div key={set.id || si} style={{ background: 'rgba(203,162,59,0.07)', border: '1px solid rgba(203,162,59,0.15)', borderRadius: 7, padding: '4px 10px', fontSize: '.72rem', fontFamily: 'monospace', color: 'rgba(255,255,255,0.65)' }}>
+                                      {si + 1}.{set.weight_kg ? ` ${set.weight_kg}كجم ×` : ''}{set.reps ? ` ${set.reps}` : ''}{set.duration_seconds ? ` ${set.duration_seconds}ث` : ''}
+                                    </div>
+                                  ))}
+                                  {!ex.sets?.length && <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,0.2)', fontFamily: F }}>لا مجموعات</span>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      {sess.muscles_trained?.length > 0 && (
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                          {sess.muscles_trained.map(m => (
-                            <span key={m} style={{ background: 'rgba(203,162,59,0.1)', color: G, border: '1px solid rgba(203,162,59,0.2)', padding: '2px 8px', borderRadius: 12, fontSize: '.68rem', fontWeight: 600 }}>{m}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                   {!d.recentSessions?.length && <div style={{ color: 'rgba(255,255,255,0.25)', textAlign: 'center', padding: 30, fontFamily: F }}>لا تمارين مسجلة</div>}
                 </div>
               </div>
@@ -401,10 +461,11 @@ export default function UserDetail() {
                   </div>
                 ))}
               </div>
+
               {d.charts?.caloriesHistory?.length > 0 && (
-                <div style={card}>
+                <div style={{ ...card, marginBottom: 16 }}>
                   <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>السعرات اليومية</div>
-                  <ResponsiveContainer width="100%" height={200}>
+                  <ResponsiveContainer width="100%" height={180}>
                     <BarChart data={d.charts.caloriesHistory} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                       <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: F }} tickLine={false} axisLine={false} />
@@ -415,6 +476,56 @@ export default function UserDetail() {
                   </ResponsiveContainer>
                 </div>
               )}
+
+              {/* Individual meal log per day */}
+              <div style={card}>
+                <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>سجل الوجبات التفصيلي</div>
+                {(() => {
+                  const byDate = {}
+                  ;(d.rawMeals || []).forEach(m => {
+                    const dt = m.meal_date || m.created_at?.split('T')[0]
+                    if (!dt) return
+                    if (!byDate[dt]) byDate[dt] = []
+                    byDate[dt].push(m)
+                  })
+                  const dates = Object.keys(byDate).sort().reverse().slice(0, 14)
+                  if (!dates.length) return <div style={{ color: 'rgba(255,255,255,0.25)', textAlign: 'center', padding: 30, fontFamily: F }}>لا وجبات مسجلة</div>
+                  return dates.map(date => {
+                    const dayMeals = byDate[date]
+                    const totalCal = dayMeals.reduce((a, m) => a + (m.total_calories || 0), 0)
+                    const totalPro = dayMeals.reduce((a, m) => a + (m.protein_g || 0), 0)
+                    return (
+                      <div key={date} style={{ marginBottom: 18 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>
+                            {new Date(date + 'T12:00:00').toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' })}
+                          </div>
+                          <div style={{ marginRight: 'auto', display: 'flex', gap: 10 }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: '.72rem', color: '#f97316', fontWeight: 700 }}>{Math.round(totalCal)} kcal</span>
+                            <span style={{ fontFamily: 'monospace', fontSize: '.72rem', color: '#3b82f6' }}>{Math.round(totalPro)}g بروتين</span>
+                          </div>
+                        </div>
+                        {dayMeals.map(m => (
+                          <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '1fr 70px 55px 50px 50px 60px', gap: 6, padding: '7px 10px', borderRadius: 8, marginBottom: 3, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
+                            <div>
+                              <span style={{ fontSize: '.8rem', fontWeight: 600 }}>{m.meal_name || '—'}</span>
+                              {m.meal_type && <span style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.3)', marginRight: 6 }}>{MEAL_TYPE_AR[m.meal_type] || m.meal_type}</span>}
+                            </div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '.73rem', color: '#f97316', textAlign: 'center' }}>{m.total_calories || 0}</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '.7rem', color: '#3b82f6', textAlign: 'center' }}>{m.protein_g || 0}g P</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '.7rem', color: '#22c55e', textAlign: 'center' }}>{m.carbs_g || 0}g C</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '.7rem', color: '#a855f7', textAlign: 'center' }}>{m.fat_g || 0}g F</div>
+                            <button onClick={() => deleteMeal(m.id)} disabled={mealDeleting === m.id}
+                              style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444', borderRadius: 6, padding: '3px 8px', cursor: 'pointer', fontSize: '.68rem', fontFamily: F }}>
+                              {mealDeleting === m.id ? '...' : '🗑 حذف'}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })
+                })()}
+              </div>
             </div>
           )}
 
@@ -746,10 +857,10 @@ export default function UserDetail() {
           {/* ═══ APP TIME TAB ═══ */}
           {tab === 'apptime' && (
             <div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 16 }}>
                 {[
                   ['إجمالي وقت التطبيق', d.stats?.total_app_time ? `${Math.round(d.stats.total_app_time / 60)} د` : '—', G],
-                  ['متوسط يومي', d.stats?.avg_daily_time ? `${Math.round(d.stats.avg_daily_time / 60)} د` : '—', '#3b82f6'],
+                  ['متوسط/جلسة', d.stats?.avg_daily_time ? `${Math.round(d.stats.avg_daily_time / 60)} د` : '—', '#3b82f6'],
                   ['آخر جلسة', d.stats?.last_app_session ? new Date(d.stats.last_app_session).toLocaleDateString('ar-SA') : '—', '#22c55e'],
                 ].map(([l, v, c]) => (
                   <div key={l} style={card}>
@@ -759,17 +870,101 @@ export default function UserDetail() {
                 ))}
               </div>
 
+              {/* Daily time chart */}
+              {(() => {
+                const dailyTime = {}
+                ;(d.appSessions || []).forEach(s => {
+                  const dt = s.started_at?.split('T')[0]
+                  if (dt) dailyTime[dt] = (dailyTime[dt] || 0) + (s.duration_seconds || 0)
+                })
+                const chartData = Object.entries(dailyTime).sort().slice(-30).map(([date, secs]) => ({
+                  date: new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+                  minutes: Math.round(secs / 60),
+                }))
+                return chartData.length > 0 && (
+                  <div style={{ ...card, marginBottom: 16 }}>
+                    <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>الوقت اليومي في التطبيق (دقائق)</div>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                        <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: F }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }} tickLine={false} axisLine={false} />
+                        <Tooltip content={<Tip />} />
+                        <Bar dataKey="minutes" name="دقائق" fill="#3b82f6" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )
+              })()}
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+                {/* Feature usage from API calls */}
+                <div style={card}>
+                  <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>استخدام الميزات</div>
+                  {[
+                    ['التمارين اليومية', 'daily', G, '🏋️'],
+                    ['خطة الوجبات', 'meal-plan', '#f97316', '🥗'],
+                    ['تحليل التمارين', 'analyze', '#3b82f6', '📸'],
+                    ['ملخص أسبوعي', 'weekly', '#22c55e', '📊'],
+                    ['تحليل الجسم', 'body', '#a855f7', '💪'],
+                    ['المساعد الذكي', 'coach', '#06b6d4', '🤖'],
+                  ].map(([lbl, ep, color, icon]) => {
+                    const count = (d.costs?.by_endpoint || []).find(e => e.endpoint === ep)?.calls || 0
+                    const max = Math.max(1, ...(d.costs?.by_endpoint || []).map(e => e.calls || 0))
+                    return (
+                      <div key={ep} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: '.9rem' }}>{icon}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '.78rem', fontWeight: 600, marginBottom: 3 }}>{lbl}</div>
+                          <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+                            <div style={{ height: '100%', background: color, borderRadius: 2, width: `${Math.min(100, (count / max) * 100)}%`, transition: 'width .5s' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: 'monospace', fontWeight: 700, color, fontSize: '.78rem', minWidth: 28, textAlign: 'left' }}>{count}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Page visits (from track.js) */}
+                <div style={card}>
+                  <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>الصفحات المُزارة</div>
+                  {(() => {
+                    const pageEps = (d.costs?.by_endpoint || []).filter(e => e.endpoint?.startsWith('page:'))
+                    if (!pageEps.length) return (
+                      <div style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '20px 0', fontSize: '.78rem', fontFamily: F, lineHeight: 1.7 }}>
+                        لا بيانات تتبع الصفحات بعد<br/>
+                        <span style={{ fontSize: '.7rem' }}>ستظهر هنا تلقائياً بعد زيارة المستخدم للتطبيق</span>
+                      </div>
+                    )
+                    const PAGE_AR = { 'page:program': 'التمرين', 'page:meals': 'الوجبات', 'page:dashboard': 'لوحة التحكم', 'page:body': 'تحليل الجسم', 'page:packages': 'الباقات' }
+                    const max = Math.max(1, ...pageEps.map(e => e.calls || 0))
+                    return pageEps.sort((a, b) => b.calls - a.calls).map((ep, i) => (
+                      <div key={ep.endpoint} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '.78rem', fontWeight: 600, marginBottom: 3 }}>{PAGE_AR[ep.endpoint] || ep.endpoint.replace('page:', '')}</div>
+                          <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+                            <div style={{ height: '100%', background: C[i % C.length], borderRadius: 2, width: `${(ep.calls / max) * 100}%` }} />
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: 'monospace', fontWeight: 700, color: C[i % C.length], fontSize: '.78rem', minWidth: 28, textAlign: 'left' }}>{ep.calls}</div>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              </div>
+
               {/* App sessions list */}
               <div style={card}>
                 <div style={{ fontWeight: 700, fontSize: '.83rem', marginBottom: 14, color: 'rgba(255,255,255,0.7)' }}>سجل جلسات التطبيق</div>
-                <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+                <div style={{ maxHeight: 360, overflowY: 'auto' }}>
                   {(d.appSessions || []).length === 0 ? (
                     <div style={{ color: 'rgba(255,255,255,0.25)', textAlign: 'center', padding: 30, fontFamily: F }}>لا جلسات مسجلة بعد</div>
                   ) : (d.appSessions || []).map((s, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                       <div style={{ fontSize: '.82rem' }}>{new Date(s.started_at).toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-                      <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', fontFamily: F }}>
-                        {s.duration_seconds ? `${Math.round(s.duration_seconds / 60)} دقيقة` : '—'}
+                      <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>
+                        {s.duration_seconds ? `${Math.round(s.duration_seconds / 60)} د` : '—'}
                       </div>
                     </div>
                   ))}

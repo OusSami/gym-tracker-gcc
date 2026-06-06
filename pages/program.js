@@ -795,6 +795,12 @@ export default function Program() {
   useEffect(()=>{ if(tabQuery&&['workout','meals','progress'].includes(tabQuery)) setTab(tabQuery) },[tabQuery])
   useEffect(()=>{if(user)loadAll()},[user])
 
+  useEffect(()=>{
+    if(!user?.id) return
+    const start=Date.now()
+    return ()=>{ const dur=Math.round((Date.now()-start)/1000); if(dur>=5) fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:user.id,page:'program',duration_seconds:dur})}).catch(()=>{}) }
+  },[user?.id])
+
   const loadAll=async()=>{
     setLoading(true)
     try{

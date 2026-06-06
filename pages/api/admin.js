@@ -157,8 +157,7 @@ export default async function handler(req, res) {
         // FIX: join exercises→sets so we can compute volume and set counts
         sb.from('sessions').select('*, exercises(id,name,muscle,duration_seconds,sets(id,weight_kg,reps,set_number,duration_seconds))').eq('user_id', userId).order('session_date', { ascending: false }),
         sb.from('weight_history').select('weight_kg,recorded_at').eq('user_id', userId).order('recorded_at', { ascending: false }),
-        // FIX: column is total_calories not calories
-        sb.from('meals').select('total_calories,protein_g,carbs_g,fat_g,created_at').eq('user_id', userId).order('created_at', { ascending: true }),
+        sb.from('meals').select('id,meal_type,meal_name,meal_date,total_calories,protein_g,carbs_g,fat_g,created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(120),
         sb.from('api_usage').select('cost_usd,created_at').eq('user_id', userId),
         sb.from('api_usage').select('endpoint,cost_usd,created_at').eq('user_id', userId),
         sb.from('app_sessions').select('started_at,ended_at,duration_seconds').eq('user_id', userId).order('started_at', { ascending: false }).limit(50),
@@ -202,20 +201,21 @@ export default async function handler(req, res) {
 
       // Calories avg
       const mealDays = {}
-      meals.forEach(m => { const d = m.created_at?.split('T')[0]; if (d) { if (!mealDays[d]) mealDays[d] = { calories: 0, protein: 0 }; mealDays[d].calories += m.calories || 0; mealDays[d].protein += m.protein_g || 0 } })
+      meals.forEach(m => { const d = m.meal_date || m.created_at?.split('T')[0]; if (d) { if (!mealDays[d]) mealDays[d] = { calories: 0, protein: 0 }; mealDays[d].calories += m.total_calories || 0; mealDays[d].protein += m.protein_g || 0 } })
       const mealDayArr = Object.values(mealDays)
       const avg_calories = mealDayArr.length ? Math.round(mealDayArr.reduce((a, d) => a + d.calories, 0) / mealDayArr.length) : 0
       const avg_protein = mealDayArr.length ? Math.round(mealDayArr.reduce((a, d) => a + d.protein, 0) / mealDayArr.length) : 0
 
-      // Costs
+      // Costs (page: tracking entries have cost=0 so they don't inflate totals)
       const totalCost = costs.reduce((a, r) => a + (r.cost_usd || 0), 0)
       const monthlyCost = costs.filter(r => new Date(r.created_at) >= new Date(mStart)).reduce((a, r) => a + (r.cost_usd || 0), 0)
       const epMap = {}
       allCosts.forEach(r => { if (!epMap[r.endpoint]) epMap[r.endpoint] = { endpoint: r.endpoint, calls: 0, total_cost: 0 }; epMap[r.endpoint].calls++; epMap[r.endpoint].total_cost += r.cost_usd || 0 })
-      const by_endpoint = Object.values(epMap).map(e => ({ ...e, total_cost: e.total_cost.toFixed(4) })).sort((a, b) => b.total_cost - a.total_cost)
+      // Include page: tracking entries (cost=0) so admin can see feature usage
+      const by_endpoint = Object.values(epMap).map(e => ({ ...e, total_cost: e.total_cost.toFixed(4) })).sort((a, b) => b.calls - a.calls)
 
-      // User daily cost chart
-      const userDailyCost = groupByDate(costs, 'created_at', 'cost_usd').slice(-30)
+      // User daily cost chart (uses allCosts which has endpoint field, exclude page visits)
+      const userDailyCost = groupByDate(allCosts.filter(r => !r.endpoint?.startsWith('page:')), 'created_at', 'cost_usd').slice(-30)
 
       // Volume by session chart
       const volumeBySession = sessions.slice(0, 30).reverse().map(s => ({
@@ -273,7 +273,8 @@ export default async function handler(req, res) {
           by_endpoint,
         },
         charts: { volumeBySession, weightHistory, caloriesHistory, sessionsPerWeek, musclesDist, userDailyCost },
-        recentSessions: sessions.slice(0, 20),
+        recentSessions: sessions.slice(0, 30),
+        rawMeals: meals.slice(0, 120),
         appSessions,
       })
     }
@@ -435,6 +436,30 @@ export default async function handler(req, res) {
       }
       // Reset profile so user goes through onboarding again
       await sb.from('profiles').update({ onboarded: false, recommended_package: null, package_updated_at: null }).eq('id', userId)
+      return res.json({ success: true })
+    }
+
+    // MEALS: delete a specific meal entry
+    if (action === 'delete_meal' && userId) {
+      const { mealId } = req.body
+      if (!mealId) return res.status(400).json({ error: 'Missing mealId' })
+      const { error } = await sb.from('meals').delete().eq('id', mealId).eq('user_id', userId)
+      if (error) return res.status(500).json({ error: error.message })
+      return res.json({ success: true })
+    }
+
+    // SESSIONS: delete a workout session + its exercises + sets
+    if (action === 'delete_session' && userId) {
+      const { sessionId } = req.body
+      if (!sessionId) return res.status(400).json({ error: 'Missing sessionId' })
+      const { data: exes } = await sb.from('exercises').select('id').eq('session_id', sessionId)
+      if (exes?.length) {
+        const exIds = exes.map(e => e.id)
+        await sb.from('sets').delete().in('exercise_id', exIds)
+        await sb.from('exercises').delete().in('id', exIds)
+      }
+      const { error } = await sb.from('sessions').delete().eq('id', sessionId).eq('user_id', userId)
+      if (error) return res.status(500).json({ error: error.message })
       return res.json({ success: true })
     }
 
