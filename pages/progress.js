@@ -15,13 +15,20 @@ export default function Progress() {
   const [dayModal, setDayModal] = useState(null)
   const [dayReport, setDayReport] = useState(null)
   const [dayReportLoading, setDayReportLoading] = useState(false)
+  const [weightHistory, setWeightHistory] = useState([])
+  const [weightInput, setWeightInput] = useState('')
+  const [savingWeight, setSavingWeight] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) { router.push('/'); return }
       setUser(session.user)
       try {
-        const sr = await fetch('/api/packages/status?userId=' + session.user.id).then(r => r.json())
+        const [sr, wr] = await Promise.all([
+          fetch('/api/packages/status?userId=' + session.user.id).then(r => r.json()),
+          fetch('/api/weight?userId=' + session.user.id).then(r => r.json()).catch(() => ({ entries: [] })),
+        ])
+        setWeightHistory(wr.entries || [])
         if (sr.program) {
           setProgram(sr.program)
           const dr = await fetch('/api/packages/days?programId=' + sr.program.id).then(r => r.json()).catch(() => ({ days: [] }))
@@ -31,6 +38,19 @@ export default function Progress() {
       setLoading(false)
     })
   }, [])
+
+  const logWeight = async () => {
+    const kg = parseFloat(weightInput)
+    if (!kg || kg < 20 || kg > 300 || !user) return
+    setSavingWeight(true)
+    try {
+      const r = await fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, weight_kg: kg }) })
+      const d = await r.json()
+      if (d.entry) setWeightHistory(prev => { const filtered = prev.filter(e => e.recorded_at !== d.entry.recorded_at); return [...filtered, d.entry].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at)) })
+      setWeightInput('')
+    } catch (e) {}
+    setSavingWeight(false)
+  }
 
   const openDayReport = async (dayNum) => {
     setDayModal({ dayNumber: dayNum }); setDayReport(null); setDayReportLoading(true)
@@ -65,6 +85,35 @@ export default function Progress() {
   const completedCount = dayRecords.filter(d => ['completed', 'partial'].includes(d.checkin_status)).length
   const pct = Math.round((completedCount / totalDays) * 100)
 
+  // Streak — consecutive checked-in days going backwards from yesterday
+  let streak = 0
+  for (let d = currentDay - 1; d >= 1; d--) {
+    const rec = dayRecords.find(r => r.day_number === d)
+    if (rec && ['completed', 'partial', 'rest'].includes(rec.checkin_status)) streak++
+    else break
+  }
+
+  // This week's summary
+  const weekStart = currentDay - ((currentDay - 1) % 7)
+  const weekDays = dayRecords.filter(r => r.day_number >= weekStart && r.day_number < currentDay)
+  const weekCompleted = weekDays.filter(r => ['completed', 'partial'].includes(r.checkin_status)).length
+  const weekTotal = Math.min(7, currentDay - weekStart)
+
+  // Milestones
+  const MILESTONES = [
+    { label: 'أول تمرين', icon: '🏆', need: 1 },
+    { label: '3 أيام',    icon: '🔥', need: 3 },
+    { label: 'أسبوع كامل',icon: '⭐', need: 7 },
+    { label: '10 أيام',   icon: '💪', need: 10 },
+    { label: 'النصف',     icon: '🥇', need: Math.ceil(totalDays / 2) },
+    { label: 'الإنهاء',   icon: '🎯', need: totalDays },
+  ]
+
+  // Weight data
+  const firstWeight = weightHistory[0]?.weight_kg || null
+  const lastWeight = weightHistory[weightHistory.length - 1]?.weight_kg || null
+  const weightDiff = firstWeight && lastWeight ? Math.round((lastWeight - firstWeight) * 10) / 10 : null
+
   return (
     <div style={B}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} .fu{animation:fu .3s ease}`}</style>
@@ -93,6 +142,74 @@ export default function Progress() {
               <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.3)', marginTop: 5 }}>{l}</div>
             </div>
           ))}
+        </div>
+
+        {/* Streak + Weekly row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+          {/* Streak */}
+          <div style={{ background: streak >= 3 ? 'rgba(251,146,60,0.07)' : 'rgba(255,255,255,0.03)', border: `1px solid ${streak >= 3 ? 'rgba(251,146,60,0.25)' : 'rgba(255,255,255,0.07)'}`, borderRadius: 14, padding: '14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.6rem', lineHeight: 1, marginBottom: 4 }}>{streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'}</div>
+            <div style={{ fontWeight: 900, fontSize: '1.3rem', color: streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.5)', fontFamily: 'monospace', lineHeight: 1 }}>{streak}</div>
+            <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>سلسلة الأيام</div>
+          </div>
+          {/* This week */}
+          <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 14, padding: '14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.6rem', lineHeight: 1, marginBottom: 4 }}>📅</div>
+            <div style={{ fontWeight: 900, fontSize: '1.3rem', color: '#22c55e', fontFamily: 'monospace', lineHeight: 1 }}>{weekCompleted}<span style={{ fontSize: '.75rem', color: 'rgba(255,255,255,0.3)' }}>/{weekTotal}</span></div>
+            <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>هذا الأسبوع</div>
+          </div>
+        </div>
+
+        {/* Milestones */}
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ fontWeight: 700, fontSize: '.75rem', color: 'rgba(255,255,255,0.35)', marginBottom: 12, letterSpacing: 1 }}>الإنجازات</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {MILESTONES.map(m => {
+              const done = completedCount >= m.need
+              return (
+                <div key={m.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 52, opacity: done ? 1 : 0.3, filter: done ? 'none' : 'grayscale(1)' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: done ? `${G}18` : 'rgba(255,255,255,0.04)', border: `2px solid ${done ? G : 'rgba(255,255,255,0.08)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: done ? `0 0 12px ${G}30` : 'none' }}>{m.icon}</div>
+                  <div style={{ fontSize: '.58rem', color: done ? G : 'rgba(255,255,255,0.3)', fontWeight: done ? 700 : 400, textAlign: 'center' }}>{m.label}</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Weight tracker */}
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ fontWeight: 700, fontSize: '.75rem', color: 'rgba(255,255,255,0.35)', letterSpacing: 1 }}>الوزن</div>
+            {weightDiff !== null && (
+              <div style={{ fontSize: '.72rem', fontWeight: 700, color: weightDiff < 0 ? '#22c55e' : weightDiff > 0 ? '#ef4444' : 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
+                {weightDiff > 0 ? '+' : ''}{weightDiff} كجم
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: lastWeight ? 12 : 0 }}>
+            <input value={weightInput} onChange={e => setWeightInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && logWeight()} placeholder="وزنك اليوم بالكجم" type="number" min="20" max="300" step="0.1"
+              style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '9px 12px', color: '#ECE3CF', fontFamily: F, fontSize: '.88rem', outline: 'none', direction: 'rtl' }} />
+            <button onClick={logWeight} disabled={savingWeight || !weightInput}
+              style={{ background: G, color: '#09090B', border: 'none', borderRadius: 10, padding: '9px 16px', fontFamily: F, fontWeight: 800, fontSize: '.82rem', cursor: 'pointer', opacity: (!weightInput || savingWeight) ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+              {savingWeight ? '...' : 'سجّل'}
+            </button>
+          </div>
+          {weightHistory.length > 0 && (
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>البداية</div>
+                <div style={{ fontFamily: 'monospace', fontWeight: 800, color: '#3b82f6' }}>{firstWeight} كجم</div>
+              </div>
+              <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>الآن</div>
+                <div style={{ fontFamily: 'monospace', fontWeight: 800, color: G }}>{lastWeight} كجم</div>
+              </div>
+              <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '8px 12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>القياسات</div>
+                <div style={{ fontFamily: 'monospace', fontWeight: 800, color: 'rgba(255,255,255,0.5)' }}>{weightHistory.length}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Progress bar */}
