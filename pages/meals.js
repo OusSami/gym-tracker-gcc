@@ -41,7 +41,7 @@ export default function Meals() {
   const [meals, setMeals] = useState([])
   const [water, setWater] = useState([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState('daily')
+  const [tab, setTab] = useState('plan')
   const [addStep, setAddStep] = useState('type')
   const [mealType, setMealType] = useState(null)
   const [imgB64, setImgB64] = useState(null)
@@ -71,6 +71,8 @@ export default function Meals() {
   const [barcode, setBarcode] = useState('')
   const [barcodeLoading, setBarcodeLoading] = useState(false)
   const [savingTemplate, setSavingTemplate] = useState(false)
+  const [mealPlan, setMealPlan] = useState(null)
+  const [mealPlanLoading, setMealPlanLoading] = useState(false)
 
   const loadDay = useCallback(async (uid, date) => {
     try {
@@ -106,6 +108,9 @@ export default function Meals() {
         setGoals(calcNutrientGoals(pd.profile))
       }
       await loadDay(session.user.id, viewDate)
+      // Load AI meal plan
+      setMealPlanLoading(true)
+      fetch('/api/packages/meal-plan?userId='+session.user.id).then(r=>r.json()).then(d=>{ if(d?.plan) setMealPlan(d) }).catch(()=>{}).finally(()=>setMealPlanLoading(false))
       // Load custom meal templates
       const cmr = await fetch('/api/custom-meals?userId='+session.user.id)
       const cmd = await cmr.json()
@@ -445,6 +450,7 @@ export default function Meals() {
       </div>
 
       <div style={{display:'flex',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'0 16px'}}>
+        <button className={`ptab${tab==='plan'?' on':''}`} onClick={()=>setTab('plan')}>🍽️ خطة اليوم</button>
         <button className={`ptab${tab==='daily'?' on':''}`} onClick={()=>setTab('daily')}>أكلك اليوم</button>
         <button className={`ptab${tab==='add'?' on':''}`} onClick={()=>{setTab('add');resetAdd()}}>+ سجّل وجبة</button>
         <button className={`ptab${tab==='nutrients'?' on':''}`} onClick={()=>setTab('nutrients')}>📊 مغذياتي</button>
@@ -452,6 +458,62 @@ export default function Meals() {
       </div>
 
       <div style={{maxWidth:520,margin:'0 auto',padding:'0 16px'}}>
+
+        {/* ── MEAL PLAN ── */}
+        {tab==='plan' && (
+          <div style={{paddingTop:14,paddingBottom:100}}>
+            {mealPlanLoading ? (
+              <div style={{textAlign:'center',padding:'60px 0',color:'rgba(255,255,255,0.35)'}}>
+                <div style={{width:28,height:28,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite',margin:'0 auto 14px'}}/>
+                <div style={{fontSize:'.85rem'}}>جاري تحميل خطة الوجبات...</div>
+              </div>
+            ) : mealPlan ? (<>
+              {/* Calorie goal header */}
+              <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.15)',borderRadius:16,padding:'14px 16px',marginBottom:12}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                  <div style={{fontWeight:700,fontSize:'.85rem'}}>هدف السعرات</div>
+                  <div style={{fontWeight:900,color:'#CBA23B',fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
+                </div>
+                <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
+                  <div style={{height:'100%',width:'100%',background:'linear-gradient(90deg,#CBA23B,#e8c55a)',borderRadius:10}}/>
+                </div>
+                <div style={{display:'flex',gap:12,fontSize:'.72rem'}}>
+                  {[['بروتين',mealPlan.total_protein+'g','#3b82f6'],['كارب','—g','#f97316'],['دهون','—g','#22c55e']].map(([l,v,c])=>(
+                    <div key={l} style={{display:'flex',gap:4}}><span style={{color:c,fontWeight:700,fontFamily:'monospace'}}>{v}</span><span style={{color:'rgba(255,255,255,0.35)'}}>{l}</span></div>
+                  ))}
+                </div>
+                {mealPlan.tip&&<div style={{marginTop:10,fontSize:'.76rem',color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>💡 {mealPlan.tip}</div>}
+              </div>
+              {/* Meal list */}
+              {(mealPlan.plan||[]).map((meal,i)=>(
+                <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:16,padding:'14px 16px',marginBottom:9}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                    <div style={{fontWeight:700,fontSize:'.78rem',color:'#CBA23B'}}>{meal.meal_time}</div>
+                    <div style={{fontFamily:'monospace',fontWeight:700,color:'#CBA23B',fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
+                  </div>
+                  <div style={{fontWeight:800,fontSize:'.9rem',marginBottom:3}}>{meal.food?.name_ar}</div>
+                  <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)',marginBottom:8}}>{meal.food?.portion_desc}</div>
+                  <div style={{display:'flex',gap:10,fontSize:'.68rem'}}>
+                    {[['B',meal.protein_g+'g','#3b82f6'],['C',meal.carbs_g+'g','#f97316'],['F',meal.fat_g+'g','#22c55e']].map(([l,v,c])=>(
+                      <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'rgba(255,255,255,0.3)'}}>{l==='B'?'بروتين':l==='C'?'كارب':'دهون'}</span></div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {/* Log button */}
+              <button onClick={()=>{setTab('add');resetAdd()}}
+                style={{width:'100%',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',color:'#22c55e',borderRadius:12,padding:'13px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
+                🍽️ سجّل ما أكلته اليوم ←
+              </button>
+            </>) : (
+              <div style={{textAlign:'center',padding:'60px 0',color:'rgba(255,255,255,0.35)'}}>
+                <div style={{fontSize:'2.5rem',marginBottom:12}}>🍽️</div>
+                <div style={{marginBottom:8}}>لا توجد خطة وجبات بعد</div>
+                <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.25)'}}>ابدأ برنامجك لتفعيل خطة التغذية</div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── DAILY LOG ── */}
         {tab==='daily' && (

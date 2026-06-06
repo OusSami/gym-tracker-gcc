@@ -771,7 +771,7 @@ export default function Program() {
   const [program, setProgram] = useState(null)
   const [dayRecords, setDayRecords] = useState([])
   const [workout, setWorkout] = useState(null)
-  const [mealPlan, setMealPlan] = useState(null)
+
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [view, setView] = useState('overview')
@@ -792,7 +792,7 @@ export default function Program() {
     })
   },[])
 
-  useEffect(()=>{ if(tabQuery&&['workout','meals','progress'].includes(tabQuery)) setTab(tabQuery) },[tabQuery])
+  useEffect(()=>{ if(tabQuery&&['workout','progress'].includes(tabQuery)) setTab(tabQuery) },[tabQuery])
   useEffect(()=>{if(user)loadAll()},[user])
 
   useEffect(()=>{
@@ -804,9 +804,8 @@ export default function Program() {
   const loadAll=async()=>{
     setLoading(true)
     try{
-      const [sr,mp]=await Promise.all([
+      const [sr]=await Promise.all([
         fetch('/api/packages/status?userId='+user.id).then(r=>r.json()),
-        fetch('/api/packages/meal-plan?userId='+user.id).then(r=>r.json()).catch(()=>null),
       ])
       if(sr.program){
         setProgram(sr.program)
@@ -821,7 +820,7 @@ export default function Program() {
           autoGenerate(sr.program,dr.days||[])
         }
       }
-      if(mp?.plan)setMealPlan(mp)
+
     }catch(e){}
     setLoading(false)
   }
@@ -925,7 +924,7 @@ export default function Program() {
 
       {/* Tabs */}
       <div style={{display:'flex',borderBottom:'1px solid rgba(203,162,59,0.1)',background:'rgba(0,0,0,0.5)',backdropFilter:'blur(10px)'}}>
-        {[['workout','🏋️ تمريني'],['meals','🍽️ وجباتي'],['progress','📊 تقدمي']].map(([id,lbl])=>(
+        {[['workout','🏋️ تمريني'],['progress','📊 تقدمي']].map(([id,lbl])=>(
           <button key={id} onClick={()=>setTab(id)} style={{flex:1,background:'none',border:'none',borderBottom:tab===id?`3px solid ${G}`:'3px solid transparent',color:tab===id?G:'rgba(255,255,255,0.4)',padding:'12px 6px',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.8rem',transition:'all .15s',marginBottom:-1,whiteSpace:'nowrap'}}>
             {lbl}
           </button>
@@ -1046,54 +1045,6 @@ export default function Program() {
         )}
 
         {/* ── MEALS TAB ── */}
-        {tab==='meals'&&(
-          <div className="fu">
-            {mealPlan?(<>
-              {/* Calorie progress */}
-              <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:16,padding:'14px 16px',marginBottom:12}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                  <div style={{fontWeight:700,fontSize:'.85rem'}}>هدف السعرات</div>
-                  <div style={{fontWeight:900,color:G,fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
-                </div>
-                <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-                  <div style={{height:'100%',width:'60%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10}}/>
-                </div>
-                <div style={{display:'flex',gap:12,fontSize:'.72rem'}}>
-                  {[['بروتين',mealPlan.total_protein+'g','#3b82f6'],['كارب','—g','#f97316'],['دهون','—g','#22c55e']].map(([l,v,c])=>(
-                    <div key={l} style={{display:'flex',gap:4}}><span style={{color:c,fontWeight:700,fontFamily:'monospace'}}>{v}</span><span style={{color:'rgba(255,255,255,0.35)'}}>{l}</span></div>
-                  ))}
-                </div>
-                {mealPlan.tip&&<div style={{marginTop:10,fontSize:'.76rem',color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>💡 {mealPlan.tip}</div>}
-              </div>
-
-              {(mealPlan.plan||[]).map((meal,i)=>(
-                <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:16,padding:'14px 16px',marginBottom:9,transition:'border-color .2s'}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                    <div style={{fontWeight:700,fontSize:'.78rem',color:G}}>{meal.meal_time}</div>
-                    <div style={{fontFamily:'monospace',fontWeight:700,color:G,fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
-                  </div>
-                  <div style={{fontWeight:800,fontSize:'.9rem',marginBottom:3}}>{meal.food?.name_ar}</div>
-                  <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)',marginBottom:8}}>{meal.food?.portion_desc}</div>
-                  <div style={{display:'flex',gap:10,fontSize:'.68rem'}}>
-                    {[['B',meal.protein_g+'g','#3b82f6'],['C',meal.carbs_g+'g','#f97316'],['F',meal.fat_g+'g','#22c55e']].map(([l,v,c])=>(
-                      <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'rgba(255,255,255,0.3)'}}>{ l==='B'?'بروتين':l==='C'?'كارب':'دهون' }</span></div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
-              <button onClick={()=>router.push('/meals')}
-                style={{width:'100%',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',color:'#22c55e',borderRadius:12,padding:'12px',fontFamily:F,fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
-                🍽️ سجّل ما أكلته اليوم ←
-              </button>
-            </>):(
-              <div style={{textAlign:'center',padding:'40px 0',color:'rgba(255,255,255,0.35)'}}>
-                <div style={{fontSize:'2rem',marginBottom:10}}>🍽️</div>
-                <div>خطة الوجبات تُحضَّر...</div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* ── PROGRESS TAB ── */}
         {tab==='progress'&&(
@@ -1358,7 +1309,7 @@ export default function Program() {
 
       {/* Tabs */}
       <div style={{display:'flex',borderBottom:'1px solid rgba(255,255,255,0.06)',background:'rgba(0,0,0,0.3)'}}>
-        {[['workout','🏋️ تمريني'],['meals','🍽️ وجباتي'],['progress','📊 تقدمي']].map(([id,lbl])=>(
+        {[['workout','🏋️ تمريني'],['progress','📊 تقدمي']].map(([id,lbl])=>(
           <button key={id} onClick={()=>setTab(id)} style={{flex:1,background:'none',border:'none',borderBottom:tab===id?`3px solid ${G}`:'3px solid transparent',color:tab===id?G:'rgba(255,255,255,0.4)',padding:'12px 6px',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.8rem',transition:'all .15s',marginBottom:-1,whiteSpace:'nowrap'}}>
             {lbl}
           </button>
@@ -1479,54 +1430,6 @@ export default function Program() {
         )}
 
         {/* ── MEALS TAB ── */}
-        {tab==='meals'&&(
-          <div className="fu">
-            {mealPlan?(<>
-              {/* Calorie progress */}
-              <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:16,padding:'14px 16px',marginBottom:12}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                  <div style={{fontWeight:700,fontSize:'.85rem'}}>هدف السعرات</div>
-                  <div style={{fontWeight:900,color:G,fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
-                </div>
-                <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-                  <div style={{height:'100%',width:'60%',background:`linear-gradient(90deg,${G},#e8c55a)`,borderRadius:10}}/>
-                </div>
-                <div style={{display:'flex',gap:12,fontSize:'.72rem'}}>
-                  {[['بروتين',mealPlan.total_protein+'g','#3b82f6'],['كارب','—g','#f97316'],['دهون','—g','#22c55e']].map(([l,v,c])=>(
-                    <div key={l} style={{display:'flex',gap:4}}><span style={{color:c,fontWeight:700,fontFamily:'monospace'}}>{v}</span><span style={{color:'rgba(255,255,255,0.35)'}}>{l}</span></div>
-                  ))}
-                </div>
-                {mealPlan.tip&&<div style={{marginTop:10,fontSize:'.76rem',color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>💡 {mealPlan.tip}</div>}
-              </div>
-
-              {(mealPlan.plan||[]).map((meal,i)=>(
-                <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:16,padding:'14px 16px',marginBottom:9,transition:'border-color .2s'}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                    <div style={{fontWeight:700,fontSize:'.78rem',color:G}}>{meal.meal_time}</div>
-                    <div style={{fontFamily:'monospace',fontWeight:700,color:G,fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
-                  </div>
-                  <div style={{fontWeight:800,fontSize:'.9rem',marginBottom:3}}>{meal.food?.name_ar}</div>
-                  <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)',marginBottom:8}}>{meal.food?.portion_desc}</div>
-                  <div style={{display:'flex',gap:10,fontSize:'.68rem'}}>
-                    {[['B',meal.protein_g+'g','#3b82f6'],['C',meal.carbs_g+'g','#f97316'],['F',meal.fat_g+'g','#22c55e']].map(([l,v,c])=>(
-                      <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'rgba(255,255,255,0.3)'}}>{ l==='B'?'بروتين':l==='C'?'كارب':'دهون' }</span></div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
-              <button onClick={()=>router.push('/meals')}
-                style={{width:'100%',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',color:'#22c55e',borderRadius:12,padding:'12px',fontFamily:F,fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
-                🍽️ سجّل ما أكلته اليوم ←
-              </button>
-            </>):(
-              <div style={{textAlign:'center',padding:'40px 0',color:'rgba(255,255,255,0.35)'}}>
-                <div style={{fontSize:'2rem',marginBottom:10}}>🍽️</div>
-                <div>خطة الوجبات تُحضَّر...</div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* ── PROGRESS TAB ── */}
         {tab==='progress'&&(
