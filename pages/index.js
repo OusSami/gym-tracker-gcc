@@ -1053,20 +1053,21 @@ function HomeScreen({ user, quote, onStart, router }) {
       const fatTarget = nutriGoals?.fat_g || 65
       setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, proteinTarget, carbsTarget, fatTarget, bfPct, bmi, dailyPhrase, sex, todayCalories: 0, todayProtein: 0, todayCarbs: 0, todayFat: 0 })
 
-      // Fetch meals AFTER homeData is set to avoid race condition
+      // Fetch meals directly via Supabase client (user is authenticated at this point)
       const todayDate = new Date().toISOString().split('T')[0]
-      fetch('/api/meals?userId=' + uid + '&date=' + todayDate)
-        .then(async r => {
-          if (!r.ok) return
-          const data = await r.json()
-          const meals = data.meals || []
+      supabase
+        .from('meals')
+        .select('total_calories,protein_g,carbs_g,fat_g')
+        .eq('user_id', uid)
+        .eq('meal_date', todayDate)
+        .then(({ data: meals, error }) => {
+          if (error || !meals) return
           const todayCalories = meals.reduce((s, m) => s + (m.total_calories || 0), 0)
           const todayProtein = Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0))
           const todayCarbs = Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0))
           const todayFat = Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0))
           setHomeData(prev => prev ? { ...prev, todayCalories, todayProtein, todayCarbs, todayFat } : prev)
         })
-        .catch(() => {})
     }).catch(() => {})
   }, [user?.id])
 
