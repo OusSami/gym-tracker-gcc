@@ -54,7 +54,7 @@ function buildRoadmap(profile, totalDays) {
   let trainDay = 0
   for (let d = 1; d <= totalDays; d++) {
     const weekNum = Math.ceil(d / 7)
-    const week = WEEK_THEMES[Math.min(weekNum - 1, weeks - 1)]
+    const week = WEEK_THEMES[Math.min(weekNum - 1, WEEK_THEMES.length - 1)]
     const dayOfWeek = ((d - 1) % 7)
     const isTrainDay = dayOfWeek < daysPerWeek
     const comboIdx = trainDay % MUSCLE_COMBOS.length
