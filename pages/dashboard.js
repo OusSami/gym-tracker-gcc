@@ -79,6 +79,8 @@ export default function Dashboard() {
   const [contImgPreview, setContImgPreview] = useState(null)
   const contFileRef = useRef(null)
   const [weightEntries, setWeightEntries] = useState([])
+  const [quickWeight, setQuickWeight] = useState('')
+  const [quickWeightSaving, setQuickWeightSaving] = useState(false)
   const [profile, setProfile] = useState(null)
   const [selProgressEx, setSelProgressEx] = useState('')   // exercise selected for progress chart
   const [progDropGroup, setProgDropGroup] = useState(null)
@@ -99,6 +101,19 @@ export default function Dashboard() {
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear())
 
   const [templates, setTemplates] = useState([])
+
+  const logQuickWeight = async () => {
+    const kg = parseFloat(quickWeight)
+    if (!kg || kg < 20 || kg > 300 || !user) return
+    setQuickWeightSaving(true)
+    try {
+      const r = await fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, weight_kg: kg }) })
+      const d = await r.json()
+      if (d.entry) setWeightEntries(prev => { const filtered = prev.filter(e => e.recorded_at !== d.entry.recorded_at); return [...filtered, d.entry].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at)) })
+      setQuickWeight('')
+    } catch (e) {}
+    setQuickWeightSaving(false)
+  }
 
   const reload = async (uid) => {
     const r = await fetch(`/api/sessions?userId=${uid}`)
@@ -1031,10 +1046,14 @@ export default function Dashboard() {
                   <div className="card" style={{marginBottom:16}}>
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
                       <div className="bb" style={{fontSize:'.85rem',color:'#ccc',letterSpacing:2}}>رحلة وزنك</div>
-                      <button onClick={()=>router.push('/weight')}
-                        style={{background:'rgba(203,162,59,0.08)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:8,padding:'5px 12px',color:'#CBA23B',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:700}}>
-                        + Log Weight
-                      </button>
+                      <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                        <input value={quickWeight} onChange={e=>setQuickWeight(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logQuickWeight()} placeholder="كجم" type="number" min="20" max="300" step="0.1"
+                          style={{width:64,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:8,padding:'5px 8px',color:'#ECE3CF',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem',outline:'none',textAlign:'center'}}/>
+                        <button onClick={logQuickWeight} disabled={quickWeightSaving||!quickWeight}
+                          style={{background:'rgba(203,162,59,0.12)',border:'1px solid rgba(203,162,59,0.25)',borderRadius:8,padding:'5px 10px',color:'#CBA23B',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:700,opacity:(!quickWeight||quickWeightSaving)?0.5:1,whiteSpace:'nowrap'}}>
+                          {quickWeightSaving?'...':'+ سجّل'}
+                        </button>
+                      </div>
                     </div>
                     {/* Stats */}
                     <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:14}}>
