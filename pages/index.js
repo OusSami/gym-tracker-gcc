@@ -956,21 +956,6 @@ function AuthScreen() {
 function HomeScreen({ user, quote, onStart, router }) {
   const [homeData, setHomeData] = React.useState(null)
   const [activeProgram, setActiveProgram] = React.useState(null)
-  const [quickWeight, setQuickWeight] = React.useState('')
-  const [quickWeightSaving, setQuickWeightSaving] = React.useState(false)
-
-  const logQuickWeight = async () => {
-    const kg = parseFloat(quickWeight)
-    if (!kg || kg < 20 || kg > 300 || !user?.id) return
-    setQuickWeightSaving(true)
-    try {
-      const r = await fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, weight_kg: kg }) })
-      const d = await r.json()
-      if (d.entry) setHomeData(prev => prev ? { ...prev, latestW: d.entry } : prev)
-      setQuickWeight('')
-    } catch (e) {}
-    setQuickWeightSaving(false)
-  }
   const hour = new Date().getHours()
 
   const greeting = hour < 5  ? 'المنضبط يفرق 🔥' :
@@ -1012,7 +997,8 @@ function HomeScreen({ user, quote, onStart, router }) {
       fetch('/api/weight?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/profile?userId=' + uid).then(r => r.json()).catch(() => ({})),
       fetch('/api/packages/status?userId=' + uid).then(r => r.json()).catch(() => ({})),
-    ]).then(([sd, wd, pd, prog]) => {
+      fetch('/api/meals?userId=' + uid).then(r => r.json()).catch(() => ({})),
+    ]).then(([sd, wd, pd, prog, md]) => {
       if (prog?.program) setActiveProgram(prog)
       const sessions = sd.sessions || []
       // Streak: consecutive days with at least one session
@@ -1060,7 +1046,8 @@ function HomeScreen({ user, quote, onStart, router }) {
       const bfPct = pd?.profile?.body_fat_pct || null
       const bmi = pd?.profile?.weight_kg && pd?.profile?.height_cm
         ? Math.round(pd.profile.weight_kg / Math.pow(pd.profile.height_cm/100,2) * 10)/10 : null
-      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex })
+      const todayCalories = (md?.meals || []).reduce((s, m) => s + (m.calories || 0), 0)
+      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex, todayCalories })
     }).catch(() => {})
   }, [user?.id])
 
@@ -1278,24 +1265,41 @@ function HomeScreen({ user, quote, onStart, router }) {
               <div style={{fontSize:'.7rem',color:'var(--text-muted)',lineHeight:1.4,fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
           ))}
-          {/* Weight quick-log card — fills the empty 4th slot */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(168,85,247,0.18)',borderRadius:18,padding:'14px 14px',position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
-            <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:'rgba(168,85,247,0.1)',borderRadius:'50%'}}/>
-            <div>
-              <div style={{fontSize:'.6rem',color:'rgba(168,85,247,0.7)',fontWeight:700,fontFamily:"'Tajawal',sans-serif",marginBottom:4}}>⚖️ وزنك</div>
-              <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1rem',color:d?.latestW?'#a855f7':'rgba(255,255,255,0.2)',lineHeight:1,marginBottom:10}}>
-                {d?.latestW ? d.latestW.weight_kg+' '+(d.unit||'كجم') : '—'}
+          {/* Calories card — fills the empty 4th slot */}
+          {(() => {
+            const cal = d?.todayCalories || 0
+            const target = d?.calorieTarget || 0
+            const pct = target > 0 ? Math.min(1, cal / target) : 0
+            const r = 22, circ = 2 * Math.PI * r
+            const color = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#22c55e'
+            return (
+              <div onClick={() => router.push('/meals')}
+                style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(34,197,94,0.18)',borderRadius:18,padding:'16px 14px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',justifyContent:'space-between'}}
+                onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
+                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+                <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:'rgba(34,197,94,0.08)',borderRadius:'50%'}}/>
+                <div>
+                  <div style={{fontSize:'.6rem',color:'rgba(34,197,94,0.7)',fontWeight:700,fontFamily:"'Tajawal',sans-serif",marginBottom:8}}>🍽️ سعرات اليوم</div>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                    <div>
+                      <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.1rem',color:color,lineHeight:1}}>{cal}</div>
+                      {target>0&&<div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.25)',marginTop:3}}>من {target}</div>}
+                    </div>
+                    {/* Mini ring */}
+                    <svg width={54} height={54} style={{flexShrink:0}}>
+                      <circle cx={27} cy={27} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={4}/>
+                      <circle cx={27} cy={27} r={r} fill="none" stroke={color} strokeWidth={4}
+                        strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+                        strokeLinecap="round" transform="rotate(-90 27 27)"
+                        style={{transition:'stroke-dashoffset .6s ease'}}/>
+                      <text x={27} y={31} textAnchor="middle" fill={color} fontSize={9} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
+                    </svg>
+                  </div>
+                </div>
+                <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.2)',marginTop:8,fontFamily:"'Tajawal',sans-serif"}}>اضغط لتسجيل وجبتك ←</div>
               </div>
-            </div>
-            <div style={{display:'flex',flexDirection:'column',gap:6}}>
-              <input value={quickWeight} onChange={e=>setQuickWeight(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logQuickWeight()} placeholder="كجم" type="number" min="20" max="300" step="0.1"
-                style={{width:'100%',background:'rgba(168,85,247,0.07)',border:'1px solid rgba(168,85,247,0.2)',borderRadius:9,padding:'6px 10px',color:'#ECE3CF',fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',outline:'none',textAlign:'center',boxSizing:'border-box'}}/>
-              <button onClick={logQuickWeight} disabled={quickWeightSaving||!quickWeight}
-                style={{width:'100%',background:'rgba(168,85,247,0.14)',border:'1px solid rgba(168,85,247,0.28)',borderRadius:9,padding:'6px',color:'#a855f7',cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.78rem',fontWeight:700,opacity:(!quickWeight||quickWeightSaving)?0.45:1}}>
-                {quickWeightSaving?'...':'سجّل ✓'}
-              </button>
-            </div>
-          </div>
+            )
+          })()}
         </div>
 
         {/* ── EMPTY STATE (no sessions yet) ── */}

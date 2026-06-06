@@ -108,35 +108,41 @@ export default function Progress() {
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px 100px' }} className="fu">
 
-        {/* Stats — compact summary card */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1 }}>
+        {/* Stats — futuristic panel */}
+        <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', background: 'rgba(4,4,7,0.95)', border: '1px solid rgba(203,162,59,0.12)', marginBottom: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(203,162,59,0.5),transparent)' }} />
+          <div style={{ display: 'flex' }}>
             {[
-              ['مكتملة', completedCount, '#22c55e'],
-              ['اليوم', currentDay, '#3b82f6'],
-              ['متبقية', Math.max(0, totalDays - currentDay + 1), G],
-            ].map(([l, v, c], i) => (
-              <div key={l} style={{ textAlign: 'center', padding: '6px 4px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                <div style={{ fontWeight: 900, fontSize: '.95rem', color: c, fontFamily: 'monospace', lineHeight: 1 }}>{v}</div>
-                <div style={{ fontSize: '.56rem', color: 'rgba(255,255,255,0.28)', marginTop: 3 }}>{l}</div>
+              ['مكتملة', completedCount, '#22c55e', '0 0 12px rgba(34,197,94,0.45)'],
+              ['اليوم', currentDay, '#60a5fa', '0 0 12px rgba(96,165,250,0.45)'],
+              ['متبقية', Math.max(0, totalDays - currentDay + 1), G, '0 0 12px rgba(203,162,59,0.4)'],
+            ].map(([l, v, c, glow], i) => (
+              <div key={l} style={{ flex: 1, textAlign: 'center', padding: '11px 4px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.15rem', color: c, textShadow: glow, lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.22)', marginTop: 5, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>{l}</div>
               </div>
             ))}
           </div>
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '8px 0' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1 }}>
-            <div style={{ textAlign: 'center', padding: '6px 4px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontWeight: 900, fontSize: '.95rem', color: streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.4)', fontFamily: 'monospace', lineHeight: 1 }}>{streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'} {streak}</div>
-              <div style={{ fontSize: '.56rem', color: 'rgba(255,255,255,0.28)', marginTop: 3 }}>سلسلة</div>
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent)', margin: '0 16px' }} />
+          <div style={{ display: 'flex' }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.3)', textShadow: streak >= 3 ? '0 0 10px rgba(249,115,22,0.5)' : 'none', lineHeight: 1 }}>
+                {streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'} {streak}
+              </div>
+              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>streak</div>
             </div>
-            <div style={{ textAlign: 'center', padding: '6px 4px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontWeight: 900, fontSize: '.95rem', color: '#22c55e', fontFamily: 'monospace', lineHeight: 1 }}>{weekCompleted}<span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,0.25)' }}>/{weekTotal}</span></div>
-              <div style={{ fontSize: '.56rem', color: 'rgba(255,255,255,0.28)', marginTop: 3 }}>هذا الأسبوع</div>
+            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: '#22c55e', textShadow: '0 0 10px rgba(34,197,94,0.45)', lineHeight: 1 }}>
+                {weekCompleted}<span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '.68rem' }}>/{weekTotal}</span>
+              </div>
+              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>this week</div>
             </div>
-            <div style={{ textAlign: 'center', padding: '6px 4px' }}>
-              <div style={{ fontWeight: 900, fontSize: '.95rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace', lineHeight: 1 }}>{totalDays}</div>
-              <div style={{ fontSize: '.56rem', color: 'rgba(255,255,255,0.28)', marginTop: 3 }}>الإجمالي</div>
+            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px' }}>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: 'rgba(255,255,255,0.28)', lineHeight: 1 }}>{totalDays}</div>
+              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>total</div>
             </div>
           </div>
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(203,162,59,0.2),transparent)' }} />
         </div>
 
         {/* Milestones */}
