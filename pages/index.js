@@ -1268,82 +1268,69 @@ function HomeScreen({ user, quote, onStart, router }) {
         </div>
 
         {/* ── QUICK ACCESS ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
           {[
-            {icon:'📊',label:'تقدمي',sub:'الأرقام والمقارنات',path:'/dashboard',color:'#3b82f6'},
-            {icon:'📅',label:'برنامجي',sub:'تمارين مخصصة',path:'/program',color:'#22c55e'},
-            {icon:'🔬',label:'جسمي',sub:'قياسات وتحليل',path:'/assessment',color:'#a855f7'},
+            {icon:'📊',label:'تابع تقدمك بالأرقام',sub:'شوف الفرق بنفسك',path:'/dashboard',color:'#3b82f6'},
+            {icon:'📅',label:'برنامجي',sub:'برامج تدريبية مخصصة',path:'/program',color:'#22c55e'},
+            {icon:'🔬',label:'تحليل جسمي',sub:'صورة أو قياسات — اختر ما يناسبك',path:'/assessment',color:'#a855f7'},
           ].map(({icon,label,sub,path,color})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:16,padding:'14px 12px',cursor:'pointer',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'18px 16px',cursor:'pointer',transition:'all .2s',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{position:'absolute',bottom:-12,right:-12,width:50,height:50,background:color+'18',borderRadius:'50%'}}/>
-              <div style={{fontSize:'1.5rem',marginBottom:8}}>{icon}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',marginBottom:2}}>{label}</div>
-              <div style={{fontSize:'.62rem',color:'var(--text-muted)',lineHeight:1.3,fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
+              <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:color+'18',borderRadius:'50%'}}/>
+              <div style={{fontSize:'1.8rem',marginBottom:10}}>{icon}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',marginBottom:4}}>{label}</div>
+              <div style={{fontSize:'.7rem',color:'var(--text-muted)',lineHeight:1.4,fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
           ))}
-        </div>
-
-        {/* ── CALORIES CARD ── */}
-        {d && (() => {
-          const cal = d.todayCalories || 0
-          const target = d.calorieTarget || 2000
-          const pct = Math.min(1, cal / target)
-          const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#CBA23B'
-          const r = 32, circ = 2 * Math.PI * r
-          const proteinTarget = d.proteinTarget || 150
-          const carbsTarget = d.carbsTarget || 250
-          const fatTarget = d.fatTarget || 65
-          const remaining = Math.max(0, target - cal)
-          return (
-            <div onClick={() => router.push('/meals')}
-              style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(203,162,59,0.15)',borderRadius:20,padding:'18px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
-              onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
-              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              {/* Header */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.8rem',color:'var(--text-muted)'}}>السعرات اليوم</div>
-                <div style={{fontSize:'.65rem',color:'rgba(203,162,59,0.6)',fontFamily:"'Tajawal',sans-serif"}}>التغذية ←</div>
-              </div>
-              {/* Ring + calories row */}
-              <div style={{display:'flex',alignItems:'center',gap:18,marginBottom:16}}>
-                <svg width={76} height={76} style={{flexShrink:0}}>
-                  <circle cx={38} cy={38} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={6}/>
-                  <circle cx={38} cy={38} r={r} fill="none" stroke={arcColor} strokeWidth={6}
-                    strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
-                    strokeLinecap="round" transform="rotate(-90 38 38)"
-                    style={{filter:`drop-shadow(0 0 6px ${arcColor}55)`,transition:'stroke-dashoffset .6s ease'}}/>
-                  <text x={38} y={43} textAnchor="middle" fill={arcColor} fontSize={12} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
-                </svg>
-                <div style={{flex:1}}>
-                  <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'2rem',color:arcColor,lineHeight:1,textShadow:`0 0 24px ${arcColor}33`}}>{cal}</div>
-                  <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.73rem',color:'var(--text-muted)',marginTop:4}}>من {target} سعرة</div>
-                  <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.67rem',color:'rgba(255,255,255,0.28)',marginTop:2}}>
-                    {remaining > 0 ? `متبقي ${remaining} سعرة` : 'وصلت الهدف اليوم 🎉'}
+          {/* Calories card — futuristic HUD */}
+          {(() => {
+            const cal = d?.todayCalories || 0
+            const target = d?.calorieTarget || 2000
+            const pct = Math.min(1, cal / target)
+            const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.7 ? '#f97316' : '#CBA23B'
+            const r = 19, circ = 2 * Math.PI * r
+            return (
+              <div onClick={() => router.push('/meals')}
+                style={{background:'rgba(4,4,7,0.95)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:18,padding:'12px 11px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:8,boxShadow:'0 4px 20px rgba(0,0,0,0.5)'}}
+                onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
+                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+                {/* Top glow line */}
+                <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${arcColor}66,transparent)`}}/>
+                {/* Label */}
+                <div style={{fontSize:'.52rem',color:'rgba(203,162,59,0.55)',fontWeight:700,letterSpacing:2,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif"}}>CALORIES</div>
+                {/* Ring + number */}
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.2rem',color:arcColor,textShadow:`0 0 14px ${arcColor}66`,lineHeight:1}}>{cal}</div>
+                    <div style={{fontSize:'.5rem',color:'rgba(255,255,255,0.2)',marginTop:3,fontFamily:"'DM Sans',sans-serif",letterSpacing:1}}>/ {target} KCAL</div>
                   </div>
+                  <svg width={46} height={46}>
+                    <circle cx={23} cy={23} r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={3}/>
+                    <circle cx={23} cy={23} r={r} fill="none" stroke={arcColor} strokeWidth={3}
+                      strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+                      strokeLinecap="round" transform="rotate(-90 23 23)"
+                      style={{filter:`drop-shadow(0 0 4px ${arcColor}88)`}}/>
+                    <text x={23} y={27} textAnchor="middle" fill={arcColor} fontSize={7.5} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
+                  </svg>
+                </div>
+                {/* Macro bars */}
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  {[['P','#3b82f6',d?.todayProtein||0],['C','#f97316',d?.todayCarbs||0],['F','#a855f7',d?.todayFat||0]].map(([l,c,v])=>(
+                    <div key={l} style={{display:'flex',alignItems:'center',gap:5}}>
+                      <div style={{width:12,fontSize:'.48rem',fontWeight:900,color:c,fontFamily:'monospace',flexShrink:0,textShadow:`0 0 6px ${c}88`}}>{l}</div>
+                      <div style={{flex:1,height:3,background:'rgba(255,255,255,0.05)',borderRadius:2,overflow:'hidden'}}>
+                        <div style={{height:'100%',width:Math.min(100,v)+'%',background:c,borderRadius:2,boxShadow:`0 0 6px ${c}66`,minWidth:v>0?4:0}}/>
+                      </div>
+                      <div style={{width:20,fontFamily:'monospace',fontWeight:700,fontSize:'.5rem',color:'rgba(255,255,255,0.4)',textAlign:'right'}}>{v}g</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              {/* Macro bars */}
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                {[
-                  ['بروتين','#3b82f6', d.todayProtein||0, proteinTarget],
-                  ['كارب',  '#f97316', d.todayCarbs||0,   carbsTarget],
-                  ['دهن',   '#a855f7', d.todayFat||0,     fatTarget],
-                ].map(([label,color,val,tgt])=>(
-                  <div key={label} style={{display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:36,fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'rgba(255,255,255,0.45)',textAlign:'right',flexShrink:0}}>{label}</div>
-                    <div style={{flex:1,height:5,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden'}}>
-                      <div style={{height:'100%',width:Math.min(100, tgt>0 ? Math.round((val/tgt)*100) : 0)+'%',background:color,borderRadius:3,boxShadow:`0 0 6px ${color}44`,minWidth:val>0?4:0,transition:'width .6s ease'}}/>
-                    </div>
-                    <div style={{fontFamily:'monospace',fontSize:'.62rem',color:'rgba(255,255,255,0.35)',flexShrink:0,textAlign:'right',minWidth:58}}>{val}g / {tgt}g</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )
-        })()}
+            )
+          })()}
+        </div>
 
         {/* ── EMPTY STATE (no sessions yet) ── */}
         {d && d.totalSessions === 0 && (
