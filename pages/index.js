@@ -1046,8 +1046,12 @@ function HomeScreen({ user, quote, onStart, router }) {
       const bfPct = pd?.profile?.body_fat_pct || null
       const bmi = pd?.profile?.weight_kg && pd?.profile?.height_cm
         ? Math.round(pd.profile.weight_kg / Math.pow(pd.profile.height_cm/100,2) * 10)/10 : null
-      const todayCalories = (md?.meals || []).reduce((s, m) => s + (m.calories || 0), 0)
-      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex, todayCalories })
+      const meals = md?.meals || []
+      const todayCalories = meals.reduce((s, m) => s + (m.total_calories || 0), 0)
+      const todayProtein = Math.round(meals.reduce((s, m) => s + (m.protein_g || 0), 0))
+      const todayCarbs = Math.round(meals.reduce((s, m) => s + (m.carbs_g || 0), 0))
+      const todayFat = Math.round(meals.reduce((s, m) => s + (m.fat_g || 0), 0))
+      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, bfPct, bmi, dailyPhrase, sex, todayCalories, todayProtein, todayCarbs, todayFat })
     }).catch(() => {})
   }, [user?.id])
 
@@ -1270,33 +1274,38 @@ function HomeScreen({ user, quote, onStart, router }) {
             const cal = d?.todayCalories || 0
             const target = d?.calorieTarget || 0
             const pct = target > 0 ? Math.min(1, cal / target) : 0
-            const r = 22, circ = 2 * Math.PI * r
+            const r = 20, circ = 2 * Math.PI * r
             const color = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#22c55e'
             return (
               <div onClick={() => router.push('/meals')}
-                style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(34,197,94,0.18)',borderRadius:18,padding:'16px 14px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',justifyContent:'space-between'}}
+                style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(34,197,94,0.18)',borderRadius:18,padding:'14px 12px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:10}}
                 onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
                 onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:'rgba(34,197,94,0.08)',borderRadius:'50%'}}/>
-                <div>
-                  <div style={{fontSize:'.6rem',color:'rgba(34,197,94,0.7)',fontWeight:700,fontFamily:"'Tajawal',sans-serif",marginBottom:8}}>🍽️ سعرات اليوم</div>
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <div>
-                      <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.1rem',color:color,lineHeight:1}}>{cal}</div>
-                      {target>0&&<div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.25)',marginTop:3}}>من {target}</div>}
-                    </div>
-                    {/* Mini ring */}
-                    <svg width={54} height={54} style={{flexShrink:0}}>
-                      <circle cx={27} cy={27} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={4}/>
-                      <circle cx={27} cy={27} r={r} fill="none" stroke={color} strokeWidth={4}
-                        strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
-                        strokeLinecap="round" transform="rotate(-90 27 27)"
-                        style={{transition:'stroke-dashoffset .6s ease'}}/>
-                      <text x={27} y={31} textAnchor="middle" fill={color} fontSize={9} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
-                    </svg>
+                <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:'rgba(34,197,94,0.07)',borderRadius:'50%'}}/>
+                {/* Header row */}
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div>
+                    <div style={{fontSize:'.58rem',color:'rgba(34,197,94,0.7)',fontWeight:700,fontFamily:"'Tajawal',sans-serif",marginBottom:4}}>🍽️ سعرات اليوم</div>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.05rem',color:color,lineHeight:1}}>{cal}</div>
+                    {target>0&&<div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.22)',marginTop:2}}>/ {target}</div>}
                   </div>
+                  <svg width={48} height={48} style={{flexShrink:0}}>
+                    <circle cx={24} cy={24} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={3.5}/>
+                    <circle cx={24} cy={24} r={r} fill="none" stroke={color} strokeWidth={3.5}
+                      strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+                      strokeLinecap="round" transform="rotate(-90 24 24)"/>
+                    <text x={24} y={28} textAnchor="middle" fill={color} fontSize={8} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
+                  </svg>
                 </div>
-                <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.2)',marginTop:8,fontFamily:"'Tajawal',sans-serif"}}>اضغط لتسجيل وجبتك ←</div>
+                {/* Macros row */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4}}>
+                  {[['بروتين','#f97316',d?.todayProtein||0,'g'],['كارب','#60a5fa',d?.todayCarbs||0,'g'],['دهون','#a78bfa',d?.todayFat||0,'g']].map(([l,c,v])=>(
+                    <div key={l} style={{background:'rgba(255,255,255,0.03)',borderRadius:8,padding:'4px 2px',textAlign:'center'}}>
+                      <div style={{fontFamily:'monospace',fontWeight:800,fontSize:'.75rem',color:c,lineHeight:1}}>{v}<span style={{fontSize:'.5rem',opacity:.6}}>g</span></div>
+                      <div style={{fontSize:'.48rem',color:'rgba(255,255,255,0.25)',marginTop:2,fontFamily:"'Tajawal',sans-serif"}}>{l}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )
           })()}
