@@ -602,7 +602,7 @@ export default function App() {
 
   const pageContent = () => {
     switch(screen) {
-      case S.HOME: return <HomeScreen user={user} quote={quote} onStart={()=>setScreen(S.SETUP)} router={router}/>
+      case S.HOME: return <HomeScreen user={user} quote={quote} onStart={()=>router.push('/program')} router={router}/>
       case S.SETUP: return <SetupScreen date={date} setDate={setDate} muscles={muscles} setMuscles={setMuscles} onNext={()=>setScreen(S.WARMUP)} onBack={()=>setScreen(S.HOME)} templates={templates} showTemplates={showTemplates} setShowTemplates={setShowTemplates} setTemplateQueue={setTemplateQueue}/>
       case S.WARMUP: return <WarmupScreen muscles={muscles}
       onStart={(dur,exs)=>{setWarmupDuration(dur);setWarmupSkipped(false);setWarmupExercises(exs||[]);setScreen(S.UPLOAD)}}
