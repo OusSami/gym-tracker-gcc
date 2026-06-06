@@ -313,7 +313,7 @@ export default function Onboarding() {
                 ⚠️ هذا التطبيق لأغراض اللياقة العامة فقط وليس بديلاً عن الاستشارة الطبية. استشر طبيبك قبل البدء.
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:9, marginBottom:20 }}>
-                {HEALTH_OPTIONS.map(opt => {
+                {HEALTH_OPTIONS.filter(opt => opt.id !== 'pregnancy' || form.sex === 'female').map(opt => {
                   const selected = healthConditions.includes(opt.id)
                   const isBlocked = opt.risk === 'blocked'
                   return (
@@ -407,7 +407,7 @@ export default function Onboarding() {
         </div>
 
         {/* NEXT BUTTON (for steps that need it) */}
-        {step > 0 && step < 6 && STEPS[step] && !['sex','goal','bodyShape','صحتك'].some(k=>STEPS[step]?.q?.includes(k)) && (
+        {[2, 4, 5].includes(step) && (
           <div style={{ flexShrink:0, paddingBottom:20 }}>
             <button onClick={()=>setStep(s=>s+1)} disabled={!canNext}
               style={{ width:'100%', background:canNext?G:'rgba(255,255,255,0.06)', color:canNext?'#09090B':'rgba(255,255,255,0.2)', border:'none', borderRadius:14, padding:'15px', fontFamily:F, fontWeight:900, fontSize:'.98rem', cursor:canNext?'pointer':'not-allowed', transition:'all .2s', boxShadow:canNext?`0 4px 20px rgba(203,162,59,0.28)`:'none' }}>
