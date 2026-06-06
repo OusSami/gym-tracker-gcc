@@ -131,7 +131,7 @@ export function BottomTabs({ active }) {
 
   const tabs = [
     { id:'home',      icon:'🏠', label: hasSession ? '🔴 جارٍ' : 'الرئيسية', path:'/' },
-    { id:'dashboard', icon:'📊', label:'التقدم', path:'/program?tab=progress' },
+    { id:'dashboard', icon:'📊', label:'التقدم', path:'/progress' },
     { id:'meals',     icon:'🍽️', label:'التغذية', path:'/meals' },
     { id:'program',   icon:'📅', label:'برنامجي', path:'/program' },
     { id:'exercises', icon:'📚', label:'المكتبة', path:'/exercises' },
