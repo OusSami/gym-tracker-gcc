@@ -152,6 +152,24 @@ const EXERCISES = {
     {name:'رفع الورك | Hip Thrust',        sets:3,reps:'15-20',rest:45,level:'intermediate',tip:'ظهرك على الأرض، ارفع الحوض عالياً'},
     {name:'قرفصاء سومو | Sumo Squat',      sets:3,reps:'15',   rest:50,level:'beginner',    tip:'قدماك متباعدتان، أصابعك للخارج'},
   ],
+  // ── Pregnancy (women-only, all trimesters safe) ──────────────────
+  'الحمل': [
+    {name:'تمشية خفيفة | Prenatal March',         sets:2,reps:'45 ثانية',           rest:30,level:'beginner',tip:'ارفعي ركبتيكِ ببطء وتنفّسي بعمق — لا تتسرّعي'},
+    {name:'قرفصاء بالدعم | Supported Squat',       sets:2,reps:'10-12',              rest:45,level:'beginner',tip:'تمسّكي بكرسي ثابت — ظهركِ مستقيم والركبتان خارجيتان'},
+    {name:'جلوس الجدار | Wall Sit',                sets:2,reps:'20-30 ثانية',        rest:45,level:'beginner',tip:'ظهركِ مسطح على الجدار — لا تنزلي أكثر مما يريحكِ'},
+    {name:'رفع الكعب | Calf Raise',                sets:2,reps:'15-20',              rest:30,level:'beginner',tip:'يحسّن الدورة الدموية ويقلّل تورّم الساقين في الحمل'},
+    {name:'دوائر الحوض | Hip Circle',              sets:2,reps:'10 لكل اتجاه',       rest:30,level:'beginner',tip:'دوائر بطيئة واسعة — تريح أسفل الظهر وتفتح الحوض'},
+    {name:'ضغط الجدار | Wall Push Up',             sets:2,reps:'10-12',              rest:45,level:'beginner',tip:'يداكِ على الجدار — آمن تماماً في الحمل'},
+    {name:'بيرد دوج | Bird Dog',                   sets:2,reps:'8 لكل جانب',         rest:40,level:'beginner',tip:'يقوّي الظهر ويثبّت الحوض — على الأربع مريحة للحمل'},
+    {name:'قطة وبقرة | Cat Cow',                   sets:2,reps:'10 لكل وضع',         rest:30,level:'beginner',tip:'يريح ضغط الرحم على الظهر — من أفضل تمارين الحمل'},
+    {name:'قاع الحوض | Pelvic Floor',              sets:3,reps:'10 تكرار',            rest:30,level:'beginner',tip:'شدّي العضلة الداخلية 5 ثوانٍ ثم أرخي — مهم للولادة والتعافي'},
+    {name:'رفع الساق جانبياً | Side Lying Raise',  sets:2,reps:'12 لكل ساق',         rest:35,level:'beginner',tip:'استلقي على جانبكِ وارفعي الساق ببطء — يقوّي المؤخرة الجانبية'},
+    {name:'مط الجانب وقوفاً | Side Stretch',       sets:2,reps:'30 ثانية لكل جانب',  rest:20,level:'beginner',tip:'ارفعي ذراعاً وانحني بلطف — يريح ضغط الرحم على الأضلاع'},
+    {name:'تنفس البطن | Belly Breathing',          sets:3,reps:'5 أنفاس',            rest:20,level:'beginner',tip:'شهيق 4 ثوانٍ من الأنف، زفير 6 ثوانٍ من الفم — يهدّئ الجهاز العصبي'},
+    {name:'شد الكتفين | Shoulder Squeeze',         sets:2,reps:'15-20',              rest:30,level:'beginner',tip:'اشدّي لوحَي الكتف للخلف — يريح الظهر العلوي المرهق'},
+    {name:'جلسة الفراشة | Butterfly Sit',          sets:2,reps:'30-45 ثانية',        rest:20,level:'beginner',tip:'لصق أخمص القدمين معاً — يفتح الحوض بلطف ويريح الداخلية'},
+    {name:'رفع الذراعين | Overhead Arm Raise',     sets:2,reps:'15',                 rest:30,level:'beginner',tip:'ارفعي ذراعيكِ ببطء للأعلى وأنزليهما — يقوّي الكتفين بأمان'},
+  ],
 }
 
 // ── Warmup (will be filtered by conditions) ───────────────────────
@@ -570,6 +588,37 @@ const EXERCISE_META = {
   'nordic curl':      { imageKey:'h-superman',
     steps:      ['ثبّت قدميك تحت شيء ثقيل (كنبة أو باب)','ابدأ رافعاً من الركبتين مع جسم مستقيم','انزل بجسمك للأمام ببطء شديد مع مقاومة الجاذبية','ادفع للأعلى بيديك واعد للوضع الأول'],
     femaleSteps:['ثبّتي قدميكِ تحت شيء ثقيل (كنبة أو باب)','ابدئي رافعةً من الركبتين مع جسم مستقيم','انزلي بجسمكِ للأمام ببطء شديد مع مقاومة الجاذبية','ادفعي للأعلى بيديكِ وعودي للوضع الأول'] },
+  // ── Pregnancy ────────────────────────────────────────────────────────
+  'prenatal march':   { imageKey:'w-march-in-place',
+    steps:      ['قفي منتصبةً وارخي الكتفين','ارفعي ركبتكِ اليمنى ببطء لمستوى الخصر','انزلي وارفعي اليسرى بإيقاع هادئ','تنفّسي بعمق مع كل خطوة — الراحة أولاً'],
+    femaleSteps:['قفي منتصبةً وارخي الكتفين','ارفعي ركبتكِ اليمنى ببطء لمستوى الخصر','انزلي وارفعي اليسرى بإيقاع هادئ','تنفّسي بعمق مع كل خطوة — الراحة أولاً'] },
+  'supported squat':  { imageKey:'h-squat',
+    steps:      ['قفي أمام كرسي ثابت وأمسكي ظهره بكلتا يديكِ','قدماكِ بعرض الكتفين وأصابعكِ للخارج قليلاً','أخفضي نفسكِ ببطء مع إبقاء الظهر مستقيماً','ارجعي للوقوف ببطء — لا تنزلي أعمق مما يريحكِ'],
+    femaleSteps:['قفي أمام كرسي ثابت وأمسكي ظهره بكلتا يديكِ','قدماكِ بعرض الكتفين وأصابعكِ للخارج قليلاً','أخفضي نفسكِ ببطء مع إبقاء الظهر مستقيماً','ارجعي للوقوف ببطء — لا تنزلي أعمق مما يريحكِ'] },
+  'hip circle':       { imageKey:null,
+    steps:      ['قفي مع مسافة الكتفين بين قدميكِ وضعي يديكِ على خصركِ','ابدئي بدوائر كبيرة بطيئة بالخصر نحو اليمين','١٠ دوائر كاملة ثم عكسي الاتجاه نحو اليسار','ركّزي على إرخاء أسفل الظهر والحوض'],
+    femaleSteps:['قفي مع مسافة الكتفين بين قدميكِ وضعي يديكِ على خصركِ','ابدئي بدوائر كبيرة بطيئة بالخصر نحو اليمين','١٠ دوائر كاملة ثم عكسي الاتجاه نحو اليسار','ركّزي على إرخاء أسفل الظهر والحوض'] },
+  'pelvic floor':     { imageKey:null,
+    steps:      ['اجلسي أو قفي بوضع مريح مع إرخاء الجسم','شدّي عضلات قاع الحوض للداخل والأعلى كأنكِ تمنعين التبوّل','ثبّتي الشد 5 ثوانٍ مع التنفس الطبيعي','أرخي تماماً لـ5 ثوانٍ ثم كرّري — لا تحبسي النفس'],
+    femaleSteps:['اجلسي أو قفي بوضع مريح مع إرخاء الجسم','شدّي عضلات قاع الحوض للداخل والأعلى كأنكِ تمنعين التبوّل','ثبّتي الشد 5 ثوانٍ مع التنفس الطبيعي','أرخي تماماً لـ5 ثوانٍ ثم كرّري — لا تحبسي النفس'] },
+  'side lying raise': { imageKey:'h-side-lunge',
+    steps:      ['استلقي على جانبكِ الأيسر مع دعم رأسكِ بذراعكِ','جسمكِ مستقيم والبطن مشدود قليلاً للحماية','ارفعي الساق اليمنى للأعلى ببطء حتى ارتفاع الورك','انزلي ببطء دون لمس الأرض — كرّري ثم غيّري الجانب'],
+    femaleSteps:['استلقي على جانبكِ الأيسر مع دعم رأسكِ بذراعكِ','جسمكِ مستقيم والبطن مشدود قليلاً للحماية','ارفعي الساق اليمنى للأعلى ببطء حتى ارتفاع الورك','انزلي ببطء دون لمس الأرض — كرّري ثم غيّري الجانب'] },
+  'side stretch':     { imageKey:null,
+    steps:      ['قفي منتصبةً مع مسافة الكتفين بين القدمين','ارفعي يدكِ اليمنى للأعلى وانحني بلطف نحو اليسار','ثبّتي 20-30 ثانية وتنفّسي بعمق','عودي للوسط وكرّري الجانب الآخر'],
+    femaleSteps:['قفي منتصبةً مع مسافة الكتفين بين القدمين','ارفعي يدكِ اليمنى للأعلى وانحني بلطف نحو اليسار','ثبّتي 20-30 ثانية وتنفّسي بعمق','عودي للوسط وكرّري الجانب الآخر'] },
+  'belly breathing':  { imageKey:null,
+    steps:      ['اجلسي بوضع مريح أو ضعي وسادة خلف ظهركِ واستندي','ضعي يدكِ على البطن واليد الأخرى على الصدر','خذي نفساً عميقاً من الأنف — اليد على البطن ترتفع فقط','أخرجي الهواء ببطء من الفم في 6 ثوانٍ — كرّري'],
+    femaleSteps:['اجلسي بوضع مريح أو ضعي وسادة خلف ظهركِ واستندي','ضعي يدكِ على البطن واليد الأخرى على الصدر','خذي نفساً عميقاً من الأنف — اليد على البطن ترتفع فقط','أخرجي الهواء ببطء من الفم في 6 ثوانٍ — كرّري'] },
+  'shoulder squeeze': { imageKey:null,
+    steps:      ['اجلسي أو قفي مع إبقاء الظهر مستقيماً','ذراعاكِ على الجانبين مع ثني الكوعين بزاوية 90°','اشدّي لوحَي الكتف للخلف وللأسفل بقوة','ثبّتي لثانيتين ثم أرخي — تنفّسي بانتظام'],
+    femaleSteps:['اجلسي أو قفي مع إبقاء الظهر مستقيماً','ذراعاكِ على الجانبين مع ثني الكوعين بزاوية 90°','اشدّي لوحَي الكتف للخلف وللأسفل بقوة','ثبّتي لثانيتين ثم أرخي — تنفّسي بانتظام'] },
+  'butterfly sit':    { imageKey:null,
+    steps:      ['اجلسي على الأرض وألصقي أخمص قدميكِ ببعضهما','دعي ركبتيكِ تسقطان للجانبين بشكل طبيعي','استندي بظهركِ على الجدار إذا لزم للراحة','تنفّسي ببطء وأبقي هذا الوضع — يفتح الحوض بلطف'],
+    femaleSteps:['اجلسي على الأرض وألصقي أخمص قدميكِ ببعضهما','دعي ركبتيكِ تسقطان للجانبين بشكل طبيعي','استندي بظهركِ على الجدار إذا لزم للراحة','تنفّسي ببطء وأبقي هذا الوضع — يفتح الحوض بلطف'] },
+  'overhead arm raise':{ imageKey:null,
+    steps:      ['قفي أو اجلسي مع الظهر المستقيم','ارفعي ذراعيكِ للأعلى ببطء حتى تمتدا فوق الرأس','ثبّتي لثانية واشعري بتمديد الجانبين','أنزليهما ببطء — كرّري بإيقاع هادئ'],
+    femaleSteps:['قفي أو اجلسي مع الظهر المستقيم','ارفعي ذراعيكِ للأعلى ببطء حتى تمتدا فوق الرأس','ثبّتي لثانية واشعري بتمديد الجانبين','أنزليهما ببطء — كرّري بإيقاع هادئ'] },
   'standing hamstring':{ imageKey:null,
     steps:      ['قف وارفع قدمك على سطح بارتفاع الكوع','أبقِ ساقك مستقيمة وانحنِ للأمام ببطء','حتى تشعر بتمديد في الجزء الخلفي من الفخذ','ثبّت 20 ثانية وكرر مع الجانب الآخر'],
     femaleSteps:['قفي وارفعي قدمكِ على سطح بارتفاع الكوع','أبقي ساقكِ مستقيمة وانحني للأمام ببطء','حتى تحسّي بتمديد في الجزء الخلفي من الفخذ','ثبّتي 20 ثانية وكرّري مع الجانب الآخر'] },
@@ -682,11 +731,18 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
 
   // ── Collect exercise pool for target muscles ──────────────────
   let exercisePool = []
-  muscles.forEach(m => {
-    const key = Object.keys(EXERCISES).find(k => m.includes(k) || k.includes(m)) || 'البطن'
-    const pool = (EXERCISES[key] || []).filter(ex => !isBlocked(ex))
-    exercisePool.push(...pool)
-  })
+
+  // Pregnancy: always use the dedicated safe pool regardless of muscle_focus
+  if (healthConditions.includes('pregnancy') && sex === 'female') {
+    exercisePool = [...(EXERCISES['الحمل'] || [])]
+  } else {
+    muscles.forEach(m => {
+      const key = Object.keys(EXERCISES).find(k => m.includes(k) || k.includes(m)) || 'البطن'
+      const pool = (EXERCISES[key] || []).filter(ex => !isBlocked(ex))
+      exercisePool.push(...pool)
+    })
+  }
+
   // Deduplicate
   exercisePool = exercisePool.filter((ex, idx, arr) => arr.findIndex(e => e.name === ex.name) === idx)
 
@@ -781,7 +837,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
   if (healthConditions.includes('hypertension'))  conditionNotes.push('راقب نفسك — إذا أحسست بدوار أو صداع توقف فوراً')
   if (healthConditions.includes('heart'))         conditionNotes.push('ابقَ في منطقة الشدة المنخفضة — لا تتجاوز 70% من طاقتك')
   if (healthConditions.includes('asthma'))        conditionNotes.push('ضع البخاخ قريباً — خفّف إذا صعّب التنفس')
-  if (healthConditions.includes('pregnancy'))     conditionNotes.push('تمارينك معدّلة للحمل — استشيري طبيبتك دائماً')
+  if (healthConditions.includes('pregnancy'))     conditionNotes.push('تمارينكِ مخصّصة للحمل وآمنة لكل الأشهر — استشيري طبيبتكِ دائماً', 'توقّفي فوراً عند أي ألم أو دوار أو ضيق في التنفس')
   if (healthConditions.includes('diabetes'))      conditionNotes.push('تناول وجبة خفيفة قبل التمرين — راقب مستوى السكر')
 
   const coachMsg = COACH_MSGS[yesterdayStatus === 'missed' ? 'missed' : energyLevel] || COACH_MSGS.normal
@@ -807,7 +863,7 @@ function buildWorkout(dayTarget, energyLevel, yesterdayStatus, profile, dayNumbe
     nutrition_reminder: nutrition,
     estimated_duration_min: duration,
     sex,
-    v: 9, // bump when workout structure changes — triggers cache bust in frontend
+    v: 10, // bump when workout structure changes — triggers cache bust in frontend
   }
 }
 
