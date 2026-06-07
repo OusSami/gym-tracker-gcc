@@ -620,7 +620,12 @@ export default async function handler(req, res) {
     const { data: freshProfile } = await sb.from('profiles')
       .select('health_conditions,sex,age,birthday,fitness_level,weight_kg,calorie_target,goal,body_fat_pct')
       .eq('id', userId).single()
-    const mergedProfile = { ...profile, ...freshProfile }
+    // Merge: freshProfile wins for non-null values; client profile fills any gaps
+    const mergedProfile = {
+      ...profile,
+      ...freshProfile,
+      sex: freshProfile?.sex || profile?.sex || 'male',
+    }
 
     const { data: program } = await sb.from('user_programs').select('roadmap,total_days').eq('id', programId).single()
     if (!program) return res.status(404).json({ error: 'Program not found' })

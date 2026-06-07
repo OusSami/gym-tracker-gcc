@@ -830,17 +830,22 @@ export default function Program() {
   const loadAll=async()=>{
     setLoading(true)
     try{
-      const [sr]=await Promise.all([
+      // Fetch status AND profile in parallel — profile must be ready before autoGenerate
+      const [sr,pr]=await Promise.all([
         fetch('/api/packages/status?userId='+user.id).then(r=>r.json()),
+        fetch('/api/profile?userId='+user.id).then(r=>r.json()),
       ])
+      const freshProfile=pr.profile||{}
+      if(pr.profile)setProfile(pr.profile)
+
       if(sr.program){
         setProgram(sr.program)
         if(sr.todayDay?.checkin_status)setCheckinDone(true)
         const dr=await fetch('/api/packages/days?programId='+sr.program.id).then(r=>r.json()).catch(()=>({days:[]}))
         setDayRecords(dr.days||[])
-        // Always regenerate if not checked in yet — ensures fresh profile.sex from DB every load
+        // Always regenerate if not checked in yet — passes freshProfile so sex is always correct
         if(!sr.todayDay?.checkin_status){
-          autoGenerate(sr.program,dr.days||[])
+          autoGenerate(sr.program,dr.days||[],freshProfile)
         }else{
           // Already checked in — show the cached workout from that session
           const cached=sr.todayDay?.daily_workout
@@ -852,13 +857,15 @@ export default function Program() {
     setLoading(false)
   }
 
-  const autoGenerate=async(prog,days)=>{
+  const autoGenerate=async(prog,days,freshProfile)=>{
     setGenerating(true)
     try{
       const yesterday=days.find(d=>d.day_number===(prog.current_day||1)-1)
+      // Use freshProfile (fetched in loadAll) so sex is guaranteed to be set
+      const profileToSend=freshProfile||profile||{}
       const r=await fetch('/api/packages/daily',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({userId:user.id,programId:prog.id,dayNumber:prog.current_day,energyLevel:'normal',yesterdayStatus:yesterday?.checkin_status||'completed',profile})
+        body:JSON.stringify({userId:user.id,programId:prog.id,dayNumber:prog.current_day,energyLevel:'normal',yesterdayStatus:yesterday?.checkin_status||'completed',profile:profileToSend})
       })
       const d=await r.json()
       if(r.ok)setWorkout(d.workout)
