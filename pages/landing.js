@@ -141,6 +141,12 @@ export default function Landing() {
               </div>
             ))}
           </div>
+
+          {/* Hero avatars */}
+          <div className="rv" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:0,marginTop:40,borderRadius:24,overflow:'hidden',border:'1px solid rgba(203,162,59,0.15)'}}>
+            <img src="/gender-male.webp" alt="ذكر" style={{width:'100%',height:'auto',display:'block'}}/>
+            <img src="/gender-female.webp" alt="أنثى" style={{width:'100%',height:'auto',display:'block'}}/>
+          </div>
         </div>
       </section>
 
@@ -167,6 +173,11 @@ export default function Landing() {
               </div>
             </div>
           ))}
+          {/* Before/after transformation */}
+          <div className="rv" style={{marginTop:32,borderRadius:20,overflow:'hidden',border:'1px solid rgba(203,162,59,0.12)'}}>
+            <img src="/landing-transform.webp" alt="قبل وبعد" style={{width:'100%',height:'auto',display:'block'}}/>
+          </div>
+
           <blockquote className="rv" style={{borderRight:`3px solid ${G}`,padding:'14px 20px',marginTop:28,fontStyle:'italic',color:'#6B5F47',fontSize:'.9rem',lineHeight:1.7}}>
             "ما كنت هكذا دائماً... أصبحت أبدأ وأوقف، أبدأ وأوقف، حتى ظننت إن الاستمرار مو من طبيعتي."
           </blockquote>
@@ -211,6 +222,12 @@ export default function Landing() {
           <div className="lbl rv" style={{marginBottom:14}}>الحل</div>
           <h2 className="lg rv" style={{marginBottom:14}}>GYM TRACKER GCC<br/><span className="gold">نظامك الشخصي للتحول الحقيقي.</span></h2>
           <p className="muted rv" style={{marginBottom:36}}>مو مجرد تطبيق تتبع. <strong style={{color:'#ECE3CF'}}>مدرب ذكي يعرف جسمك، يفهم أكلك الخليجي، ويبني خطتك يومياً</strong> بناءً على ما حصل بالفعل.</p>
+
+          {/* App mockup */}
+          <div className="rv" style={{textAlign:'center',marginBottom:40,borderRadius:24,overflow:'hidden'}}>
+            <img src="/landing-app-mockup.webp" alt="تطبيق GYM TRACKER GCC" style={{width:'75%',maxWidth:320,height:'auto',display:'inline-block',filter:'drop-shadow(0 20px 60px rgba(203,162,59,0.25))'}}/>
+          </div>
+
           {[
             ['الأيام 1 – 7','ph1','rgba(239,68,68,.12)','#ef4444','بناء الأساس الحقيقي','تحليل جسمك الفعلي — قياسات + هدف + مستوى. برنامج مخصص من اليوم الأول.',['فهم جسمك وأين أنت الآن بالأرقام','برنامج تمرين خليجي (جيم أو بيت)','خطة تغذية من أكل تعرفه — كبسة، مندي، حمص، شاورما']],
             ['الأيام 8 – 14 ← المرحلة الأهم','ph2','rgba(203,162,59,.12)',G,'النظام يتكيف معك — لا يعاقبك','فاتك يوم؟ عندك مناسبة؟ النظام يعدّل ويكمل.',['محاسبة يومية ذكية — تقدير لا مثالية','مدرب ذكي بالعربي يرد فوراً','الخطة تتكيف مع حياتك']],
@@ -236,11 +253,16 @@ export default function Landing() {
           {[
             ['01','برنامج تمرين مخصص 100% لجسمك','ليس برنامجاً عاماً. برنامج يعرف وزنك، مستواك، معداتك، والوقت المتاح عندك.'],
             ['02','تغذية من مطبخك الخليجي الحقيقي','أول تطبيق يحتوي الكبسة، المندي، الحمص، الفول، والشاورما بقيم غذائية دقيقة.'],
+            ['__food__','','',''],
             ['03','نظام يتكيف مع حياتك — مو يوقفها','فاتك يوم؟ مناسبة؟ النظام يعدّل ويعيدك بشكل تدريجي. ما في "من الصفر".'],
             ['04','مدرب ذكي بالعربي 24/7','اسأل عن التمرين، التغذية، التعافي — ردود متخصصة، بأسلوب خليجي.'],
             ['05','محاسبة يومية بالأرقام الحقيقية','وزنك، خصرك، تمارينك، سعراتك — كل شيء في مكان. الأرقام لا تكذب.'],
             ['06','تحليل الجسم — مع أو بدون صورة','نسبة دهونك وأولوياتك بدقة — عبر القياسات فقط. خصوصيتك محفوظة.'],
-          ].map(([n,t,d])=>(
+          ].map(([n,t,d])=> n === '__food__' ? (
+            <div key="food" className="rv" style={{borderRadius:20,overflow:'hidden',margin:'4px 0 10px',border:'1px solid rgba(203,162,59,0.12)'}}>
+              <img src="/landing-food.webp" alt="أكل خليجي" style={{width:'100%',height:'auto',display:'block'}}/>
+            </div>
+          ) : (
             <div key={n} className="bene rv">
               <div className="bnum">{n}</div>
               <div>
