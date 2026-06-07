@@ -219,7 +219,7 @@ function ExerciseCard({ ex, onSelect, sex = 'male' }) {
       <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,position:'relative',overflow:'hidden',minHeight:100}}>
         <div style={{position:'absolute',top:6,right:8,zIndex:2,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}cc`,background:'rgba(0,0,0,0.45)',borderRadius:6,padding:'1px 6px'}}>{ex.equipment.toUpperCase()}</div>
         <img
-          src={`/exercises/${ex.id}-${sex}.png`}
+          src={`/exercises/${ex.id}-${sex}.webp`}
           alt={ex.name}
           style={{width:'100%',display:'block',objectFit:'cover',maxHeight:160}}
           onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}}
@@ -279,7 +279,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
         <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,border:`1px solid ${color}25`,borderRadius:20,overflow:'hidden',marginBottom:16}}>
           {ex.id ? (
             <img
-              src={`/exercises/${ex.id}-${sex}.png`}
+              src={`/exercises/${ex.id}-${sex}.webp`}
               alt={ex.name}
               style={{width:'100%',display:'block',borderRadius:20}}
               onError={e => {
@@ -523,7 +523,7 @@ export default function Exercises() {
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {stretches.map((s,i)=>(
                     <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
-                      {s.id&&<img src={`/exercises/${s.id}-${sex}.png`} alt={s.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
+                      {s.id&&<img src={`/exercises/${s.id}-${sex}.webp`} alt={s.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
                       <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{s.name}</div>
@@ -556,7 +556,7 @@ export default function Exercises() {
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {routines.map((r,i) => (
                     <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
-                      {r.id&&<img src={`/exercises/${r.id}-${sex}.png`} alt={r.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
+                      {r.id&&<img src={`/exercises/${r.id}-${sex}.webp`} alt={r.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
                       <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{r.name}</div>

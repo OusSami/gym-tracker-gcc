@@ -212,7 +212,7 @@ export default function Onboarding() {
               <h2 style={{ fontSize:'1.3rem', fontWeight:900, marginBottom:6 }}>{STEPS[1].q}</h2>
               <p style={{ fontSize:'.83rem', color:'rgba(255,255,255,0.4)', marginBottom:28 }}>{STEPS[1].sub}</p>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                {[{id:'male',label:'ذكر',img:'/gender-male.png'},{id:'female',label:'أنثى',img:'/gender-female.png'}].map(s=>(
+                {[{id:'male',label:'ذكر',img:'/gender-male.webp'},{id:'female',label:'أنثى',img:'/gender-female.webp'}].map(s=>(
                   <div key={s.id} onClick={()=>{set('sex',s.id); setTimeout(()=>setStep(2),260)}}
                     style={{ border:`2px solid ${form.sex===s.id?'rgba(203,162,59,0.8)':'rgba(255,255,255,0.08)'}`, borderRadius:24, overflow:'hidden', cursor:'pointer', transition:'all .25s', position:'relative', background:'#09090B', boxShadow: form.sex===s.id?'0 0 24px rgba(203,162,59,0.25)':'none' }}>
                     <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden' }}>
@@ -359,7 +359,7 @@ export default function Onboarding() {
                     style={{ background:'#09090B', border:`2px solid ${form.bodyShape===b.id?'rgba(203,162,59,0.8)':'rgba(255,255,255,0.08)'}`, borderRadius:20, overflow:'hidden', cursor:'pointer', transition:'all .25s', boxShadow: form.bodyShape===b.id?'0 0 20px rgba(203,162,59,0.2)':'none' }}>
                     <div style={{ aspectRatio:'1/1', overflow:'hidden', position:'relative' }}>
                       <img
-                        src={`/body-shapes/${b.id}-${form.sex === 'female' ? 'female' : 'male'}.png`}
+                        src={`/body-shapes/${b.id}-${form.sex === 'female' ? 'female' : 'male'}.webp`}
                         alt={b.label}
                         style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block', transform: form.bodyShape===b.id?'scale(1.05)':'scale(1)', transition:'transform .25s', opacity: form.bodyShape===b.id ? 1 : 0.75 }}
                       />

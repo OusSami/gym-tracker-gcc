@@ -76,7 +76,7 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
   const pct=((dur-left)/dur)*100
   const c2=color||G
   const imgSex = sex === 'female' ? 'female' : 'male'
-  const imgSrc = exercise.imageKey ? `/exercises/${exercise.imageKey}-${imgSex}.png` : null
+  const imgSrc = exercise.imageKey ? `/exercises/${exercise.imageKey}-${imgSex}.webp` : null
 
   return (
     <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${c2}22`,borderRadius:18,overflow:'hidden'}}>
@@ -701,7 +701,7 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
         {ex.imageKey && (
           <div style={{width:'100%',height:220,background:'#0d0d0a',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',borderBottom:`1px solid ${G}18`}}>
             <img
-              src={`/exercises/${ex.imageKey}-${workout.sex==='female'?'female':'male'}.png`}
+              src={`/exercises/${ex.imageKey}-${workout.sex==='female'?'female':'male'}.webp`}
               alt={ex.name}
               onError={e=>{e.target.parentNode.style.display='none'}}
               style={{height:'100%',width:'100%',objectFit:'contain',objectPosition:'center'}}/>
