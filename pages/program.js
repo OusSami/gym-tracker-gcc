@@ -82,9 +82,9 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
     <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${c2}22`,borderRadius:18,overflow:'hidden'}}>
       {/* Exercise image */}
       {imgSrc && (
-        <div style={{width:'100%',height:220,background:'#0d0d0a',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',borderBottom:`1px solid ${c2}18`}}>
+        <div style={{width:'100%',background:'#0d0d0a',overflow:'hidden',borderBottom:`1px solid ${c2}18`}}>
           <img src={imgSrc} alt={exercise.name} onError={e=>{e.target.parentNode.style.display='none'}}
-            style={{height:'100%',width:'100%',objectFit:'contain',objectPosition:'center'}}/>
+            style={{width:'100%',height:'auto',display:'block'}}/>
         </div>
       )}
 
@@ -699,12 +699,12 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
       <div style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${G}22`,borderRadius:18,marginBottom:12,overflow:'hidden'}}>
         {/* Exercise image */}
         {ex.imageKey && (
-          <div style={{width:'100%',height:220,background:'#0d0d0a',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',borderBottom:`1px solid ${G}18`}}>
+          <div style={{width:'100%',background:'#0d0d0a',overflow:'hidden',borderBottom:`1px solid ${G}18`}}>
             <img
               src={`/exercises/${ex.imageKey}-${workout.sex==='female'?'female':'male'}.webp`}
               alt={ex.name}
               onError={e=>{e.target.parentNode.style.display='none'}}
-              style={{height:'100%',width:'100%',objectFit:'contain',objectPosition:'center'}}/>
+              style={{width:'100%',height:'auto',display:'block'}}/>
           </div>
         )}
         <div style={{padding:'14px 16px'}}>
