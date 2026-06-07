@@ -69,7 +69,7 @@ export default function Packages() {
             equipment: 'home', days_per_week: profile.days_per_week || 3,
             weight_kg: profile.weight_kg, height_cm: profile.height_cm,
             body_fat_pct: profile.body_fat_pct, calorie_target: profile.calorie_target,
-            session_minutes: 30,
+            session_minutes: 30, sex: profile.sex,
           }
         })
       })

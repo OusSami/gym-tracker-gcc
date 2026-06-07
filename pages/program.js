@@ -843,14 +843,11 @@ export default function Program() {
         if(sr.todayDay?.checkin_status)setCheckinDone(true)
         const dr=await fetch('/api/packages/days?programId='+sr.program.id).then(r=>r.json()).catch(()=>({days:[]}))
         setDayRecords(dr.days||[])
-        // Always regenerate if not checked in yet — passes freshProfile so sex is always correct
-        if(!sr.todayDay?.checkin_status){
-          autoGenerate(sr.program,dr.days||[],freshProfile)
-        }else{
-          // Already checked in — show the cached workout from that session
-          const cached=sr.todayDay?.daily_workout
-          if(cached)setWorkout(cached)
-        }
+        // Always regenerate — cheap (no AI), guarantees sex/steps match current profile
+        // Show cached immediately as placeholder while regenerating to avoid blank screen
+        const cached=sr.todayDay?.daily_workout
+        if(cached)setWorkout(cached)
+        autoGenerate(sr.program,dr.days||[],freshProfile)
       }
 
     }catch(e){}
