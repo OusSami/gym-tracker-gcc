@@ -212,11 +212,11 @@ export default function Onboarding() {
               <h2 style={{ fontSize:'1.3rem', fontWeight:900, marginBottom:6 }}>{STEPS[1].q}</h2>
               <p style={{ fontSize:'.83rem', color:'rgba(255,255,255,0.4)', marginBottom:28 }}>{STEPS[1].sub}</p>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-                {[{id:'male',label:'ذكر',icon:'👨'},{id:'female',label:'أنثى',icon:'👩'}].map(s=>(
+                {[{id:'male',label:'ذكر',img:'/gender-male.png'},{id:'female',label:'أنثى',img:'/gender-female.png'}].map(s=>(
                   <div key={s.id} onClick={()=>{set('sex',s.id); setTimeout(()=>setStep(2),260)}}
-                    style={{ background:form.sex===s.id?`rgba(203,162,59,0.12)`:'rgba(255,255,255,0.03)', border:`1px solid ${form.sex===s.id?'rgba(203,162,59,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:20, padding:'32px 20px', textAlign:'center', cursor:'pointer', transition:'all .2s' }}>
-                    <div style={{ fontSize:'2.8rem', marginBottom:12 }}>{s.icon}</div>
-                    <div style={{ fontWeight:800, fontSize:'1.1rem', color:form.sex===s.id?G:'#ECE3CF' }}>{s.label}</div>
+                    style={{ background:form.sex===s.id?`rgba(203,162,59,0.12)`:'rgba(255,255,255,0.03)', border:`2px solid ${form.sex===s.id?'rgba(203,162,59,0.6)':'rgba(255,255,255,0.08)'}`, borderRadius:20, overflow:'hidden', textAlign:'center', cursor:'pointer', transition:'all .2s', position:'relative' }}>
+                    <img src={s.img} alt={s.label} style={{ width:'100%', display:'block', objectFit:'contain' }} />
+                    <div style={{ padding:'10px 16px 14px', fontWeight:800, fontSize:'1.1rem', color:form.sex===s.id?G:'#ECE3CF' }}>{s.label}</div>
                   </div>
                 ))}
               </div>
