@@ -211,12 +211,15 @@ export default function Onboarding() {
             <div className="fu">
               <h2 style={{ fontSize:'1.3rem', fontWeight:900, marginBottom:6 }}>{STEPS[1].q}</h2>
               <p style={{ fontSize:'.83rem', color:'rgba(255,255,255,0.4)', marginBottom:28 }}>{STEPS[1].sub}</p>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
                 {[{id:'male',label:'ذكر',img:'/gender-male.png'},{id:'female',label:'أنثى',img:'/gender-female.png'}].map(s=>(
                   <div key={s.id} onClick={()=>{set('sex',s.id); setTimeout(()=>setStep(2),260)}}
-                    style={{ background:form.sex===s.id?`rgba(203,162,59,0.12)`:'rgba(255,255,255,0.03)', border:`2px solid ${form.sex===s.id?'rgba(203,162,59,0.6)':'rgba(255,255,255,0.08)'}`, borderRadius:20, overflow:'hidden', textAlign:'center', cursor:'pointer', transition:'all .2s', position:'relative' }}>
-                    <img src={s.img} alt={s.label} style={{ width:'100%', display:'block', objectFit:'contain' }} />
-                    <div style={{ padding:'10px 16px 14px', fontWeight:800, fontSize:'1.1rem', color:form.sex===s.id?G:'#ECE3CF' }}>{s.label}</div>
+                    style={{ border:`2px solid ${form.sex===s.id?'rgba(203,162,59,0.8)':'rgba(255,255,255,0.08)'}`, borderRadius:24, overflow:'hidden', cursor:'pointer', transition:'all .25s', position:'relative', background:'#09090B', boxShadow: form.sex===s.id?'0 0 24px rgba(203,162,59,0.25)':'none' }}>
+                    <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden' }}>
+                      <img src={s.img} alt={s.label} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block', transform: form.sex===s.id?'scale(1.03)':'scale(1)', transition:'transform .25s' }} />
+                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'40%', background:'linear-gradient(to top, #09090B 20%, transparent)' }} />
+                    </div>
+                    <div style={{ padding:'4px 16px 16px', fontWeight:800, fontSize:'1.15rem', color:form.sex===s.id?'#CBA23B':'#ECE3CF', textAlign:'center', letterSpacing:1 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
