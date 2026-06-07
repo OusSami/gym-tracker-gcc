@@ -356,16 +356,19 @@ export default function Onboarding() {
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
                 {(form.sex==='female'?BODY_SHAPES_F:BODY_SHAPES_M).map(b=>(
                   <div key={b.id} onClick={()=>{set('bodyShape',b.id); setTimeout(()=>setStep(7),300)}}
-                    style={{ padding:'16px 14px 18px', textAlign:'center', background:form.bodyShape===b.id?'rgba(203,162,59,0.12)':'rgba(255,255,255,0.03)', border:`1px solid ${form.bodyShape===b.id?'rgba(203,162,59,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:18, cursor:'pointer', transition:'all .2s' }}>
-                    <div style={{ display:'flex', justifyContent:'center', marginBottom:10, height:110, alignItems:'flex-end' }}>
+                    style={{ background:'#09090B', border:`2px solid ${form.bodyShape===b.id?'rgba(203,162,59,0.8)':'rgba(255,255,255,0.08)'}`, borderRadius:20, overflow:'hidden', cursor:'pointer', transition:'all .25s', boxShadow: form.bodyShape===b.id?'0 0 20px rgba(203,162,59,0.2)':'none' }}>
+                    <div style={{ aspectRatio:'1/1', overflow:'hidden', position:'relative' }}>
                       <img
                         src={`/body-shapes/${b.id}-${form.sex === 'female' ? 'female' : 'male'}.png`}
                         alt={b.label}
-                        style={{ height:100, width:100, objectFit:'contain', borderRadius:12, opacity: form.bodyShape===b.id ? 1 : 0.65, transition:'opacity .2s' }}
+                        style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block', transform: form.bodyShape===b.id?'scale(1.05)':'scale(1)', transition:'transform .25s', opacity: form.bodyShape===b.id ? 1 : 0.75 }}
                       />
+                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'35%', background:'linear-gradient(to top, #09090B 10%, transparent)' }} />
                     </div>
-                    <div style={{ fontWeight:800, fontSize:'.88rem', color:form.bodyShape===b.id?G:'#ECE3CF', marginBottom:3 }}>{b.label}</div>
-                    <div style={{ fontSize:'.7rem', color:'rgba(255,255,255,0.4)' }}>{b.desc}</div>
+                    <div style={{ padding:'6px 12px 12px', textAlign:'center' }}>
+                      <div style={{ fontWeight:800, fontSize:'.9rem', color:form.bodyShape===b.id?'#CBA23B':'#ECE3CF', marginBottom:2 }}>{b.label}</div>
+                      <div style={{ fontSize:'.7rem', color:'rgba(255,255,255,0.4)' }}>{b.desc}</div>
+                    </div>
                   </div>
                 ))}
               </div>
