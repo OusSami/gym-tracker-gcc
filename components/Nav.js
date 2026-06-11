@@ -140,12 +140,11 @@ export function BottomTabs({ active }) {
   return (
     <div style={{
       position:'fixed', bottom:0, left:0, right:0, zIndex:100,
-      background:'rgba(9,9,11,0.95)',
-      backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)',
-      borderTop:'1px solid rgba(203,162,59,0.13)',
+      background:'var(--card)',
+      borderBlockStart:'1px solid rgba(0,0,0,0.08)',
       display:'flex', alignItems:'center', justifyContent:'space-around',
-      padding:'8px 0',
-      paddingBottom:'calc(8px + env(safe-area-inset-bottom))',
+      paddingBlock:'8px',
+      paddingBlockEnd:'calc(8px + env(safe-area-inset-bottom))',
       height:'calc(60px + env(safe-area-inset-bottom))',
       direction:'rtl',
     }}>
@@ -153,9 +152,10 @@ export function BottomTabs({ active }) {
         <button key={t.id} onClick={() => router.push(t.path)}
           style={{
             display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-            padding:'5px 14px', borderRadius:12, cursor:'pointer',
+            paddingBlock:'5px', paddingInline:'14px',
+            borderRadius:'var(--radius-md)', cursor:'pointer',
             transition:'all .15s', background:'transparent', border:'none',
-            color: active===t.id ? '#CBA23B' : 'rgba(203,162,59,0.3)',
+            color: active===t.id ? '#111111' : '#A1A1AA',
             minWidth:56,
           }}>
           <span style={{fontSize:'1.25rem',lineHeight:1}}>{t.icon}</span>
