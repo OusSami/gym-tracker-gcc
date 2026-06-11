@@ -140,7 +140,7 @@ export default function ChatWidget() {
         @keyframes cw-pop { 0%{opacity:0;transform:scale(.85) translateY(10px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
         @keyframes cw-dot { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
         @keyframes cw-badge { 0%,100%{transform:scale(1)} 60%{transform:scale(1.3)} }
-        @keyframes cw-glow { 0%,100%{box-shadow:0 2px 14px rgba(203,162,59,0.35)} 50%{box-shadow:0 2px 22px rgba(203,162,59,0.6)} }
+        @keyframes cw-glow { 0%,100%{box-shadow:0 2px 14px rgba(0,0,0,0.18)} 50%{box-shadow:0 4px 24px rgba(0,0,0,0.30)} }
       `}</style>
 
       {/* ── COMPACT FLOATING PANEL ── */}
@@ -153,10 +153,10 @@ export default function ChatWidget() {
           width: 'min(340px, calc(100vw - 28px))',
           marginLeft: 'auto',
           height: 460,
-          background: '#0D0B08',
+          background: 'var(--card)',
           borderRadius: 18,
-          border: '1px solid rgba(203,162,59,0.2)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(203,162,59,0.06)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)',
           display: 'flex',
           flexDirection: 'column',
           direction: 'rtl',
@@ -167,26 +167,26 @@ export default function ChatWidget() {
         }}>
 
           {/* HEADER */}
-          <div style={{ padding: '12px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, background: 'linear-gradient(180deg,rgba(203,162,59,0.07) 0%,transparent 100%)' }}>
-            <div style={{ width: 34, height: 34, borderRadius: '50%', background: `rgba(203,162,59,0.1)`, border: `1.5px solid ${ctx.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.95rem', flexShrink: 0 }}>
+          <div style={{ padding: '12px 14px 10px', borderBottom: '1px solid rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
+            <div style={{ width: 34, height: 34, borderRadius: '50%', background: `rgba(0,0,0,0.05)`, border: `1.5px solid ${ctx.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.95rem', flexShrink: 0 }}>
               {ctx.icon}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: '.84rem', color: '#ECE3CF' }}>{ctx.title}</div>
+              <div style={{ fontWeight: 800, fontSize: '.84rem', color: 'var(--text-primary)' }}>{ctx.title}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
                 <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }}/>
-                <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,0.3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{remaining} رد · {ctx.scope}</div>
+                <div style={{ fontSize: '.6rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{remaining} رد · {ctx.scope}</div>
               </div>
             </div>
             {/* clear + close */}
             {msgs.length > 1 && (
-              <button onClick={clearChat} title="مسح المحادثة" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.22)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, flexShrink: 0, transition: 'color .15s' }}
+              <button onClick={clearChat} title="مسح المحادثة" style={{ background: 'none', border: 'none', color: 'rgba(0,0,0,0.28)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, flexShrink: 0, transition: 'color .15s' }}
                 onMouseEnter={e => e.currentTarget.style.color='#ef4444'}
-                onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.22)'}>
+                onMouseLeave={e => e.currentTarget.style.color='rgba(0,0,0,0.28)'}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
               </button>
             )}
-            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, flexShrink: 0 }}>
+            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(0,0,0,0.35)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, flexShrink: 0 }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
@@ -196,26 +196,26 @@ export default function ChatWidget() {
             {msgs.map((m, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: m.role === 'user' ? 'row' : 'row-reverse', alignItems: 'flex-end', gap: 6 }}>
                 {m.role === 'bot' && (
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(203,162,59,0.1)', border: `1px solid ${ctx.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem', flexShrink: 0 }}>{ctx.icon}</div>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', border: `1px solid ${ctx.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem', flexShrink: 0 }}>{ctx.icon}</div>
                 )}
                 <div style={{
                   maxWidth: '82%',
-                  background: m.role === 'user' ? 'rgba(203,162,59,0.1)' : 'rgba(255,255,255,0.05)',
-                  border: m.role === 'user' ? '1px solid rgba(203,162,59,0.2)' : '1px solid rgba(255,255,255,0.07)',
+                  background: m.role === 'user' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.03)',
+                  border: m.role === 'user' ? '1px solid rgba(0,0,0,0.10)' : '1px solid rgba(0,0,0,0.06)',
                   borderRight: m.role === 'bot' ? `2px solid ${ctx.color}45` : undefined,
                   borderRadius: m.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                   padding: '8px 12px',
                 }}>
-                  <div style={{ fontSize: '.82rem', lineHeight: 1.7, whiteSpace: 'pre-wrap', color: '#ECE3CF' }}>{m.text}</div>
-                  {m.t && <div style={{ fontSize: '.55rem', color: 'rgba(255,255,255,0.18)', marginTop: 3, textAlign: m.role === 'user' ? 'left' : 'right' }}>{m.t}</div>}
+                  <div style={{ fontSize: '.82rem', lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>{m.text}</div>
+                  {m.t && <div style={{ fontSize: '.55rem', color: 'var(--text-secondary)', marginTop: 3, textAlign: m.role === 'user' ? 'end' : 'start' }}>{m.t}</div>}
                 </div>
               </div>
             ))}
             {busy && (
               <div style={{ display: 'flex', flexDirection: 'row-reverse', alignItems: 'flex-end', gap: 6 }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(203,162,59,0.1)', border: `1px solid ${ctx.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem' }}>{ctx.icon}</div>
-                <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', borderRight: `2px solid ${ctx.color}45`, borderRadius: '14px 14px 14px 4px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
-                  {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.3)', animation: `cw-dot .8s ${i*.15}s ease-in-out infinite` }}/>)}
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', border: `1px solid ${ctx.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem' }}>{ctx.icon}</div>
+                <div style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.07)', borderRight: `2px solid ${ctx.color}45`, borderRadius: '14px 14px 14px 4px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
+                  {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(0,0,0,0.25)', animation: `cw-dot .8s ${i*.15}s ease-in-out infinite` }}/>)}
                 </div>
               </div>
             )}
@@ -227,9 +227,9 @@ export default function ChatWidget() {
             <div style={{ padding: '4px 12px 6px', display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none', flexShrink: 0 }}>
               {ctx.quick.map(q => (
                 <button key={q} onClick={() => { setInput(q); setTimeout(() => inputRef.current?.focus(), 40) }}
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.5)', padding: '5px 10px', borderRadius: 12, cursor: 'pointer', fontFamily: F, fontSize: '.68rem', whiteSpace: 'nowrap', flexShrink: 0, transition: 'all .15s' }}
+                  style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.10)', color: 'var(--text-secondary)', padding: '5px 10px', borderRadius: 12, cursor: 'pointer', fontFamily: F, fontSize: '.68rem', whiteSpace: 'nowrap', flexShrink: 0, transition: 'all .15s' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = ctx.color + '55'; e.currentTarget.style.color = ctx.color }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)' }}>
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.10)'; e.currentTarget.style.color = 'var(--text-secondary)' }}>
                   {q}
                 </button>
               ))}
@@ -237,7 +237,7 @@ export default function ChatWidget() {
           )}
 
           {/* INPUT */}
-          <div style={{ padding: '8px 12px 12px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0, background: 'rgba(0,0,0,0.2)' }}>
+          <div style={{ padding: '8px 12px 12px', borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
             <textarea
               ref={inputRef}
               value={input}
@@ -246,12 +246,12 @@ export default function ChatWidget() {
               placeholder={remaining <= 0 ? 'وصلت للحد اليومي' : `اسألني عن ${ctx.scope}...`}
               disabled={remaining <= 0}
               rows={1}
-              style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#ECE3CF', padding: '9px 12px', borderRadius: 11, fontFamily: F, fontSize: '.83rem', resize: 'none', direction: 'rtl', lineHeight: 1.5, maxHeight: 72, overflow: 'hidden', outline: 'none', transition: 'border-color .2s' }}
-              onFocus={e => e.target.style.borderColor = 'rgba(203,162,59,0.45)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              style={{ flex: 1, background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.12)', color: 'var(--text-primary)', padding: '9px 12px', borderRadius: 11, fontFamily: F, fontSize: '.83rem', resize: 'none', direction: 'rtl', lineHeight: 1.5, maxHeight: 72, overflow: 'hidden', outline: 'none', transition: 'border-color .2s' }}
+              onFocus={e => e.target.style.borderColor = 'rgba(17,17,17,0.35)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
             />
             <button onClick={send} disabled={!input.trim() || busy || remaining <= 0}
-              style={{ width: 36, height: 36, borderRadius: 10, background: input.trim() && !busy && remaining > 0 ? `linear-gradient(135deg,${G},#8B6914)` : 'rgba(255,255,255,0.05)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() && !busy && remaining > 0 ? 'pointer' : 'not-allowed', flexShrink: 0, transition: 'all .2s', color: input.trim() && !busy && remaining > 0 ? '#09090B' : 'rgba(255,255,255,0.2)' }}>
+              style={{ width: 36, height: 36, borderRadius: 10, background: input.trim() && !busy && remaining > 0 ? '#111111' : 'rgba(0,0,0,0.06)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() && !busy && remaining > 0 ? 'pointer' : 'not-allowed', flexShrink: 0, transition: 'all .2s', color: input.trim() && !busy && remaining > 0 ? '#FFFFFF' : 'rgba(0,0,0,0.22)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
             </button>
           </div>
@@ -261,12 +261,12 @@ export default function ChatWidget() {
       {/* ── FAB BUTTON ── */}
       <div
         onClick={() => setOpen(v => !v)}
-        style={{ position: 'fixed', bottom: 82, left: 18, zIndex: 9999, width: 48, height: 48, borderRadius: '50%', background: open ? 'rgba(255,255,255,0.1)' : `linear-gradient(145deg,${G},#7A5E1A)`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s', border: '1px solid rgba(203,162,59,0.3)', animation: open ? 'none' : 'cw-glow 2.5s ease-in-out infinite' }}
+        style={{ position: 'fixed', bottom: 82, left: 18, zIndex: 9999, width: 48, height: 48, borderRadius: '50%', background: open ? 'rgba(0,0,0,0.08)' : '#111111', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s', border: '1px solid rgba(0,0,0,0.15)', animation: open ? 'none' : 'cw-glow 2.5s ease-in-out infinite' }}
       >
         {open
           ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           : <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
-        {unread && !open && <div style={{ position: 'absolute', top: 1, right: 1, width: 11, height: 11, borderRadius: '50%', background: '#ef4444', border: '2px solid #09090B', animation: 'cw-badge 1.5s infinite' }}/>}
+        {unread && !open && <div style={{ position: 'absolute', top: 1, right: 1, width: 11, height: 11, borderRadius: '50%', background: '#ef4444', border: '2px solid var(--card)', animation: 'cw-badge 1.5s infinite' }}/>}
       </div>
     </>
   )
