@@ -105,22 +105,22 @@ export default function WeightPage() {
   const minW = allWeights.length ? fmt1(Math.min(...allWeights)) : null
   const maxW = allWeights.length ? fmt1(Math.max(...allWeights)) : null
 
-  const INP = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: '#ECE3CF', padding: '13px 16px', fontFamily: "'DM Sans','Tajawal',sans-serif", fontSize: '.95rem', borderRadius: 12, outline: 'none', width: '100%', transition: 'border .2s' }
+  const INP = { background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.10)', color: 'var(--text-primary)', padding: '13px 16px', fontFamily: "'DM Sans','Tajawal',sans-serif", fontSize: '.95rem', borderRadius: 12, outline: 'none', width: '100%', transition: 'border .2s' }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#09090B', color: '#ECE3CF' }}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5)} input:focus{border-color:#CBA23B !important;background:rgba(203,162,59,0.04) !important}`}</style>
+    <div style={{ minHeight: '100vh', background: 'var(--surface)', color: 'var(--text-primary)' }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input[type=date]::-webkit-calendar-picker-indicator{filter:none}`}</style>
       <TopNav title="الوزن" user={user} back="/dashboard" onSignOut={() => supabase.auth.signOut().then(() => router.push('/'))} />
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px calc(90px + env(safe-area-inset-bottom))' }}>
 
         {/* Log weight */}
-        <div style={{ background: 'rgba(203,162,59,0.05)', border: '1px solid rgba(203,162,59,0.18)', borderRadius: 18, padding: '18px', marginBottom: 20 }}>
-          <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'rgba(203,162,59,0.6)', marginBottom: 14 }}>إضافة وزن</div>
+        <div style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 18, padding: '18px', marginBottom: 20 }}>
+          <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'var(--text-secondary)', marginBottom: 14 }}>إضافة وزن</div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: '.68rem', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1, marginBottom: 6 }}>WEIGHT ({unit})</div>
+              <div style={{ fontSize: '.68rem', fontWeight: 700, color: 'rgba(0,0,0,0.25)', letterSpacing: 1, marginBottom: 6 }}>WEIGHT ({unit})</div>
               <input
                 type="number" inputMode="decimal" placeholder={isMetric ? '75.0' : '165.0'}
                 value={weight} onChange={e => setWeight(e.target.value)}
@@ -129,7 +129,7 @@ export default function WeightPage() {
               />
             </div>
             <div>
-              <div style={{ fontSize: '.68rem', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1, marginBottom: 6 }}>التاريخ</div>
+              <div style={{ fontSize: '.68rem', fontWeight: 700, color: 'rgba(0,0,0,0.25)', letterSpacing: 1, marginBottom: 6 }}>التاريخ</div>
               <input
                 type="date" value={date} max={todayStr()}
                 onChange={e => setDate(e.target.value)}
@@ -148,7 +148,7 @@ export default function WeightPage() {
           {success && <div style={{ color: '#4ade80', fontSize: '.8rem', marginBottom: 10, padding: '9px 13px', background: 'rgba(74,222,128,.08)', borderRadius: 9, border: '1px solid rgba(74,222,128,.2)' }}>✓ {success}</div>}
 
           <button onClick={save} disabled={saving || !weight}
-            style={{ width: '100%', padding: '14px', background: (!weight || saving) ? 'rgba(203,162,59,0.3)' : '#CBA23B', border: 'none', borderRadius: 12, fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '.95rem', color: '#0C0B0D', cursor: (!weight || saving) ? 'not-allowed' : 'pointer', transition: 'all .2s' }}>
+            style={{ width: '100%', padding: '14px', background: (!weight || saving) ? 'rgba(0,0,0,0.15)' : '#111111', border: 'none', borderRadius: 12, fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '.95rem', color: '#FFFFFF', cursor: (!weight || saving) ? 'not-allowed' : 'pointer', transition: 'all .2s' }}>
             {saving ? 'جاري الحفظ' : date === todayStr() ? 'Log Today\'s Weight' : 'Save Historical Entry'}
           </button>
         </div>
@@ -157,13 +157,13 @@ export default function WeightPage() {
         {entries.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 16 }}>
             {[
-              ['الحالي', current, unit, '#CBA23B'],
+              ['الحالي', current, unit, 'var(--text-primary)'],
               ['كيف تغيّر', change !== null ? (change > 0 ? '+' + change : change) : '--', unit, change > 0 ? '#ef4444' : change < 0 ? '#4ade80' : '#888'],
               ['أدنى وزن', minW, unit, '#3b82f6'],
             ].map(([label, val, u, col]) => (
-              <div key={label} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(203,162,59,0.10)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '1.1rem', color: col, lineHeight: 1 }}>{val ?? '--'}<span style={{ fontSize: '.6rem', opacity: .6, marginLeft: 2 }}>{u}</span></div>
-                <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.28)', letterSpacing: 1, marginTop: 4, fontWeight: 700 }}>{label.toUpperCase()}</div>
+              <div key={label} style={{ background: 'var(--card)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '1.1rem', color: col, lineHeight: 1 }}>{val ?? '--'}<span style={{ fontSize: '.6rem', opacity: .6, marginInlineStart: 2 }}>{u}</span></div>
+                <div style={{ fontSize: '.58rem', color: 'var(--text-secondary)', letterSpacing: 1, marginTop: 4, fontWeight: 700 }}>{label.toUpperCase()}</div>
               </div>
             ))}
           </div>
@@ -171,13 +171,13 @@ export default function WeightPage() {
 
         {/* Chart */}
         {chartData.length > 1 && (
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(203,162,59,0.10)', borderRadius: 16, padding: '16px', marginBottom: 16 }}>
+          <div style={{ background: 'var(--card)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 16, padding: '16px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'rgba(255,255,255,0.3)' }}>سجل وزنك</div>
+              <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'var(--text-secondary)' }}>سجل وزنك</div>
               <div style={{ display: 'flex', gap: 4 }}>
                 {['1m', '3m', '6m', '1y', 'all'].map(p => (
                   <button key={p} onClick={() => setPeriod(p)}
-                    style={{ padding: '4px 9px', background: period === p ? 'rgba(203,162,59,0.15)' : 'transparent', border: '1px solid ' + (period === p ? 'rgba(203,162,59,0.35)' : 'rgba(203,162,59,0.12)'), borderRadius: 20, color: period === p ? '#CBA23B' : 'rgba(255,255,255,0.3)', cursor: 'pointer', fontFamily: "'DM Sans','Tajawal',sans-serif", fontSize: '.7rem', fontWeight: 700 }}>
+                    style={{ padding: '4px 9px', background: period === p ? 'rgba(0,0,0,0.07)' : 'transparent', border: '1px solid ' + (period === p ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.08)'), borderRadius: 20, color: period === p ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: "'DM Sans','Tajawal',sans-serif", fontSize: '.7rem', fontWeight: 700 }}>
                     {p}
                   </button>
                 ))}
@@ -185,23 +185,23 @@ export default function WeightPage() {
             </div>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={chartData} margin={{ top: 5, right: 8, bottom: 0, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="label" tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                <YAxis tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="label" tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                 <Tooltip
-                  contentStyle={{ background: '#0c0c14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: '#ECE3CF' }}
+                  contentStyle={{ background: 'var(--card)', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 10, color: 'var(--text-primary)' }}
                   formatter={(v) => [v + ' ' + unit, 'Weight']}
-                  labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '.78rem' }}
+                  labelStyle={{ color: 'var(--text-secondary)', fontSize: '.78rem' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#CBA23B" strokeWidth={2.5} dot={{ fill: '#CBA23B', r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="weight" stroke="#111111" strokeWidth={2.5} dot={{ fill: '#111111', r: 3 }} activeDot={{ r: 5 }} />
                 {/* Goal line if profile has a target */}
                 {profile?.weight_kg && (
-                  <ReferenceLine y={isMetric ? profile.weight_kg : fmt1(profile.weight_kg / 0.453592)} stroke="rgba(203,162,59,0.2)" strokeDasharray="4 3" />
+                  <ReferenceLine y={isMetric ? profile.weight_kg : fmt1(profile.weight_kg / 0.453592)} stroke="rgba(0,0,0,0.15)" strokeDasharray="4 3" />
                 )}
               </LineChart>
             </ResponsiveContainer>
             {chartData.length > 0 && (
-              <div style={{ fontSize: '.68rem', color: 'rgba(255,255,255,0.25)', marginTop: 8, textAlign: 'center' }}>
+              <div style={{ fontSize: '.68rem', color: 'var(--text-secondary)', marginTop: 8, textAlign: 'center' }}>
                 {chartData.length} entries · {period === 'all' ? 'All time' : 'Last ' + period}
               </div>
             )}
@@ -211,7 +211,7 @@ export default function WeightPage() {
         {/* History list */}
         {entries.length > 0 && (
           <div>
-            <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'rgba(255,255,255,0.25)', marginBottom: 10 }}>كل السجلات</div>
+            <div style={{ fontSize: '.62rem', fontWeight: 700, letterSpacing: 1.5, color: 'var(--text-secondary)', marginBottom: 10 }}>كل السجلات</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[...entries].reverse().map((e, i) => {
                 const w = isMetric ? fmt1(e.weight_kg) : fmt1(e.weight_kg / 0.453592)
@@ -221,19 +221,19 @@ export default function WeightPage() {
                 const diffDisp = prevW !== null ? (isMetric ? diff : fmt1(diff / 0.453592)) : null
                 const isToday = e.recorded_at === todayStr()
                 return (
-                  <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 14px', background: isToday ? 'rgba(203,162,59,0.05)' : 'rgba(255,255,255,0.02)', border: '1px solid ' + (isToday ? 'rgba(203,162,59,0.15)' : 'rgba(255,255,255,0.06)'), borderRadius: 11 }}>
+                  <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 14px', background: isToday ? 'rgba(0,0,0,0.03)' : 'var(--card)', border: '1px solid ' + (isToday ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.08)'), borderRadius: 11 }}>
                     <div>
                       <div style={{ fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 700, fontSize: '.88rem' }}>
                         {w} {unit}
                         {diffDisp !== null && diffDisp !== 0 && (
-                          <span style={{ marginLeft: 8, fontSize: '.72rem', fontWeight: 600, color: diffDisp > 0 ? '#ef4444' : '#4ade80' }}>
+                          <span style={{ marginInlineStart: 8, fontSize: '.72rem', fontWeight: 600, color: diffDisp > 0 ? '#ef4444' : '#4ade80' }}>
                             {diffDisp > 0 ? '+' : ''}{diffDisp} {unit}
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
+                      <div style={{ fontSize: '.7rem', color: 'var(--text-secondary)', marginTop: 2 }}>
                         {new Date(e.recorded_at + 'T12:00:00').toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                        {isToday && <span style={{ marginLeft: 6, color: '#CBA23B', fontWeight: 700 }}>· Today</span>}
+                        {isToday && <span style={{ marginInlineStart: 6, color: 'var(--text-primary)', fontWeight: 700 }}>· Today</span>}
                       </div>
                     </div>
                     <button onClick={() => del(e.id)} disabled={deleting === e.id}
@@ -248,7 +248,7 @@ export default function WeightPage() {
         )}
 
         {entries.length === 0 && !loading && (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
             <div style={{ fontSize: '3rem', marginBottom: 10 }}>⚖️</div>
             <div style={{ fontWeight: 600, marginBottom: 4 }}>No weight logged yet</div>
             <div style={{ fontSize: '.82rem' }}>سجّل أول قياس وخلّنا نتابع رحلتك.</div>

@@ -28,8 +28,8 @@ const LEVEL_C = { Beginner:'#22c55e',Intermediate:'#eab308',Advanced:'#f97316' }
 function MuscleMap({ ex }) {
   const color = mc(ex.category)
   return (
-    <div style={{background:`linear-gradient(135deg,${color}12 0%,#09090B 100%)`,border:`1px solid ${color}25`,borderRadius:16,padding:'16px',marginBottom:16}}>
-      <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:12}}>العضلات المُشغَّلة</div>
+    <div style={{background:`linear-gradient(135deg,${color}12 0%,var(--surface) 100%)`,border:`1px solid ${color}25`,borderRadius:16,padding:'16px',marginBottom:16}}>
+      <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(0,0,0,0.25)',marginBottom:12}}>العضلات المُشغَّلة</div>
       {/* Primary */}
       <div style={{marginBottom:8}}>
         <div style={{fontSize:'.65rem',fontWeight:700,color:color,letterSpacing:1,marginBottom:4}}>الأساسية</div>
@@ -38,18 +38,18 @@ function MuscleMap({ ex }) {
       {/* Secondary */}
       {ex.secondary?.length>0&&(
         <div style={{marginBottom:8}}>
-          <div style={{fontSize:'.65rem',fontWeight:700,color:'rgba(255,255,255,0.4)',letterSpacing:1,marginBottom:4}}>الثانوية</div>
+          <div style={{fontSize:'.65rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1,marginBottom:4}}>الثانوية</div>
           <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-            {ex.secondary.map((m,i)=><span key={i} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.65)',padding:'3px 10px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>{m}</span>)}
+            {ex.secondary.map((m,i)=><span key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-secondary)',padding:'3px 10px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>{m}</span>)}
           </div>
         </div>
       )}
       {/* Other */}
       {ex.other?.length>0&&(
         <div>
-          <div style={{fontSize:'.65rem',fontWeight:700,color:'rgba(255,255,255,0.25)',letterSpacing:1,marginBottom:4}}>المثبّتة</div>
+          <div style={{fontSize:'.65rem',fontWeight:700,color:'rgba(0,0,0,0.25)',letterSpacing:1,marginBottom:4}}>المثبّتة</div>
           <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-            {ex.other.map((m,i)=><span key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',color:'rgba(255,255,255,0.35)',padding:'2px 9px',borderRadius:20,fontSize:'.7rem'}}>{m}</span>)}
+            {ex.other.map((m,i)=><span key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',color:'rgba(0,0,0,0.25)',padding:'2px 9px',borderRadius:20,fontSize:'.7rem'}}>{m}</span>)}
           </div>
         </div>
       )}
@@ -174,11 +174,11 @@ function GifPlayer({ src, color, name }) {
   // Use a key trick to pause/resume GIF (GIFs can't be paused natively in HTML)
   // We show a static screenshot when "paused" - simplified: just show/hide
   return (
-    <div style={{position:'relative',background:'#000',minHeight:220}}>
+    <div style={{position:'relative',background:'rgba(0,0,0,0.06)',minHeight:220}}>
       {!loaded && !err && (
         <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:10}}>
           <div style={{width:36,height:36,border:`3px solid ${color}33`,borderTopColor:color,borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
-          <div style={{color:`${color}80`,fontSize:'.72rem',fontWeight:600}}>Loading GIF...</div>
+          <div style={{color:'var(--text-secondary)',fontSize:'.72rem',fontWeight:600}}>Loading GIF...</div>
         </div>
       )}
       {!err ? (
@@ -188,16 +188,16 @@ function GifPlayer({ src, color, name }) {
           alt={name}
           onLoad={() => setLoaded(true)}
           onError={() => setErr(true)}
-          style={{width:'100%',maxHeight:280,objectFit:'contain',display:loaded?'block':'none',background:'#111'}}
+          style={{width:'100%',maxHeight:280,objectFit:'contain',display:loaded?'block':'none',background:'rgba(0,0,0,0.06)'}}
         />
       ) : (
         <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:8,padding:16}}>
           <div style={{fontSize:'2rem'}}>🏋️</div>
-          <div style={{color:'rgba(255,255,255,0.3)',fontSize:'.75rem',textAlign:'center'}}>معاينة غير متاحة</div>
+          <div style={{color:'var(--text-secondary)',fontSize:'.75rem',textAlign:'center'}}>معاينة غير متاحة</div>
         </div>
       )}
       {loaded && !err && (
-        <div style={{position:'absolute',bottom:8,right:8}}>
+        <div style={{position:'absolute',bottom:8,insetInlineEnd:8}}>
           <span style={{background:'rgba(0,0,0,.65)',borderRadius:20,padding:'3px 10px',fontSize:'.65rem',color:color,fontWeight:700,backdropFilter:'blur(4px)'}}>
             GIF
           </span>
@@ -211,13 +211,13 @@ function ExerciseCard({ ex, onSelect, sex = 'male' }) {
   const color = mc(ex.category)
   return (
     <div onClick={() => onSelect(ex)}
-      style={{background:'#0a0a0e',border:`1px solid ${color}22`,borderRadius:16,overflow:'hidden',cursor:'pointer',transition:'all .2s'}}
+      style={{background:'var(--surface)',border:`1px solid ${color}22`,borderRadius:16,overflow:'hidden',cursor:'pointer',transition:'all .2s'}}
       onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'} onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}
-      onMouseEnter={e=>{e.currentTarget.style.borderColor=color+'55';e.currentTarget.style.background='#111118'}}
-      onMouseLeave={e=>{e.currentTarget.style.borderColor=color+'22';e.currentTarget.style.background='#0a0a0e'}}>
+      onMouseEnter={e=>{e.currentTarget.style.borderColor=color+'55';e.currentTarget.style.background='var(--card)'}}
+      onMouseLeave={e=>{e.currentTarget.style.borderColor=color+'22';e.currentTarget.style.background='var(--surface)'}}>
       {/* Illustration */}
-      <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,position:'relative',overflow:'hidden',minHeight:100}}>
-        <div style={{position:'absolute',top:6,right:8,zIndex:2,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}cc`,background:'rgba(0,0,0,0.45)',borderRadius:6,padding:'1px 6px'}}>{ex.equipment.toUpperCase()}</div>
+      <div style={{background:`linear-gradient(135deg,${color}0c 0%,var(--surface) 100%)`,position:'relative',overflow:'hidden',minHeight:100}}>
+        <div style={{position:'absolute',top:6,insetInlineEnd:8,zIndex:2,fontSize:'.58rem',fontWeight:700,letterSpacing:1,color:`${color}cc`,background:'rgba(0,0,0,0.45)',borderRadius:6,padding:'1px 6px'}}>{ex.equipment.toUpperCase()}</div>
         <img
           src={`/exercises/${ex.id}-${sex}.webp`}
           alt={ex.name}
@@ -240,7 +240,7 @@ function ExerciseCard({ ex, onSelect, sex = 'male' }) {
         </div>
         {/* English name */}
         {ex.name.includes('|') && (
-          <div style={{fontFamily:"'DM Sans','Space Grotesk',sans-serif",fontWeight:500,fontSize:'.72rem',color:'rgba(255,255,255,0.35)',marginBottom:3}}>
+          <div style={{fontFamily:"'DM Sans','Space Grotesk',sans-serif",fontWeight:500,fontSize:'.72rem',color:'rgba(0,0,0,0.25)',marginBottom:3}}>
             {ex.name.split('|')[0].trim()}
           </div>
         )}
@@ -260,23 +260,23 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
   const tips  = isFemale ? (ex.female?.tips  ?? ex.tips)  : ex.tips
   const cues  = isFemale ? (ex.female?.cues  ?? ex.cues)  : ex.cues
   return (
-    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.96)',zIndex:300,overflowY:'auto',backdropFilter:'blur(12px)'}}>
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.06)',zIndex:300,overflowY:'auto',backdropFilter:'blur(12px)'}}>
       <div style={{maxWidth:540,margin:'0 auto',padding:'16px 16px calc(80px + env(safe-area-inset-bottom))'}}>
         {/* Header */}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16}}>
-          <div style={{flex:1,marginRight:10}}>
+          <div style={{flex:1,marginInlineEnd:10}}>
             <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:6}}>
               <span style={{background:`${color}22`,border:`1px solid ${color}44`,color,padding:'3px 10px',borderRadius:20,fontSize:'.68rem',fontWeight:700}}>{ex.category} › {ex.sub}</span>
               <span style={{background:LEVEL_C[ex.level]+'18',border:`1px solid ${LEVEL_C[ex.level]}44`,color:LEVEL_C[ex.level],padding:'3px 10px',borderRadius:20,fontSize:'.68rem',fontWeight:700}}>{ex.level}</span>
-              <span style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',padding:'3px 10px',borderRadius:20,fontSize:'.68rem'}}>{ex.type}</span>
+              <span style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-secondary)',padding:'3px 10px',borderRadius:20,fontSize:'.68rem'}}>{ex.type}</span>
             </div>
             <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1.3rem',lineHeight:1.2}}>{ex.name}</div>
           </div>
-          <button onClick={onClose} style={{background:'rgba(203,162,59,0.10)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:10,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'rgba(255,255,255,0.6)',fontSize:'1rem',flexShrink:0}}>✕</button>
+          <button onClick={onClose} style={{background:'rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--text-secondary)',fontSize:'1rem',flexShrink:0}}>✕</button>
         </div>
 
         {/* Exercise illustration / GIF demonstration */}
-        <div style={{background:`linear-gradient(135deg,${color}0c 0%,#09090B 100%)`,border:`1px solid ${color}25`,borderRadius:20,overflow:'hidden',marginBottom:16}}>
+        <div style={{background:`linear-gradient(135deg,${color}0c 0%,var(--surface) 100%)`,border:`1px solid ${color}25`,borderRadius:20,overflow:'hidden',marginBottom:16}}>
           {ex.id ? (
             <img
               src={`/exercises/${ex.id}-${sex}.webp`}
@@ -313,10 +313,10 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
           </div>
           {/* Muscle activation tags */}
           <div style={{padding:'12px 16px',borderTop:`1px solid ${color}18`}}>
-            <div style={{fontSize:'.58rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.2)',marginBottom:6}}>العضلات المُشغَّلة</div>
+            <div style={{fontSize:'.58rem',fontWeight:700,letterSpacing:1.5,color:'rgba(0,0,0,0.25)',marginBottom:6}}>العضلات المُشغَّلة</div>
             <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
               <span style={{background:`${color}25`,border:`1px solid ${color}44`,color,padding:'3px 10px',borderRadius:20,fontSize:'.7rem',fontWeight:800}}>⬤ {ex.primary}</span>
-              {ex.secondary?.map((m,i)=><span key={i} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.6)',padding:'3px 10px',borderRadius:20,fontSize:'.68rem',fontWeight:600}}>{m}</span>)}
+              {ex.secondary?.map((m,i)=><span key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-secondary)',padding:'3px 10px',borderRadius:20,fontSize:'.68rem',fontWeight:600}}>{m}</span>)}
             </div>
           </div>
         </div>
@@ -324,22 +324,22 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
         {/* Volume guide */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:14}}>
           {[['Volume',ex.sets,''],['Rest',ex.rest,''],['Tempo',ex.tempo||'2-1-1','']].map(([l,v])=>(
-            <div key={l} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:12,padding:'11px 10px',textAlign:'center'}}>
+            <div key={l} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:12,padding:'11px 10px',textAlign:'center'}}>
               <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.82rem',color,lineHeight:1.2}}>{v}</div>
-              <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.25)',letterSpacing:1,marginTop:4,fontWeight:700}}>{l.toUpperCase()}</div>
+              <div style={{fontSize:'.58rem',color:'rgba(0,0,0,0.25)',letterSpacing:1,marginTop:4,fontWeight:700}}>{l.toUpperCase()}</div>
             </div>
           ))}
         </div>
 
         {/* Step by step */}
-        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,padding:'14px 16px',marginBottom:12}}>
-          <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:14}}>طريقة الأداء الصحيحة</div>
+        <div style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:14,padding:'14px 16px',marginBottom:12}}>
+          <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(0,0,0,0.30)',marginBottom:14}}>طريقة الأداء الصحيحة</div>
           {steps.map((step,i)=>(
             <div key={i} style={{display:'flex',gap:12,marginBottom:12,alignItems:'flex-start'}}>
               <div style={{width:24,height:24,borderRadius:'50%',background:`${color}20`,border:`1px solid ${color}44`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
                 <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.7rem',color}}>{i+1}</span>
               </div>
-              <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.75)',lineHeight:1.55}}>{step}</div>
+              <div style={{fontSize:'.85rem',color:'var(--text-primary)',lineHeight:1.55}}>{step}</div>
             </div>
           ))}
         </div>
@@ -350,7 +350,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
           {ex.mistakes.map((m,i)=>(
             <div key={i} style={{display:'flex',gap:8,marginBottom:8,alignItems:'flex-start'}}>
               <span style={{color:'#ef4444',flexShrink:0,fontSize:.9+'rem',marginTop:1}}>✗</span>
-              <span style={{fontSize:'.83rem',color:'rgba(255,255,255,0.65)',lineHeight:1.5}}>{m}</span>
+              <span style={{fontSize:'.83rem',color:'var(--text-secondary)',lineHeight:1.5}}>{m}</span>
             </div>
           ))}
         </div>
@@ -358,12 +358,12 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
         {/* Pro tip */}
         {tips&&<div style={{background:`${color}0c`,border:`1px solid ${color}28`,borderRadius:14,padding:'14px 16px',marginBottom:12}}>
           <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:`${color}99`,marginBottom:8}}>💡 PRO TIP</div>
-          <div style={{fontSize:'.85rem',color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>{tips}</div>
+          <div style={{fontSize:'.85rem',color:'var(--text-secondary)',lineHeight:1.6}}>{tips}</div>
         </div>}
 
         {/* Form cues */}
         {cues?.length>0&&<div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>
-          {cues.map((cue,i)=><span key={i} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',padding:'5px 13px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>"{cue}"</span>)}
+          {cues.map((cue,i)=><span key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-secondary)',padding:'5px 13px',borderRadius:20,fontSize:'.75rem',fontWeight:600}}>"{cue}"</span>)}
         </div>}
 
         {/* Stretching section */}
@@ -371,10 +371,10 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
           <div style={{background:'rgba(129,140,248,0.05)',border:'1px solid rgba(129,140,248,0.18)',borderRadius:14,padding:'14px 16px',marginBottom:12}}>
             <button onClick={()=>setShowStretch(v=>!v)} style={{width:'100%',background:'none',border:'none',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',padding:0}}>
               <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'#818cf8'}}>🧘 POST-WORKOUT STRETCHES FOR {ex.category.toUpperCase()}</div>
-              <span style={{color:'rgba(255,255,255,0.3)',fontSize:'.8rem',transition:'transform .2s',transform:showStretch?'rotate(180deg)':'none'}}>▼</span>
+              <span style={{color:'var(--text-secondary)',fontSize:'.8rem',transition:'transform .2s',transform:showStretch?'rotate(180deg)':'none'}}>▼</span>
             </button>
             {showStretch&&stretches.map((s,i)=>(
-              <div key={i} style={{marginTop:12,paddingTop:12,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+              <div key={i} style={{marginTop:12,paddingTop:12,borderTop:'1px solid rgba(0,0,0,0.08)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
                   <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem'}}>{s.name}</div>
                   <span style={{background:'rgba(129,140,248,0.15)',color:'#818cf8',padding:'2px 8px',borderRadius:20,fontSize:'.65rem',fontWeight:700}}>{s.duration}</span>
@@ -383,7 +383,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
                 {(isFemale ? (s.femaleSteps ?? s.steps) : s.steps).map((step,j)=>(
                   <div key={j} style={{display:'flex',gap:7,marginBottom:5}}>
                     <span style={{color:'#818cf8',fontSize:'.7rem',flexShrink:0,minWidth:14}}>{j+1}.</span>
-                    <span style={{fontSize:'.8rem',color:'rgba(255,255,255,0.55)',lineHeight:1.4}}>{step}</span>
+                    <span style={{fontSize:'.8rem',color:'var(--text-secondary)',lineHeight:1.4}}>{step}</span>
                   </div>
                 ))}
               </div>
@@ -446,22 +446,22 @@ export default function Exercises() {
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'#09090B',color:'#ECE3CF'}}>
+    <div style={{minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary)'}}>
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         *{box-sizing:border-box}
-        input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#ECE3CF;padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s}
-        input:focus{border-color:#CBA23B;background:rgba(203,162,59,0.04)}
-        ::placeholder{color:rgba(255,255,255,0.2)}
-        .ptab{background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.3);font-family:'DM Sans','Tajawal',sans-serif;font-size:.88rem;font-weight:600;padding:10px 14px;cursor:pointer;transition:all .2s}
-        .ptab.on{color:#CBA23B;border-bottom-color:#CBA23B}
-        ::-webkit-scrollbar{height:3px;width:3px} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1)}
+        input{background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:var(--text-primary);padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s}
+        input:focus{border-color:#111111;background:rgba(0,0,0,0.04)}
+        ::placeholder{color:rgba(0,0,0,0.25)}
+        .ptab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.88rem;font-weight:600;padding:10px 14px;cursor:pointer;transition:all .2s}
+        .ptab.on{color:var(--text-primary);border-bottom-color:#111111}
+        ::-webkit-scrollbar{height:3px;width:3px} ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
       `}</style>
       <TopNav title="مكتبة التمارين" user={user} back="/" onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
 
       <div style={{maxWidth:760,margin:'0 auto',padding:'14px 16px 0'}}>
         {/* Tabs */}
-        <div style={{display:'flex',borderBottom:'1px solid rgba(203,162,59,0.10)',marginBottom:14}}>
+        <div style={{display:'flex',borderBottom:'1px solid rgba(0,0,0,0.08)',marginBottom:14}}>
           <button className={`ptab${tab==='exercises'?' on':''}`} onClick={()=>setTab('exercises')}>🏋️ التمارين</button>
           <button className={`ptab${tab==='stretching'?' on':''}`} onClick={()=>setTab('stretching')}>🧘 التمديد</button>
           <button className={`ptab${tab==='warmup'?' on':''}`} onClick={()=>setTab('warmup')}>🔥 الإحماء</button>
@@ -474,9 +474,9 @@ export default function Exercises() {
               {[['home','🏠 المنزل'],['gym','🏋️ الصالة']].map(([v,lbl])=>(
                 <button key={v} onClick={()=>{setEnv(v);setCat('الكل')}}
                   style={{flex:1,padding:'10px 0',borderRadius:22,fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.9rem',cursor:'pointer',transition:'all .2s',
-                    background: env===v ? '#CBA23B' : 'rgba(255,255,255,0.04)',
-                    color:       env===v ? '#09090B' : 'rgba(255,255,255,0.45)',
-                    border:      env===v ? 'none'    : '1px solid rgba(255,255,255,0.1)',
+                    background: env===v ? '#111111' : 'rgba(0,0,0,0.05)',
+                    color:       env===v ? '#FFFFFF' : 'var(--text-primary)',
+                    border:      env===v ? 'none'    : '1px solid rgba(0,0,0,0.08)',
                   }}>
                   {lbl}
                 </button>
@@ -487,7 +487,7 @@ export default function Exercises() {
             <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4,marginBottom:sub!=='الكل'||subOptions.length>0?8:12,scrollbarWidth:'none'}}>
               {CATS.map(c=>(
                 <button key={c} onClick={()=>setCat(c)}
-                  style={{flexShrink:0,padding:'6px 13px',background:cat===c?(MC[c]||'#CBA23B')+'22':'rgba(255,255,255,0.04)',border:`1px solid ${cat===c?(MC[c]||'#CBA23B')+'55':'rgba(255,255,255,0.1)'}`,borderRadius:20,color:cat===c?(MC[c]||'#CBA23B'):'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.8rem',fontWeight:700}}>
+                  style={{flexShrink:0,padding:'6px 13px',background:cat===c?(MC[c]||'#111111')+'22':'rgba(0,0,0,0.04)',border:`1px solid ${cat===c?(MC[c]||'#111111')+'55':'rgba(0,0,0,0.08)'}`,borderRadius:20,color:cat===c?(MC[c]||'#111111'):'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.8rem',fontWeight:700}}>
                   {CAT_AR[c]||c}
                 </button>
               ))}
@@ -497,13 +497,13 @@ export default function Exercises() {
               <div style={{display:'flex',gap:5,overflowX:'auto',paddingBottom:4,marginBottom:12,scrollbarWidth:'none'}}>
                 {subOptions.map(s=>(
                   <button key={s} onClick={()=>setSub(s)}
-                    style={{flexShrink:0,padding:'4px 11px',background:sub===s?'rgba(255,255,255,0.1)':'transparent',border:`1px solid ${sub===s?'rgba(255,255,255,0.25)':'rgba(203,162,59,0.10)'}`,borderRadius:20,color:sub===s?'#ECE3CF':'rgba(255,255,255,0.35)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:sub===s?700:500}}>
+                    style={{flexShrink:0,padding:'4px 11px',background:sub===s?'rgba(0,0,0,0.10)':'transparent',border:`1px solid ${sub===s?'rgba(0,0,0,0.25)':'rgba(0,0,0,0.06)'}`,borderRadius:20,color:sub===s?'var(--text-primary)':'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:sub===s?700:500}}>
                     {SUB_AR[s]||s}
                   </button>
                 ))}
               </div>
             )}
-            <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:10}}>
+            <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(0,0,0,0.25)',marginBottom:10}}>
               {filtered.length} تمرين · {env==='home'?'🏠 المنزل':'🏋️ الصالة'}
             </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,marginBottom:20}}>
@@ -522,18 +522,18 @@ export default function Exercises() {
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {stretches.map((s,i)=>(
-                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
+                    <div key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:14,overflow:'hidden'}}>
                       {s.id&&<img src={`/exercises/${s.id}-${sex}.webp`} alt={s.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
                       <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{s.name}</div>
-                        <span style={{background:mc(muscle)+'18',border:`1px solid ${mc(muscle)}33`,color:mc(muscle),padding:'3px 9px',borderRadius:20,fontSize:'.65rem',fontWeight:700,whiteSpace:'nowrap',marginLeft:8,flexShrink:0}}>{s.duration}</span>
+                        <span style={{background:mc(muscle)+'18',border:`1px solid ${mc(muscle)}33`,color:mc(muscle),padding:'3px 9px',borderRadius:20,fontSize:'.65rem',fontWeight:700,whiteSpace:'nowrap',marginInlineStart:8,flexShrink:0}}>{s.duration}</span>
                       </div>
-                      <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginBottom:8}}>Targets: {s.muscles}</div>
+                      <div style={{fontSize:'.72rem',color:'var(--text-secondary)',marginBottom:8}}>Targets: {s.muscles}</div>
                       {(sex==='female'?(s.femaleSteps??s.steps):s.steps).map((step,j)=>(
                         <div key={j} style={{display:'flex',gap:8,marginBottom:5}}>
                           <span style={{color:mc(muscle),fontSize:'.7rem',flexShrink:0,minWidth:16,fontWeight:700}}>{j+1}.</span>
-                          <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
+                          <span style={{fontSize:'.82rem',color:'var(--text-secondary)',lineHeight:1.45}}>{step}</span>
                         </div>
                       ))}
                       </div>
@@ -555,21 +555,21 @@ export default function Exercises() {
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {routines.map((r,i) => (
-                    <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,overflow:'hidden'}}>
+                    <div key={i} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:14,overflow:'hidden'}}>
                       {r.id&&<img src={`/exercises/${r.id}-${sex}.webp`} alt={r.name} style={{width:'100%',maxHeight:160,objectFit:'cover',display:'block'}} onError={e=>{e.target.style.display='none'}}/>}
                       <div style={{padding:'14px 16px'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
                         <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.92rem'}}>{r.name}</div>
-                        <div style={{display:'flex',gap:6,flexShrink:0,marginLeft:10}}>
+                        <div style={{display:'flex',gap:6,flexShrink:0,marginInlineStart:10}}>
                           <span style={{background:mc(muscle)+'18',border:`1px solid ${mc(muscle)}33`,color:mc(muscle),padding:'2px 8px',borderRadius:20,fontSize:'.63rem',fontWeight:700,whiteSpace:'nowrap'}}>{r.sets} sets</span>
-                          <span style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(203,162,59,0.12)',color:'rgba(255,255,255,0.45)',padding:'2px 8px',borderRadius:20,fontSize:'.63rem',whiteSpace:'nowrap'}}>{r.duration}</span>
+                          <span style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.06)',color:'var(--text-secondary)',padding:'2px 8px',borderRadius:20,fontSize:'.63rem',whiteSpace:'nowrap'}}>{r.duration}</span>
                         </div>
                       </div>
-                      {r.why && <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginBottom:8,lineHeight:1.4,fontStyle:'italic'}}>Why: {r.why}</div>}
+                      {r.why && <div style={{fontSize:'.72rem',color:'var(--text-secondary)',marginBottom:8,lineHeight:1.4,fontStyle:'italic'}}>Why: {r.why}</div>}
                       {(sex==='female'?(r.femaleSteps??r.steps):r.steps).map((step,j) => (
                         <div key={j} style={{display:'flex',gap:8,marginBottom:5}}>
                           <span style={{color:mc(muscle),fontSize:'.7rem',flexShrink:0,minWidth:16,fontWeight:700}}>{j+1}.</span>
-                          <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.6)',lineHeight:1.45}}>{step}</span>
+                          <span style={{fontSize:'.82rem',color:'var(--text-secondary)',lineHeight:1.45}}>{step}</span>
                         </div>
                       ))}
                       </div>

@@ -93,36 +93,36 @@ export default function SettingsPage() {
   const goals = calcNutrientGoals({ ...form, weight_kg: parseFloat(form.weight_kg)||70, height_cm: parseFloat(form.height_cm)||170 })
   const isMetric = form.unit_system !== 'imperial'
 
-  const SL = { fontSize:'.65rem', fontWeight:700, letterSpacing:1.5, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', display:'block', marginBottom:8 }
-  const MC = (sel) => ({ border:`1px solid ${sel?'rgba(203,162,59,0.35)':'rgba(203,162,59,0.12)'}`, borderRadius:12, padding:'13px 14px', cursor:'pointer', background:sel?'rgba(203,162,59,0.07)':'rgba(255,255,255,0.025)', display:'flex', alignItems:'center', gap:11, transition:'all .15s' })
-  const INP = { background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', color:'#ECE3CF', padding:'13px 16px', fontFamily:"'DM Sans','Tajawal',sans-serif", fontSize:'.95rem', borderRadius:12, outline:'none', width:'100%', transition:'border .2s' }
+  const SL = { fontSize:'.65rem', fontWeight:700, letterSpacing:1.5, color:'var(--text-secondary)', textTransform:'uppercase', display:'block', marginBottom:8 }
+  const MC = (sel) => ({ border:`1px solid ${sel?'rgba(0,0,0,0.30)':'rgba(0,0,0,0.08)'}`, borderRadius:12, padding:'13px 14px', cursor:'pointer', background:sel?'rgba(0,0,0,0.06)':'var(--card)', display:'flex', alignItems:'center', gap:11, transition:'all .15s' })
+  const INP = { background:'rgba(0,0,0,0.04)', border:'1px solid rgba(0,0,0,0.08)', color:'var(--text-primary)', padding:'13px 16px', fontFamily:"'DM Sans','Tajawal',sans-serif", fontSize:'.95rem', borderRadius:12, outline:'none', width:'100%', transition:'border .2s' }
 
   if (loading) return (
-    <div style={{minHeight:'100vh',background:'#09090B',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:14}}>
-      <div style={{width:32,height:32,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
+    <div style={{minHeight:'100vh',background:'var(--surface)',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:14}}>
+      <div style={{width:32,height:32,border:'3px solid rgba(0,0,0,0.10)',borderTopColor:'#111111',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{color:'rgba(255,255,255,0.4)',fontSize:'.82rem'}}>Loading your profile…</div>
-      {err && <div style={{color:'#fca5a5',fontSize:'.78rem',padding:'8px 16px',background:'rgba(239,68,68,.08)',borderRadius:8,maxWidth:300,textAlign:'center'}}>{err}<br/><button onClick={()=>user&&load(user.id)} style={{color:'#CBA23B',background:'none',border:'none',cursor:'pointer',marginTop:6,fontSize:'.8rem'}}>حاول مرة ثانية</button></div>}
+      <div style={{color:'var(--text-secondary)',fontSize:'.82rem'}}>Loading your profile…</div>
+      {err && <div style={{color:'#fca5a5',fontSize:'.78rem',padding:'8px 16px',background:'rgba(239,68,68,.08)',borderRadius:8,maxWidth:300,textAlign:'center'}}>{err}<br/><button onClick={()=>user&&load(user.id)} style={{color:'var(--text-primary)',background:'none',border:'none',cursor:'pointer',marginTop:6,fontSize:'.8rem'}}>حاول مرة ثانية</button></div>}
     </div>
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'#09090B',color:'#ECE3CF'}}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.6)} input:focus,select:focus{border-color:#CBA23B !important;background:rgba(203,162,59,0.04) !important}`}</style>
+    <div style={{minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary)'}}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box}`}</style>
       <TopNav title="الإعدادات" back="/" user={user} onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
 
       <div style={{maxWidth:480,margin:'0 auto',padding:'20px 16px calc(90px + env(safe-area-inset-bottom))'}}>
 
         {/* Profile card */}
         {user && (
-          <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20,padding:'14px 16px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:16}}>
+          <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20,padding:'14px 16px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16}}>
             {user.user_metadata?.avatar_url
               ? <img src={user.user_metadata.avatar_url} alt="" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover'}}/>
-              : <div style={{width:44,height:44,borderRadius:'50%',background:'rgba(203,162,59,0.1)',border:'1px solid rgba(203,162,59,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',flexShrink:0}}>👤</div>
+              : <div style={{width:44,height:44,borderRadius:'50%',background:'rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.10)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',flexShrink:0}}>👤</div>
             }
             <div>
               <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem'}}>{user.user_metadata?.full_name||user.email?.split('@')[0]||'Athlete'}</div>
-              <div style={{fontSize:'.75rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{user.email}</div>
+              <div style={{fontSize:'.75rem',color:'var(--text-secondary)',marginTop:2}}>{user.email}</div>
             </div>
           </div>
         )}
@@ -130,7 +130,7 @@ export default function SettingsPage() {
         {err && !loading && (
           <div style={{background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:10,padding:'10px 14px',marginBottom:14,color:'#fca5a5',fontSize:'.82rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             {err}
-            <button onClick={()=>user&&load(user.id)} style={{color:'#CBA23B',background:'none',border:'none',cursor:'pointer',fontSize:'.8rem',marginLeft:10}}>حاول مرة ثانية</button>
+            <button onClick={()=>user&&load(user.id)} style={{color:'var(--text-primary)',background:'none',border:'none',cursor:'pointer',fontSize:'.8rem',marginInlineStart:10}}>حاول مرة ثانية</button>
           </div>
         )}
 
@@ -140,29 +140,29 @@ export default function SettingsPage() {
           {[['metric','🌍 Metric','kg · cm'],['imperial','🇺🇸 Imperial','lbs · inches']].map(([id,label,sub])=>(
             <div key={id} style={MC(form.unit_system===id)} onClick={()=>s('unit_system',id)}>
               <div>
-                <div style={{fontWeight:700,color:form.unit_system===id?'#CBA23B':'#ECE3CF',fontSize:'.88rem'}}>{label}</div>
-                <div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{sub}</div>
+                <div style={{fontWeight:700,color:form.unit_system===id?'var(--text-primary)':'var(--text-primary)',fontSize:'.88rem'}}>{label}</div>
+                <div style={{fontSize:'.7rem',color:'var(--text-secondary)',marginTop:2}}>{sub}</div>
               </div>
-              {form.unit_system===id&&<span style={{marginLeft:'auto',color:'#CBA23B'}}>✓</span>}
+              {form.unit_system===id&&<span style={{marginInlineStart:'auto',color:'var(--text-primary)'}}>✓</span>}
             </div>
           ))}
         </div>
 
         {/* Sex */}
-        <span style={SL}>الجنس<span style={{color:'rgba(255,255,255,0.2)',fontWeight:400,fontSize:'.6rem',letterSpacing:0}}>(used for nutrition calculations)</span></span>
+        <span style={SL}>الجنس<span style={{color:'rgba(0,0,0,0.25)',fontWeight:400,fontSize:'.6rem',letterSpacing:0}}>(used for nutrition calculations)</span></span>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:20}}>
           {SEXES.map(({id,label,icon})=>(
             <div key={id} style={MC(form.sex===id)} onClick={()=>s('sex',id)}>
               <span style={{fontSize:'1.1rem'}}>{icon}</span>
-              <div style={{fontWeight:700,color:form.sex===id?'#CBA23B':'#ECE3CF',fontSize:'.9rem'}}>{label}</div>
-              {form.sex===id&&<span style={{marginLeft:'auto',color:'#CBA23B'}}>✓</span>}
+              <div style={{fontWeight:700,color:'var(--text-primary)',fontSize:'.9rem'}}>{label}</div>
+              {form.sex===id&&<span style={{marginInlineStart:'auto',color:'var(--text-primary)'}}>✓</span>}
             </div>
           ))}
         </div>
 
         {/* Personal info */}
         <span style={SL}>معلوماتك</span>
-        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:14,padding:'16px',marginBottom:20}}>
+        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:14,padding:'16px',marginBottom:20}}>
           <div style={{display:'flex',flexDirection:'column',gap:12}}>
             <div>
               <span style={{...SL,marginBottom:6}}>تاريخ الميلاد</span>
@@ -187,10 +187,10 @@ export default function SettingsPage() {
           {FITNESS_LEVELS.map(lv=>(
             <div key={lv.id} style={MC(form.fitness_level===lv.id)} onClick={()=>s('fitness_level',lv.id)}>
               <div>
-                <div style={{fontWeight:700,color:form.fitness_level===lv.id?'#CBA23B':'#ECE3CF',fontSize:'.9rem'}}>{lv.label}</div>
-                <div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{lv.desc}</div>
+                <div style={{fontWeight:700,color:'var(--text-primary)',fontSize:'.9rem'}}>{lv.label}</div>
+                <div style={{fontSize:'.7rem',color:'var(--text-secondary)',marginTop:2}}>{lv.desc}</div>
               </div>
-              {form.fitness_level===lv.id&&<span style={{marginLeft:'auto',color:'#CBA23B'}}>✓</span>}
+              {form.fitness_level===lv.id&&<span style={{marginInlineStart:'auto',color:'var(--text-primary)'}}>✓</span>}
             </div>
           ))}
         </div>
@@ -201,38 +201,38 @@ export default function SettingsPage() {
           {GOALS.map(g=>(
             <div key={g.id} style={{...MC(form.goal===g.id),flexDirection:'column',alignItems:'flex-start',gap:6}} onClick={()=>s('goal',g.id)}>
               <div style={{fontSize:'1.5rem'}}>{g.icon}</div>
-              <div style={{fontWeight:700,fontSize:'.88rem',color:form.goal===g.id?'#CBA23B':'#ECE3CF'}}>{g.label}</div>
+              <div style={{fontWeight:700,fontSize:'.88rem',color:'var(--text-primary)'}}>{g.label}</div>
             </div>
           ))}
         </div>
 
         {/* Calculated goals preview */}
         {(form.weight_kg&&form.height_cm&&form.birthday) && (
-          <div style={{background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.15)',borderRadius:14,padding:'14px 16px',marginBottom:20}}>
+          <div style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:14,padding:'14px 16px',marginBottom:20}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <span style={{...SL,marginBottom:0,color:'rgba(203,162,59,0.6)'}}>أهدافك المحسوبة</span>
-              <button onClick={()=>setShowGoals(v=>!v)} style={{background:'none',border:'none',color:'rgba(203,162,59,0.5)',cursor:'pointer',fontSize:'.75rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>{showGoals?'إخفاء':'إظهار'}</button>
+              <span style={{...SL,marginBottom:0,color:'var(--text-secondary)'}}>أهدافك المحسوبة</span>
+              <button onClick={()=>setShowGoals(v=>!v)} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.75rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>{showGoals?'إخفاء':'إظهار'}</button>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
               {[['الحرق الأساسي',goals.bmr,'سعرة/يوم'],['الحرق الكلي',goals.tdee,'سعرة/يوم'],['هدفك',goals.calories,'سعرة/يوم']].map(([l,v,u])=>(
-                <div key={l} style={{textAlign:'center',background:'rgba(0,0,0,0.2)',borderRadius:10,padding:'10px 6px'}}>
-                  <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1.1rem',color:'#CBA23B',lineHeight:1}}>{v}</div>
-                  <div style={{fontSize:'.58rem',color:'rgba(203,162,59,0.5)',letterSpacing:1,marginTop:3}}>{l}</div>
-                  <div style={{fontSize:'.58rem',color:'rgba(255,255,255,0.2)',marginTop:1}}>{u}</div>
+                <div key={l} style={{textAlign:'center',background:'rgba(0,0,0,0.06)',borderRadius:10,padding:'10px 6px'}}>
+                  <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1.1rem',color:'var(--text-primary)',lineHeight:1}}>{v}</div>
+                  <div style={{fontSize:'.58rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:3}}>{l}</div>
+                  <div style={{fontSize:'.58rem',color:'var(--text-secondary)',marginTop:1}}>{u}</div>
                 </div>
               ))}
             </div>
             {showGoals && (
               <div style={{marginTop:12,display:'grid',gridTemplateColumns:'1fr 1fr',gap:5}}>
                 {[['Protein',goals.protein_g,'g'],['Carbs',goals.carbs_g,'g'],['Fat',goals.fat_g,'g'],['Fiber',goals.fiber_g,'g'],['Sodium',goals.sodium_mg,'mg'],['Potassium',goals.potassium_mg,'mg']].map(([l,v,u])=>(
-                  <div key={l} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
-                    <span style={{fontSize:'.75rem',color:'rgba(255,255,255,0.4)'}}>{l}</span>
-                    <span style={{fontSize:'.78rem',color:'#CBA23B',fontWeight:700}}>{v}<span style={{fontSize:'.62rem',opacity:.7,marginLeft:1}}>{u}</span></span>
+                  <div key={l} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid rgba(0,0,0,0.06)'}}>
+                    <span style={{fontSize:'.75rem',color:'var(--text-secondary)'}}>{l}</span>
+                    <span style={{fontSize:'.78rem',color:'var(--text-primary)',fontWeight:700}}>{v}<span style={{fontSize:'.62rem',opacity:.7,marginInlineStart:1}}>{u}</span></span>
                   </div>
                 ))}
               </div>
             )}
-            <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.2)',marginTop:10,lineHeight:1.5}}>
+            <div style={{fontSize:'.68rem',color:'var(--text-secondary)',marginTop:10,lineHeight:1.5}}>
               محسوب بمعادلة ميفلين-سانت جيور · عمر {goals.age} · {form.sex==='male'?'ذكر':'أنثى'}
             </div>
           </div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
         {saveErr && <div style={{color:'#fca5a5',fontSize:'.82rem',marginBottom:12,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{saveErr}</div>}
 
         <button onClick={save} disabled={saving}
-          style={{width:'100%',padding:'17px',background:saved?'#4ade80':saving?'rgba(203,162,59,0.6)':'#CBA23B',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#0C0B0D',cursor:saving?'not-allowed':'pointer',transition:'all .2s',boxShadow:'0 4px 20px rgba(203,162,59,0.15)'}}>
+          style={{width:'100%',padding:'17px',background:saved?'#4ade80':saving?'rgba(0,0,0,0.15)':'#111111',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#FFFFFF',cursor:saving?'not-allowed':'pointer',transition:'all .2s',boxShadow:'0 4px 20px rgba(0,0,0,0.12)'}}>
           {saving?'جاري الحفظ':saved?'تم ✔️':'حفظ الإعدادات'
 // Measurement fields in form
 }

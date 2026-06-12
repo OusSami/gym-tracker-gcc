@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 
-const G = '#CBA23B', F = "'Tajawal',sans-serif"
+const G = '#111111', F = "'Tajawal',sans-serif"
 const DAILY_LIMIT = 20
 const KEY = 'gcc_chat_v4'
 const HIDE = ['/landing','/pending','/suspended','/onboarding']

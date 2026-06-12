@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 import { BottomTabs } from '../components/Nav'
 
-const G = '#CBA23B', F = "'Tajawal',sans-serif"
+const G = '#111111', F = "'Tajawal',sans-serif"
 
 function buildProgram(profile) {
   const goal = profile?.goal || 'weight'
@@ -80,9 +80,9 @@ export default function Packages() {
   }
 
   if (loading) return (
-    <div style={{ minHeight:'100vh', background:'#09090B', display:'flex', alignItems:'center', justifyContent:'center' }}>
+    <div style={{ minHeight:'100vh', background:'var(--surface)', display:'flex', alignItems:'center', justifyContent:'center' }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ width:26, height:26, border:`3px solid rgba(203,162,59,0.15)`, borderTopColor:G, borderRadius:'50%', animation:'spin .8s linear infinite' }}/>
+      <div style={{ width:26, height:26, border:`3px solid rgba(0,0,0,0.08)`, borderTopColor:G, borderRadius:'50%', animation:'spin .8s linear infinite' }}/>
     </div>
   )
 
@@ -91,7 +91,7 @@ export default function Packages() {
   const completedPct = hasActive ? Math.round(((active.completedDays||0) / (active.program.total_days||21)) * 100) : 0
 
   return (
-    <div style={{ minHeight:'100vh', background:'#09090B', color:'#ECE3CF', fontFamily:F, direction:'rtl' }}>
+    <div style={{ minHeight:'100vh', background:'var(--surface)', color:'var(--text-primary)', fontFamily:F, direction:'rtl' }}>
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
@@ -99,9 +99,9 @@ export default function Packages() {
       `}</style>
 
       {/* TOP BAR */}
-      <div style={{ background:'linear-gradient(180deg,rgba(10,8,5,0.98),rgba(10,8,5,0.8))', backdropFilter:'blur(20px)', borderBottom:`1px solid rgba(203,162,59,0.12)`, padding:'13px 18px', display:'flex', alignItems:'center', gap:12, position:'sticky', top:0, zIndex:50 }}>
-        <button onClick={() => router.back()} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:'1.1rem', padding:'4px 8px', lineHeight:1 }}>←</button>
-        <div style={{ fontWeight:800, fontSize:'.92rem', color:'#ECE3CF' }}>برنامجي</div>
+      <div style={{ background:'linear-gradient(180deg,rgba(244,244,245,0.98),rgba(244,244,245,0.8))', backdropFilter:'blur(20px)', borderBottom:`1px solid rgba(0,0,0,0.08)`, padding:'13px 18px', display:'flex', alignItems:'center', gap:12, position:'sticky', top:0, zIndex:50 }}>
+        <button onClick={() => router.back()} style={{ background:'none', border:'none', color:'var(--text-secondary)', cursor:'pointer', fontSize:'1.1rem', padding:'4px 8px', lineHeight:1 }}>←</button>
+        <div style={{ fontWeight:800, fontSize:'.92rem', color:'var(--text-primary)' }}>برنامجي</div>
       </div>
 
       <div style={{ maxWidth:460, margin:'0 auto', padding:'24px 18px 100px' }}>
@@ -109,17 +109,17 @@ export default function Packages() {
         {/* ACTIVE PROGRAM BANNER */}
         {hasActive && (
           <div className="fu" onClick={() => router.push('/program')}
-            style={{ background:'linear-gradient(135deg,rgba(203,162,59,0.08),rgba(203,162,59,0.03))', border:`1px solid ${G}30`, borderRadius:20, padding:'18px 20px', marginBottom:24, cursor:'pointer', position:'relative', overflow:'hidden' }}>
+            style={{ background:'linear-gradient(135deg,rgba(0,0,0,0.05),rgba(0,0,0,0.03))', border:'1px solid rgba(0,0,0,0.12)', borderRadius:20, padding:'18px 20px', marginBottom:24, cursor:'pointer', position:'relative', overflow:'hidden' }}>
             {/* Shimmer line */}
-            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${G},transparent)` }}/>
-            <div style={{ fontSize:'.62rem', fontWeight:700, color:`${G}`, letterSpacing:2, marginBottom:8, textTransform:'uppercase' }}>برنامجك النشط ✓</div>
-            <div style={{ fontWeight:900, fontSize:'1rem', marginBottom:10, color:'#ECE3CF' }}>{active.program.package_name}</div>
-            <div style={{ height:5, background:'rgba(255,255,255,0.06)', borderRadius:10, overflow:'hidden', marginBottom:8 }}>
-              <div style={{ height:'100%', width:completedPct+'%', background:`linear-gradient(90deg,#8B6914,${G})`, borderRadius:10, boxShadow:`0 0 10px ${G}50`, transition:'width .6s' }}/>
+            <div style={{ position:'absolute', top:0, insetInlineStart:0, insetInlineEnd:0, height:2, background:'linear-gradient(90deg,transparent,rgba(0,0,0,0.15),transparent)' }}/>
+            <div style={{ fontSize:'.62rem', fontWeight:700, color:'var(--text-secondary)', letterSpacing:2, marginBottom:8, textTransform:'uppercase' }}>برنامجك النشط ✓</div>
+            <div style={{ fontWeight:900, fontSize:'1rem', marginBottom:10, color:'var(--text-primary)' }}>{active.program.package_name}</div>
+            <div style={{ height:5, background:'rgba(0,0,0,0.08)', borderRadius:10, overflow:'hidden', marginBottom:8 }}>
+              <div style={{ height:'100%', width:completedPct+'%', background:'#111111', borderRadius:10, transition:'width .6s' }}/>
             </div>
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.74rem', color:'rgba(255,255,255,0.45)' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.74rem', color:'var(--text-secondary)' }}>
               <span>اليوم {active.program.current_day} من {active.program.total_days}</span>
-              <span style={{ color:G, fontWeight:700 }}>اضغط للمتابعة ←</span>
+              <span style={{ color:'var(--text-primary)', fontWeight:700 }}>اضغط للمتابعة ←</span>
             </div>
           </div>
         )}
@@ -128,58 +128,58 @@ export default function Packages() {
         <div className="fu">
 
           {/* Decorative top border */}
-          <div style={{ height:2, background:`linear-gradient(90deg,transparent,${G}60,transparent)`, borderRadius:1, marginBottom:28 }}/>
+          <div style={{ height:2, background:'linear-gradient(90deg,transparent,rgba(0,0,0,0.20),transparent)', borderRadius:1, marginBottom:28 }}/>
 
           {/* Program name */}
           <div style={{ textAlign:'center', marginBottom:28 }}>
-            <div style={{ fontWeight:900, fontSize:'1.5rem', color:'#ECE3CF', marginBottom:8, lineHeight:1.2 }}>{prog.name}</div>
-            <div style={{ fontSize:'.88rem', color:'rgba(255,255,255,0.45)', lineHeight:1.7 }}>{prog.tagline}</div>
+            <div style={{ fontWeight:900, fontSize:'1.5rem', color:'var(--text-primary)', marginBottom:8, lineHeight:1.2 }}>{prog.name}</div>
+            <div style={{ fontSize:'.88rem', color:'var(--text-secondary)', lineHeight:1.7 }}>{prog.tagline}</div>
           </div>
 
           {/* Duration + type badges */}
           <div style={{ display:'flex', justifyContent:'center', gap:8, marginBottom:24 }}>
             {[['📅', prog.days + ' يوم'], ['🏠', 'بيت'], ['🤖', 'متكيف']].map(([ic, lbl]) => (
-              <div key={lbl} style={{ display:'flex', alignItems:'center', gap:5, background:'rgba(255,255,255,0.04)', border:`1px solid rgba(203,162,59,0.15)`, borderRadius:20, padding:'6px 14px', fontSize:'.78rem', color:'rgba(255,255,255,0.6)' }}>
+              <div key={lbl} style={{ display:'flex', alignItems:'center', gap:5, background:'rgba(0,0,0,0.04)', border:`1px solid rgba(0,0,0,0.08)`, borderRadius:20, padding:'6px 14px', fontSize:'.78rem', color:'var(--text-secondary)' }}>
                 <span>{ic}</span><span>{lbl}</span>
               </div>
             ))}
           </div>
 
           {/* ── PROGRESS INFOGRAPHIC ── */}
-          <div style={{ background:'rgba(255,255,255,0.02)', border:`1px solid rgba(203,162,59,0.12)`, borderRadius:20, padding:'18px 16px', marginBottom:14 }}>
-            <div style={{ fontSize:'.63rem', fontWeight:700, color:`rgba(203,162,59,0.7)`, letterSpacing:2, marginBottom:16, textTransform:'uppercase', textAlign:'center' }}>مسار تحولك المتوقع</div>
+          <div style={{ background:'var(--card)', border:`1px solid rgba(0,0,0,0.08)`, borderRadius:20, padding:'18px 16px', marginBottom:14 }}>
+            <div style={{ fontSize:'.63rem', fontWeight:700, color:'var(--text-secondary)', letterSpacing:2, marginBottom:16, textTransform:'uppercase', textAlign:'center' }}>مسار تحولك المتوقع</div>
 
             {/* Progress curve chart */}
             <svg width="100%" viewBox="0 0 340 90" xmlns="http://www.w3.org/2000/svg" style={{ display:'block', marginBottom:4 }}>
               <defs>
                 <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#CBA23B" stopOpacity="0.22"/>
-                  <stop offset="100%" stopColor="#CBA23B" stopOpacity="0"/>
+                  <stop offset="0%" stopColor="#111111" stopOpacity="0.12"/>
+                  <stop offset="100%" stopColor="#111111" stopOpacity="0"/>
                 </linearGradient>
               </defs>
               {/* grid */}
               {[22,44,66].map(y=>(
-                <line key={y} x1="0" y1={y} x2="340" y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="5,5"/>
+                <line key={y} x1="0" y1={y} x2="340" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1" strokeDasharray="5,5"/>
               ))}
               {/* fill */}
               <path d="M 0,82 C 50,80 100,68 170,44 S 285,14 340,8 L 340,90 L 0,90 Z" fill="url(#cg)"/>
               {/* line */}
-              <path d="M 0,82 C 50,80 100,68 170,44 S 285,14 340,8" fill="none" stroke="#CBA23B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M 0,82 C 50,80 100,68 170,44 S 285,14 340,8" fill="none" stroke="#111111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               {/* milestone dots */}
               {[[0,82],[113,62],[227,28],[340,8]].map(([x,y],i)=>(
-                <circle key={i} cx={x} cy={y} r={i===0?3:5} fill="#CBA23B" opacity={i===0?0.5:1}/>
+                <circle key={i} cx={x} cy={y} r={i===0?3:5} fill="#111111" opacity={i===0?0.4:1}/>
               ))}
               {/* goal flag at end */}
-              <line x1="340" y1="8" x2="340" y2="3" stroke="#CBA23B" strokeWidth="1.5"/>
-              <polygon points="340,3 348,6 340,9" fill="#CBA23B"/>
+              <line x1="340" y1="8" x2="340" y2="3" stroke="#111111" strokeWidth="1.5"/>
+              <polygon points="340,3 348,6 340,9" fill="#111111"/>
             </svg>
 
             {/* x-axis labels */}
-            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.62rem', color:'rgba(255,255,255,0.3)', marginBottom:16, padding:'0 2px', direction:'ltr' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.62rem', color:'rgba(0,0,0,0.25)', marginBottom:16, padding:'0 2px', direction:'ltr' }}>
               <span>البداية</span>
               <span>أسبوع 1</span>
               <span>أسبوع 2</span>
-              <span style={{ color:G, fontWeight:700 }}>اليوم {prog.days} 🏁</span>
+              <span style={{ color:'var(--text-primary)', fontWeight:700 }}>اليوم {prog.days} 🏁</span>
             </div>
 
             {/* Phase cards */}
@@ -189,51 +189,51 @@ export default function Packages() {
                 { icon:'📈', week:'الأسبوع 2', title:'نتائج',  desc:'الفرق يبدأ يظهر'       },
                 { icon:'✨', week:'الأسبوع 3+', title:'تحوّل', desc:'جسم جديد يتشكّل'       },
               ].map(p=>(
-                <div key={p.title} style={{ background:'rgba(203,162,59,0.04)', border:`1px solid rgba(203,162,59,0.1)`, borderRadius:12, padding:'10px 8px', textAlign:'center' }}>
+                <div key={p.title} style={{ background:'rgba(0,0,0,0.03)', border:`1px solid rgba(0,0,0,0.08)`, borderRadius:12, padding:'10px 8px', textAlign:'center' }}>
                   <div style={{ fontSize:'1.1rem', marginBottom:3 }}>{p.icon}</div>
-                  <div style={{ fontSize:'.58rem', color:'rgba(255,255,255,0.28)', marginBottom:2 }}>{p.week}</div>
-                  <div style={{ fontSize:'.72rem', fontWeight:800, color:G, marginBottom:3 }}>{p.title}</div>
-                  <div style={{ fontSize:'.59rem', color:'rgba(255,255,255,0.38)', lineHeight:1.4 }}>{p.desc}</div>
+                  <div style={{ fontSize:'.58rem', color:'var(--text-secondary)', marginBottom:2 }}>{p.week}</div>
+                  <div style={{ fontSize:'.72rem', fontWeight:800, color:'var(--text-primary)', marginBottom:3 }}>{p.title}</div>
+                  <div style={{ fontSize:'.59rem', color:'var(--text-secondary)', lineHeight:1.4 }}>{p.desc}</div>
                 </div>
               ))}
             </div>
 
             {/* Key stats */}
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:0, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:0, paddingTop:14, borderTop:'1px solid rgba(0,0,0,0.08)' }}>
               {[
                 [prog.days + '+',      'تمرين مخصص'  ],
                 ['250+',               'وجبة خليجية' ],
                 ['∞',                  'تعديل ذكي'   ],
               ].map(([val,lbl])=>(
                 <div key={lbl} style={{ textAlign:'center' }}>
-                  <div style={{ fontWeight:900, fontSize:'1.2rem', color:G, fontFamily:'monospace', lineHeight:1 }}>{val}</div>
-                  <div style={{ fontSize:'.62rem', color:'rgba(255,255,255,0.35)', marginTop:4 }}>{lbl}</div>
+                  <div style={{ fontWeight:900, fontSize:'1.2rem', color:'var(--text-primary)', fontFamily:'monospace', lineHeight:1 }}>{val}</div>
+                  <div style={{ fontSize:'.62rem', color:'var(--text-secondary)', marginTop:4 }}>{lbl}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* What you get */}
-          <div style={{ background:'rgba(255,255,255,0.02)', border:`1px solid rgba(203,162,59,0.1)`, borderRadius:18, padding:'20px', marginBottom:14 }}>
-            <div style={{ fontSize:'.65rem', fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:2, marginBottom:16, textTransform:'uppercase' }}>ما ستحصل عليه</div>
+          <div style={{ background:'var(--card)', border:`1px solid rgba(0,0,0,0.08)`, borderRadius:18, padding:'20px', marginBottom:14 }}>
+            <div style={{ fontSize:'.65rem', fontWeight:700, color:'var(--text-secondary)', letterSpacing:2, marginBottom:16, textTransform:'uppercase' }}>ما ستحصل عليه</div>
             {prog.what.map((item, i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:14, marginBottom: i < prog.what.length - 1 ? 14 : 0 }}>
                 {/* Gold checkmark */}
-                <div style={{ width:22, height:22, borderRadius:6, background:`rgba(203,162,59,0.12)`, border:`1.5px solid ${G}40`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <div style={{ width:22, height:22, borderRadius:6, background:`rgba(0,0,0,0.05)`, border:`1.5px solid ${G}40`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 6L9 17l-5-5"/>
                   </svg>
                 </div>
-                <div style={{ fontSize:'.88rem', color:'rgba(255,255,255,0.78)', lineHeight:1.4 }}>{item}</div>
+                <div style={{ fontSize:'.88rem', color:'var(--text-primary)', lineHeight:1.4 }}>{item}</div>
               </div>
             ))}
           </div>
 
           {/* Expected result */}
-          <div style={{ background:`rgba(203,162,59,0.05)`, border:`1px solid rgba(203,162,59,0.15)`, borderRadius:14, padding:'14px 18px', marginBottom:24 }}>
+          <div style={{ background:`rgba(0,0,0,0.03)`, border:`1px solid rgba(0,0,0,0.08)`, borderRadius:14, padding:'14px 18px', marginBottom:24 }}>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
               <span style={{ fontSize:'1.1rem' }}>📈</span>
-              <span style={{ fontSize:'.85rem', color:'rgba(255,255,255,0.65)', lineHeight:1.6 }}>{prog.expect}</span>
+              <span style={{ fontSize:'.85rem', color:'var(--text-secondary)', lineHeight:1.6 }}>{prog.expect}</span>
             </div>
           </div>
 
@@ -247,12 +247,12 @@ export default function Packages() {
           {/* CTA */}
           {hasActive ? (
             <button onClick={() => router.push('/program')}
-              style={{ width:'100%', background:`linear-gradient(135deg,${G},#8B6914)`, color:'#09090B', border:'none', borderRadius:16, padding:'17px', fontFamily:F, fontWeight:900, fontSize:'1rem', cursor:'pointer', boxShadow:`0 6px 28px rgba(203,162,59,0.35)`, letterSpacing:.5 }}>
+              style={{ width:'100%', background:'#111111', color:'#FFFFFF', border:'none', borderRadius:9999, padding:'17px', fontFamily:F, fontWeight:900, fontSize:'1rem', cursor:'pointer', boxShadow:`0 6px 28px rgba(0,0,0,0.15)`, letterSpacing:.5 }}>
               متابعة برنامجي الحالي ←
             </button>
           ) : (
             <button onClick={start} disabled={generating}
-              style={{ width:'100%', background:generating ? 'rgba(255,255,255,0.06)' : `linear-gradient(135deg,${G},#8B6914)`, color:generating ? 'rgba(255,255,255,0.3)' : '#09090B', border:'none', borderRadius:16, padding:'17px', fontFamily:F, fontWeight:900, fontSize:'1rem', cursor:generating ? 'not-allowed' : 'pointer', boxShadow:generating ? 'none' : `0 6px 28px rgba(203,162,59,0.35)`, transition:'all .2s', letterSpacing:.5 }}>
+              style={{ width:'100%', background:generating ? 'rgba(0,0,0,0.04)' : '#111111', color:generating ? 'var(--text-secondary)' : '#FFFFFF', border:'none', borderRadius:9999, padding:'17px', fontFamily:F, fontWeight:900, fontSize:'1rem', cursor:generating ? 'not-allowed' : 'pointer', boxShadow:generating ? 'none' : `0 6px 28px rgba(0,0,0,0.15)`, transition:'all .2s', letterSpacing:.5 }}>
               {generating ? (
                 <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}>
                   <span style={{ width:16, height:16, border:'2px solid rgba(0,0,0,0.2)', borderTopColor:'rgba(0,0,0,0.6)', borderRadius:'50%', animation:'spin .8s linear infinite', display:'inline-block' }}/>

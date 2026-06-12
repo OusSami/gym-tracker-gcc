@@ -636,7 +636,7 @@ export default function App() {
   const isAnalyzing = screen === S.ANALYZING
 
   return (
-    <div style={{minHeight:'100vh',background:'#09090B',color:'var(--text-primary)'}}>
+    <div style={{minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary)'}}>
       {showNav && <TopNav user={user} title={screen===S.HOME?null:screen===S.SETUP?'🎯 اختر هدفك وابدأ التمرين':screen===S.UPLOAD?'أضف تمرين':screen===S.CONFIRMING?'تأكيد التمرين':screen===S.BETWEEN?'تمرينك مستمر 💪':screen===S.DONE?'التمرين اكتمل':null} back={screen===S.SETUP?()=>setScreen(S.HOME):screen===S.UPLOAD?()=>setScreen(done.length>0?S.BETWEEN:S.SETUP):screen===S.BETWEEN?null:null} onSignOut={()=>supabase.auth.signOut().then(()=>setScreen(S.AUTH))}/>}
       {isLogging && <LoggingHeader sessTimer={sessTimer} exTimer={exTimer} curName={cur?.name}/>}
       <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={e=>loadImg(e.target.files[0])}/>
@@ -688,29 +688,29 @@ function WarmupScreen({ muscles, onStart, onSkip }) {
   const doneCount = Object.values(checked).filter(Boolean).length
 
   return (
-    <div style={{minHeight:'100dvh',background:'#0C0B0D',color:'#ECE3CF',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
+    <div style={{minHeight:'100dvh',background:'var(--surface)',color:'var(--text-primary)',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
       {/* Scrollable content */}
       <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',padding:'env(safe-area-inset-top) 16px 16px'}}>
         {/* Header */}
         <div style={{paddingTop:20}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(255,255,255,0.25)',marginBottom:6}}>قبل المعركة</div>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:6}}>قبل المعركة</div>
           <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'2.2rem',letterSpacing:2,color:'#f97316',lineHeight:1}}>الإحماء</div>
-          <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.35)',marginTop:4}}>جهّز جسمك — الإحماء يحمي مكاسبك ويرفع أداءك</div>
+          <div style={{fontSize:'.78rem',color:'var(--text-secondary)',marginTop:4}}>جهّز جسمك — الإحماء يحمي مكاسبك ويرفع أداءك</div>
         </div>
 
         {/* Timer */}
         <div style={{margin:'20px 0',background:'linear-gradient(135deg,rgba(249,115,22,0.1),rgba(249,115,22,0.04))',border:'1px solid rgba(249,115,22,0.2)',borderRadius:16,padding:'22px 16px',textAlign:'center'}}>
           <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'3.4rem',letterSpacing:3,color:'#f97316',lineHeight:1}}>{fmt(elapsed)}</div>
-          <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.3)',letterSpacing:2,marginTop:4}}>وقت الإحماء</div>
+          <div style={{fontSize:'.62rem',color:'var(--text-secondary)',letterSpacing:2,marginTop:4}}>وقت الإحماء</div>
           <button onClick={toggle}
-            style={{marginTop:14,padding:'11px 30px',background:running?'rgba(249,115,22,0.15)':'#f97316',border:'1px solid rgba(249,115,22,0.4)',borderRadius:30,color:running?'#f97316':'#0C0B0D',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.88rem',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
+            style={{marginTop:14,padding:'11px 30px',background:running?'rgba(249,115,22,0.15)':'#f97316',border:'1px solid rgba(249,115,22,0.4)',borderRadius:30,color:running?'#f97316':'#FFFFFF',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.88rem',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
             {running ? '⏸ توقف مؤقت' : elapsed > 0 ? '▶ كمّل' : '▶ ابدأ الإحماء'}
           </button>
         </div>
 
         {/* Recommendations checklist */}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:2,color:'rgba(255,255,255,0.25)'}}>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:2,color:'rgba(0,0,0,0.25)'}}>
             مخصص لـ {muscles.slice(0,3).join(', ').toUpperCase() || 'جلستك'}
           </div>
           {doneCount > 0 && <div style={{fontSize:'.7rem',color:'rgba(249,115,22,0.7)',fontWeight:700}}>{doneCount}/{recs.length}</div>}
@@ -720,11 +720,11 @@ function WarmupScreen({ muscles, onStart, onSkip }) {
             const done = checked[i]
             return (
               <div key={i} onClick={() => setChecked(p => ({...p, [i]: !p[i]}))}
-                style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',background:done?'rgba(249,115,22,0.08)':'rgba(255,255,255,0.03)',border:'1px solid '+(done?'rgba(249,115,22,0.3)':'rgba(255,255,255,0.07)'),borderRadius:10,cursor:'pointer',transition:'all .15s',WebkitTapHighlightColor:'transparent'}}>
-                <div style={{width:24,height:24,borderRadius:6,border:'2px solid '+(done?'#f97316':'rgba(255,255,255,0.15)'),background:done?'#f97316':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
-                  {done && <svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" fill="none" stroke="#0C0B0D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',background:done?'rgba(249,115,22,0.08)':'rgba(0,0,0,0.04)',border:'1px solid '+(done?'rgba(249,115,22,0.3)':'rgba(0,0,0,0.08)'),borderRadius:10,cursor:'pointer',transition:'all .15s',WebkitTapHighlightColor:'transparent'}}>
+                <div style={{width:24,height:24,borderRadius:6,border:'2px solid '+(done?'#f97316':'rgba(0,0,0,0.15)'),background:done?'#f97316':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
+                  {done && <svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 </div>
-                <span style={{fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.88rem',color:done?'rgba(249,115,22,0.85)':'rgba(255,255,255,0.7)',textDecoration:done?'line-through':'none',lineHeight:1.3}}>{r}</span>
+                <span style={{fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.88rem',color:done?'rgba(249,115,22,0.85)':'var(--text-primary)',textDecoration:done?'line-through':'none',lineHeight:1.3}}>{r}</span>
               </div>
             )
           })}
@@ -732,13 +732,13 @@ function WarmupScreen({ muscles, onStart, onSkip }) {
       </div>
 
       {/* Sticky actions */}
-      <div style={{padding:'12px 16px calc(16px + env(safe-area-inset-bottom))',display:'flex',flexDirection:'column',gap:10,borderTop:'1px solid rgba(255,255,255,0.06)',background:'#0C0B0D'}}>
+      <div style={{padding:'12px 16px calc(16px + env(safe-area-inset-bottom))',display:'flex',flexDirection:'column',gap:10,borderTop:'1px solid rgba(0,0,0,0.08)',background:'var(--surface)'}}>
         <button onClick={() => onStart(elapsed, recs.filter((_,i)=>checked[i]))}
-          style={{width:'100%',padding:'15px',background:'#CBA23B',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#0C0B0D',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
+          style={{width:'100%',padding:'15px',background:'#111111',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#FFFFFF',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
           {elapsed > 0 ? 'خلّصت الإحماء — يلا نشتغل' : 'تخطّيت الإحماء'}
         </button>
         <button onClick={onSkip}
-          style={{width:'100%',padding:'12px',background:'transparent',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',WebkitTapHighlightColor:'transparent'}}>
+          style={{width:'100%',padding:'12px',background:'transparent',border:'1px solid rgba(0,0,0,0.10)',borderRadius:12,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',WebkitTapHighlightColor:'transparent'}}>
           تخطّ الإحماء — مو مضمون! ⚠
         </button>
       </div>
@@ -765,33 +765,33 @@ function StretchScreen({ muscles, onDone, onSkip }) {
   const doneCount = Object.values(checked).filter(Boolean).length
 
   return (
-    <div style={{minHeight:'100dvh',background:'#0C0B0D',color:'#ECE3CF',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
+    <div style={{minHeight:'100dvh',background:'var(--surface)',color:'var(--text-primary)',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
       {/* Scrollable content */}
       <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',padding:'env(safe-area-inset-top) 16px 16px'}}>
         {/* Header */}
         <div style={{paddingTop:20}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(255,255,255,0.25)',marginBottom:6}}>ما شاء الله! أنهيت جلستك 🏆</div>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:6}}>ما شاء الله! أنهيت جلستك 🏆</div>
           <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'2.2rem',letterSpacing:2,color:'#4ade80',lineHeight:1}}>وقت التمديد</div>
-          <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.35)',marginTop:4}}>التمديد يضاعف تعافيك — لا تتخطّاه</div>
+          <div style={{fontSize:'.78rem',color:'var(--text-secondary)',marginTop:4}}>التمديد يضاعف تعافيك — لا تتخطّاه</div>
         </div>
 
         {/* Timer + progress */}
         <div style={{margin:'20px 0',background:'linear-gradient(135deg,rgba(74,222,128,0.08),rgba(74,222,128,0.03))',border:'1px solid rgba(74,222,128,0.2)',borderRadius:16,padding:'20px 16px',textAlign:'center'}}>
           <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'3.4rem',letterSpacing:3,color:'#4ade80',lineHeight:1}}>{fmt(elapsed)}</div>
-          <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.3)',letterSpacing:2,marginTop:2}}>وقت التمديد</div>
+          <div style={{fontSize:'.62rem',color:'var(--text-secondary)',letterSpacing:2,marginTop:2}}>وقت التمديد</div>
           {recs.length > 0 && (
             <div style={{marginTop:8,fontSize:'.72rem',color:'rgba(74,222,128,0.7)'}}>
               {doneCount}/{recs.length} stretches done
             </div>
           )}
           <button onClick={toggle}
-            style={{marginTop:12,padding:'10px 28px',background:running?'rgba(74,222,128,0.12)':'#4ade80',border:'1px solid rgba(74,222,128,0.4)',borderRadius:30,color:running?'#4ade80':'#0C0B0D',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.86rem',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
+            style={{marginTop:12,padding:'10px 28px',background:running?'rgba(74,222,128,0.12)':'#4ade80',border:'1px solid rgba(74,222,128,0.4)',borderRadius:30,color:running?'#4ade80':'#FFFFFF',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.86rem',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
             {running ? '⏸ توقف مؤقت' : elapsed > 0 ? '▶ كمّل' : '▶ ابدأ الإحماء'}
           </button>
         </div>
 
         {/* Stretch checklist */}
-        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:2,color:'rgba(255,255,255,0.25)',marginBottom:10}}>
+        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:2,color:'rgba(0,0,0,0.25)',marginBottom:10}}>
           قائمة تمارين التمديد
         </div>
         <div style={{display:'flex',flexDirection:'column',gap:7}}>
@@ -799,11 +799,11 @@ function StretchScreen({ muscles, onDone, onSkip }) {
             const done = checked[i]
             return (
               <div key={i} onClick={() => setChecked(p => ({...p, [i]: !p[i]}))}
-                style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',background:done?'rgba(74,222,128,0.07)':'rgba(255,255,255,0.03)',border:'1px solid '+(done?'rgba(74,222,128,0.3)':'rgba(255,255,255,0.07)'),borderRadius:10,cursor:'pointer',transition:'all .15s',WebkitTapHighlightColor:'transparent'}}>
-                <div style={{width:24,height:24,borderRadius:6,border:'2px solid '+(done?'#4ade80':'rgba(255,255,255,0.15)'),background:done?'#4ade80':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
-                  {done && <svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" fill="none" stroke="#0C0B0D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',background:done?'rgba(74,222,128,0.07)':'rgba(0,0,0,0.04)',border:'1px solid '+(done?'rgba(74,222,128,0.3)':'rgba(0,0,0,0.08)'),borderRadius:10,cursor:'pointer',transition:'all .15s',WebkitTapHighlightColor:'transparent'}}>
+                <div style={{width:24,height:24,borderRadius:6,border:'2px solid '+(done?'#4ade80':'rgba(0,0,0,0.15)'),background:done?'#4ade80':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
+                  {done && <svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 </div>
-                <span style={{fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.88rem',color:done?'rgba(74,222,128,0.8)':'rgba(255,255,255,0.7)',textDecoration:done?'line-through':'none',lineHeight:1.3}}>{r}</span>
+                <span style={{fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.88rem',color:done?'rgba(74,222,128,0.8)':'var(--text-primary)',textDecoration:done?'line-through':'none',lineHeight:1.3}}>{r}</span>
               </div>
             )
           })}
@@ -811,13 +811,13 @@ function StretchScreen({ muscles, onDone, onSkip }) {
       </div>
 
       {/* Sticky actions */}
-      <div style={{padding:'12px 16px calc(16px + env(safe-area-inset-bottom))',display:'flex',flexDirection:'column',gap:10,borderTop:'1px solid rgba(255,255,255,0.06)',background:'#0C0B0D'}}>
+      <div style={{padding:'12px 16px calc(16px + env(safe-area-inset-bottom))',display:'flex',flexDirection:'column',gap:10,borderTop:'1px solid rgba(0,0,0,0.08)',background:'var(--surface)'}}>
         <button onClick={() => onDone(elapsed, recs.filter((_,i)=>checked[i]))}
-          style={{width:'100%',padding:'15px',background:'#4ade80',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#0C0B0D',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
+          style={{width:'100%',padding:'15px',background:'#4ade80',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'#FFFFFF',cursor:'pointer',letterSpacing:1,WebkitTapHighlightColor:'transparent'}}>
           ✓ اختم جلستك — ما شاء الله عليك!
         </button>
         <button onClick={onSkip}
-          style={{width:'100%',padding:'12px',background:'transparent',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',WebkitTapHighlightColor:'transparent'}}>
+          style={{width:'100%',padding:'12px',background:'transparent',border:'1px solid rgba(0,0,0,0.10)',borderRadius:12,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',WebkitTapHighlightColor:'transparent'}}>
           تخطّ التمديد — جسمك سيفتقده ⚠
         </button>
       </div>
@@ -868,20 +868,19 @@ function AuthScreen() {
     setLoading(false)
   }
 
-  const INPUT_S = {background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.12)',color:'#ECE3CF',padding:'14px 16px',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.95rem',borderRadius:12,outline:'none',width:'100%',transition:'border .2s',marginBottom:10}
+  const INPUT_S = {background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-primary)',padding:'14px 16px',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.95rem',borderRadius:12,outline:'none',width:'100%',transition:'border .2s',marginBottom:10}
 
   return (
-    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px',background:'#09090B',overflow:'hidden',position:'relative'}}>
-      <div style={{position:'absolute',top:'15%',left:'50%',transform:'translateX(-50%)',width:400,height:400,background:'radial-gradient(circle, rgba(203,162,59,0.06) 0%, transparent 70%)',pointerEvents:'none'}}/>
-      <style>{`input[type=email],input[type=password],input[type=text]{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#ECE3CF;padding:14px 16px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.95rem;border-radius:12px;outline:none;width:100%;transition:border .2s;margin-bottom:10px;box-sizing:border-box} input:focus{border-color:#CBA23B;background:rgba(203,162,59,0.04)} ::placeholder{color:rgba(255,255,255,0.25)}`}</style>
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px',background:'var(--surface)',overflow:'hidden',position:'relative'}}>
+      <div style={{position:'absolute',top:'15%',insetInline:0,width:400,height:400,margin:'0 auto',background:'radial-gradient(circle, rgba(0,0,0,0.04) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       <div style={{width:'100%',maxWidth:360,position:'relative',zIndex:1}}>
         {/* Logo */}
         <div style={{textAlign:'center',marginBottom:28}}>
-          <div style={{width:72,height:72,background:'rgba(203,162,59,0.1)',border:'1px solid rgba(203,162,59,0.25)',borderRadius:22,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',fontSize:'2rem'}}>🏋️</div>
-          <div className="bb" style={{fontSize:'2.8rem',color:'#CBA23B',lineHeight:.95}}>جيم</div>
+          <div style={{width:72,height:72,background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:22,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',fontSize:'2rem'}}>🏋️</div>
+          <div className="bb" style={{fontSize:'2.8rem',color:'var(--text-primary)',lineHeight:.95}}>جيم</div>
           <div className="bb" style={{fontSize:'2.8rem',lineHeight:.95,marginBottom:6}}>تراكر</div>
-          <div style={{color:'rgba(255,255,255,0.3)',fontSize:'.8rem'}}>جسمك. مسؤوليتك. 🏆</div>
+          <div style={{color:'var(--text-secondary)',fontSize:'.8rem'}}>جسمك. مسؤوليتك. 🏆</div>
         </div>
 
         {err && <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:10,padding:'10px 14px',color:'#fca5a5',fontSize:'.82rem',marginBottom:12,lineHeight:1.5}}>{err}</div>}
@@ -891,22 +890,22 @@ function AuthScreen() {
         {mode === 'main' && (
           <div>
             <button onClick={doGoogle}
-              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,width:'100%',padding:'15px',background:'#fff',color:'#111',border:'none',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,marginBottom:12,boxShadow:'0 4px 20px rgba(255,255,255,0.08)'}}>
+              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,width:'100%',padding:'15px',background:'#fff',color:'#111',border:'none',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,marginBottom:12,boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}}>
               <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
               Continue with Google
             </button>
             <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
-              <div style={{flex:1,height:1,background:'rgba(255,255,255,0.08)'}}/><span style={{color:'rgba(255,255,255,0.2)',fontSize:'.72rem',fontWeight:700}}>OR</span><div style={{flex:1,height:1,background:'rgba(255,255,255,0.08)'}}/>
+              <div style={{flex:1,height:1,background:'rgba(0,0,0,0.08)'}}/><span style={{color:'rgba(0,0,0,0.25)',fontSize:'.72rem',fontWeight:700}}>OR</span><div style={{flex:1,height:1,background:'rgba(0,0,0,0.08)'}}/>
             </div>
             <button onClick={()=>{setMode('login');setErr('');setMsg('')}}
-              style={{width:'100%',padding:'15px',background:'rgba(203,162,59,0.08)',border:'1px solid rgba(203,162,59,0.25)',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,color:'#CBA23B',marginBottom:10}}>
+              style={{width:'100%',padding:'15px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,color:'var(--text-primary)',marginBottom:10}}>
               Sign in with Email
             </button>
             <button onClick={()=>{setMode('signup');setErr('');setMsg('')}}
-              style={{width:'100%',padding:'15px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,color:'rgba(255,255,255,0.7)'}}>
+              style={{width:'100%',padding:'15px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,color:'var(--text-primary)'}}>
               Create Account
             </button>
-            <div style={{color:'rgba(255,255,255,0.2)',fontSize:'.72rem',textAlign:'center',marginTop:16}}>Free · No credit card · Your data stays yours</div>
+            <div style={{color:'var(--text-secondary)',fontSize:'.72rem',textAlign:'center',marginTop:16}}>Free · No credit card · Your data stays yours</div>
           </div>
         )}
 
@@ -917,15 +916,15 @@ function AuthScreen() {
             <input type="email" placeholder="بريدك الإلكتروني" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doLogin()}/>
             <input type="password" placeholder="كلمة السر" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doLogin()}/>
             <button onClick={doLogin} disabled={loading}
-              style={{width:'100%',padding:'15px',background:'#CBA23B',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#0C0B0D',cursor:loading?'not-allowed':'pointer',marginBottom:10,opacity:loading?.7:1}}>
+              style={{width:'100%',padding:'15px',background:'#111111',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#FFFFFF',cursor:loading?'not-allowed':'pointer',marginBottom:10,opacity:loading?.7:1}}>
               {loading?'جاري الدخول…':'ادخل ←'}
             </button>
             <div style={{display:'flex',justifyContent:'space-between'}}>
-              <button onClick={()=>{setMode('main');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'rgba(255,255,255,0.35)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>← Back</button>
-              <button onClick={doReset} style={{background:'none',border:'none',color:'rgba(203,162,59,0.5)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>Forgot password?</button>
+              <button onClick={()=>{setMode('main');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>← Back</button>
+              <button onClick={doReset} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>Forgot password?</button>
             </div>
             <div style={{textAlign:'center',marginTop:12}}>
-              <button onClick={()=>{setMode('signup');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>No account? <span style={{color:'#CBA23B',fontWeight:700}}>Create one ←</span></button>
+              <button onClick={()=>{setMode('signup');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>No account? <span style={{color:'var(--text-primary)',fontWeight:700}}>Create one ←</span></button>
             </div>
           </div>
         )}
@@ -938,14 +937,14 @@ function AuthScreen() {
             <input type="email" placeholder="بريدك الإلكتروني" value={email} onChange={e=>setEmail(e.target.value)}/>
             <input type="password" placeholder="كلمة السر (٦ أحرف على الأقل)" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doSignup()}/>
             <button onClick={doSignup} disabled={loading}
-              style={{width:'100%',padding:'15px',background:'#CBA23B',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#0C0B0D',cursor:loading?'not-allowed':'pointer',marginBottom:10,opacity:loading?.7:1}}>
+              style={{width:'100%',padding:'15px',background:'#111111',border:'none',borderRadius:14,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#FFFFFF',cursor:loading?'not-allowed':'pointer',marginBottom:10,opacity:loading?.7:1}}>
               {loading?'جاري إنشاء حسابك…':'ابدأ التحول ←'}
             </button>
             <div style={{textAlign:'center'}}>
-              <button onClick={()=>{setMode('main');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'rgba(255,255,255,0.35)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>← Back</button>
+              <button onClick={()=>{setMode('main');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>← Back</button>
             </div>
             <div style={{textAlign:'center',marginTop:12}}>
-              <button onClick={()=>{setMode('login');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>Already have an account? <span style={{color:'#CBA23B',fontWeight:700}}>Sign in ←</span></button>
+              <button onClick={()=>{setMode('login');setErr('');setMsg('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>Already have an account? <span style={{color:'var(--text-primary)',fontWeight:700}}>Sign in ←</span></button>
             </div>
           </div>
         )}
@@ -1080,7 +1079,7 @@ function HomeScreen({ user, quote, onStart, router }) {
   return (
     <div style={{padding:'20px 16px 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
       {/* BG glow */}
-      <div style={{position:'fixed',top:0,left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:520,height:300,background:'radial-gradient(ellipse at 50% 0%, rgba(203,162,59,0.07) 0%, transparent 70%)',pointerEvents:'none',zIndex:0}}/>
+      <div style={{position:'fixed',top:0,left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:520,height:300,background:'radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.02) 0%, transparent 70%)',pointerEvents:'none',zIndex:0}}/>
 
       <div style={{position:'relative',zIndex:1}}>
 
@@ -1093,9 +1092,9 @@ function HomeScreen({ user, quote, onStart, router }) {
             </div>
           </div>
           {d && d.streak > 0 && (
-            <div style={{background:'rgba(203,162,59,0.10)',border:'1px solid rgba(203,162,59,0.25)',borderRadius:14,padding:'8px 14px',textAlign:'center',minWidth:70}}>
+            <div style={{background:'rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.12)',borderRadius:14,padding:'8px 14px',textAlign:'center',minWidth:70}}>
               <div style={{fontSize:'1.2rem',lineHeight:1}}>🔥</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.1rem',color:'#CBA23B',lineHeight:1.1}}>{d.streak}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.1rem',color:'var(--text-primary)',lineHeight:1.1}}>{d.streak}</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-muted)'}}>يوم</div>
             </div>
           )}
@@ -1103,12 +1102,12 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── HERO CARD ── */}
         <div onClick={onStart}
-          style={{background:'linear-gradient(135deg,rgba(203,162,59,0.14) 0%,rgba(203,162,59,0.05) 60%,transparent 100%)',border:'1px solid rgba(203,162,59,0.30)',borderRadius:24,padding:'26px 22px',marginBottom:14,cursor:'pointer',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
+          style={{background:'linear-gradient(135deg,rgba(0,0,0,0.04) 0%,rgba(0,0,0,0.02) 60%,transparent 100%)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:24,padding:'26px 22px',marginBottom:14,cursor:'pointer',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
           onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
           onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-          <div style={{position:'absolute',right:-20,top:-20,width:130,height:130,background:'rgba(203,162,59,0.06)',borderRadius:'50%'}}/>
+          <div style={{position:'absolute',right:-20,top:-20,width:130,height:130,background:'rgba(0,0,0,0.04)',borderRadius:'50%'}}/>
           <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'1.05rem',color:'var(--text-primary)',lineHeight:1.5,marginBottom:20,maxWidth:260,textAlign:'right'}}>{hero}</div>
-          <div style={{display:'inline-flex',alignItems:'center',gap:8,background:'#CBA23B',color:'#0C0B0D',padding:'12px 22px',borderRadius:12,fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.98rem'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:8,background:'#111111',color:'#FFFFFF',padding:'12px 22px',borderRadius:12,fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.98rem'}}>
             يلا نبدأ 💪
           </div>
         </div>
@@ -1116,27 +1115,27 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── ACTIVE PROGRAM CARD ── */}
         {activeProgram?.program && (
           <div onClick={() => router.push('/program?id=' + activeProgram.program.id)}
-            style={{background:'linear-gradient(135deg,rgba(203,162,59,0.10),rgba(203,162,59,0.04))',border:'1px solid rgba(203,162,59,0.28)',borderRadius:20,padding:'16px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
+            style={{background:'linear-gradient(135deg,rgba(0,0,0,0.03),rgba(0,0,0,0.02))',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,padding:'16px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
             onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
             onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
               <div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.65rem',fontWeight:700,color:'rgba(203,162,59,0.8)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.65rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'var(--text-primary)',marginBottom:2}}>{activeProgram.program.package_name}</div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.75rem',color:'var(--text-muted)'}}>
                   اليوم {activeProgram.program.current_day} من {activeProgram.program.total_days} · {activeProgram.completedDays || 0} أيام مكتملة
                 </div>
               </div>
               <div style={{textAlign:'center',flexShrink:0}}>
-                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.6rem',color:'#CBA23B',lineHeight:1}}>
+                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.6rem',color:'var(--text-primary)',lineHeight:1}}>
                   {Math.round(((activeProgram.completedDays||0) / (activeProgram.program.total_days||21)) * 100)}%
                 </div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-muted)',marginTop:2}}>مكتمل</div>
               </div>
             </div>
             {/* Progress bar */}
-            <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-              <div style={{height:'100%',background:'linear-gradient(90deg,#CBA23B,#e8c55a)',borderRadius:10,transition:'width .5s',
+            <div style={{height:5,background:'rgba(0,0,0,0.08)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
+              <div style={{height:'100%',background:'#111111',borderRadius:10,transition:'width .5s',
                 width: Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100) + '%'}}/>
             </div>
             {/* Day dots — last 7 */}
@@ -1145,10 +1144,10 @@ function HomeScreen({ user, quote, onStart, router }) {
                 const dayNum = i+1
                 const isDone = dayNum < (activeProgram.program.current_day||1)
                 const isCurrent = dayNum === (activeProgram.program.current_day||1)
-                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'#CBA23B':isDone?'rgba(203,162,59,0.4)':'rgba(255,255,255,0.06)',transition:'background .2s'}}/>
+                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'#111111':isDone?'rgba(0,0,0,0.30)':'rgba(0,0,0,0.08)',transition:'background .2s'}}/>
               })}
             </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.75rem',color:'rgba(203,162,59,0.8)',marginTop:10,fontWeight:600}}>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.75rem',color:'var(--text-secondary)',marginTop:10,fontWeight:600}}>
               اضغط لتبدأ تمرين اليوم →
             </div>
           </div>
@@ -1157,8 +1156,8 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── Daily Islamic Phrase ── */}
         {d?.dailyPhrase && (
           <div style={{
-            background:'linear-gradient(135deg,rgba(203,162,59,0.07),rgba(203,162,59,0.02))',
-            border:'1px solid rgba(203,162,59,0.15)',
+            background:'var(--card)',
+            border:'1px solid rgba(0,0,0,0.08)',
             borderRadius:18,
             padding:'18px 20px',
             marginBottom:14,
@@ -1168,10 +1167,10 @@ function HomeScreen({ user, quote, onStart, router }) {
               fontFamily:"'Scheherazade New','Amiri','Traditional Arabic',serif",
               fontSize:'clamp(1.1rem,4vw,1.5rem)',
               fontWeight:900,
-              color:'#CBA23B',
+              color:'var(--text-primary)',
               lineHeight:1.6,
               marginBottom:8,
-              textShadow:'0 0 30px rgba(203,162,59,0.2)',
+              textShadow:'none',
               direction:'rtl',
             }}>
               {d.dailyPhrase.ar}
@@ -1179,7 +1178,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             <div style={{
               fontFamily:"'Tajawal',sans-serif",
               fontSize:'.82rem',
-              color:'rgba(255,255,255,0.45)',
+              color:'var(--text-secondary)',
               lineHeight:1.6,
             }}>
               {d.dailyPhrase.sub}
@@ -1202,17 +1201,17 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── KPI GRID ── */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14}}>
           {/* Weekly sessions */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
-            <div style={{position:'absolute',top:-10,left:-10,width:60,height:60,background:'rgba(203,162,59,0.06)',borderRadius:'50%'}}/>
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:-10,left:-10,width:60,height:60,background:'rgba(0,0,0,0.04)',borderRadius:'50%'}}/>
             <div style={{fontSize:'1.3rem',marginBottom:8}}>🏋️</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:'#CBA23B',lineHeight:1}}>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:'var(--text-primary)',lineHeight:1}}>
               {d ? d.weekSessions : '—'}
             </div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>تمارين هذا الأسبوع</div>
           </div>
 
           {/* Latest weight */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}
             onClick={()=>router.push('/weight')} >
             <div style={{position:'absolute',top:-10,left:-10,width:60,height:60,background:'rgba(59,130,246,0.06)',borderRadius:'50%'}}/>
             <div style={{fontSize:'1.3rem',marginBottom:8}}>⚖️</div>
@@ -1223,16 +1222,16 @@ function HomeScreen({ user, quote, onStart, router }) {
           </div>
 
           {/* Monthly change */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
             <div style={{fontSize:'1.3rem',marginBottom:8}}>📈</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:d?.monthChange < 0 ? '#4ade80' : d?.monthChange > 0 ? '#ef4444' : '#CBA23B',lineHeight:1}}>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:d?.monthChange < 0 ? '#4ade80' : d?.monthChange > 0 ? '#ef4444' : 'var(--text-primary)',lineHeight:1}}>
               {d?.monthChange !== null && d?.monthChange !== undefined ? (d.monthChange > 0 ? '+' : '') + d.monthChange : '—'}
             </div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>التغير هذا الشهر</div>
           </div>
 
           {/* Goal */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
             <div style={{fontSize:'1.3rem',marginBottom:8}}>🎯</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.82rem',color:'var(--text-primary)',lineHeight:1.4}}>
               {d?.goal || '—'}
@@ -1243,7 +1242,7 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── STREAK CARD ── */}
         {d && d.streak > 2 && (
-          <div style={{background:'linear-gradient(135deg,rgba(239,68,68,0.10) 0%,rgba(203,162,59,0.06) 100%)',border:'1px solid rgba(239,68,68,0.20)',borderRadius:16,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{background:'linear-gradient(135deg,rgba(239,68,68,0.08) 0%,rgba(0,0,0,0.02) 100%)',border:'1px solid rgba(239,68,68,0.18)',borderRadius:16,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',color:'var(--text-primary)'}}>سلسلة الالتزام</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-muted)',marginTop:2}}>استمر. لا تقطع السلسلة.</div>
@@ -1266,8 +1265,8 @@ function HomeScreen({ user, quote, onStart, router }) {
         </div>
 
         {/* ── COACH MESSAGE ── */}
-        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:16,padding:'14px 18px',marginBottom:14}}>
-          <div style={{color:'#CBA23B',fontSize:'.65rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
+        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'14px 18px',marginBottom:14}}>
+          <div style={{color:'var(--text-primary)',fontSize:'.65rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
           <div style={{color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif",fontSize:'.88rem',lineHeight:1.7}}>"{coach}"</div>
         </div>
 
@@ -1279,7 +1278,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             {icon:'🔬',label:'تحليل جسمي',sub:'صورة أو قياسات — اختر ما يناسبك',path:'/assessment',color:'#a855f7'},
           ].map(({icon,label,sub,path,color})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'18px 16px',cursor:'pointer',transition:'all .2s',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'18px 16px',cursor:'pointer',transition:'all .2s',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:color+'18',borderRadius:'50%'}}/>
@@ -1293,7 +1292,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             const cal = todayMeals?.calories ?? 0
             const target = d?.calorieTarget || 2000
             const pct = Math.min(1, cal / target)
-            const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#CBA23B'
+            const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#111111'
             const r = 20, circ = 2 * Math.PI * r
             const remaining = Math.max(0, target - cal)
             const ptgt = d?.proteinTarget || 150
@@ -1301,23 +1300,23 @@ function HomeScreen({ user, quote, onStart, router }) {
             const ftgt = d?.fatTarget || 65
             return (
               <div onClick={() => router.push('/meals')}
-                style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'14px 12px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:7,direction:'rtl'}}
+                style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'14px 12px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:7,direction:'rtl'}}
                 onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
                 onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
                 {/* Header */}
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'rgba(203,162,59,0.65)',fontWeight:700}}>السعرات اليوم</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-secondary)',fontWeight:700}}>السعرات اليوم</div>
                 {/* Ring + calories */}
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <div>
                     <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'1.25rem',color:arcColor,lineHeight:1,textShadow:`0 0 14px ${arcColor}44`}}>{todayMeals === null ? '...' : cal}</div>
-                    <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'rgba(255,255,255,0.25)',marginTop:2}}>من {target} سعرة</div>
+                    <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'var(--text-secondary)',marginTop:2}}>من {target} سعرة</div>
                     {remaining > 0
                       ? <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'rgba(74,222,128,0.75)',marginTop:2}}>باقي {remaining}</div>
                       : <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#4ade80',marginTop:2}}>وصلت الهدف ✓</div>
                     }
                   </div>
                   <svg width={48} height={48}>
-                    <circle cx={24} cy={24} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={3.5}/>
+                    <circle cx={24} cy={24} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={3.5}/>
                     <circle cx={24} cy={24} r={r} fill="none" stroke={arcColor} strokeWidth={3.5}
                       strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
                       strokeLinecap="round" transform="rotate(-90 24 24)"
@@ -1330,10 +1329,10 @@ function HomeScreen({ user, quote, onStart, router }) {
                   {[['بروتين','#3b82f6',todayMeals?.protein||0,ptgt],['كارب','#f97316',todayMeals?.carbs||0,ctgt],['دهن','#a855f7',todayMeals?.fat||0,ftgt]].map(([l,c,v,t])=>(
                     <div key={l} style={{display:'flex',alignItems:'center',gap:4}}>
                       <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',fontWeight:700,color:c,flexShrink:0,width:24,textAlign:'right'}}>{l}</div>
-                      <div style={{flex:1,height:3,background:'rgba(255,255,255,0.06)',borderRadius:2,overflow:'hidden'}}>
+                      <div style={{flex:1,height:3,background:'rgba(0,0,0,0.08)',borderRadius:2,overflow:'hidden'}}>
                         <div style={{height:'100%',width:Math.min(100,t>0?Math.round((v/t)*100):0)+'%',background:c,borderRadius:2,boxShadow:`0 0 5px ${c}55`,minWidth:v>0?3:0}}/>
                       </div>
-                      <div style={{fontFamily:'monospace',fontSize:'.45rem',color:'rgba(255,255,255,0.35)',flexShrink:0,width:22,textAlign:'left'}}>{v}g</div>
+                      <div style={{fontFamily:'monospace',fontSize:'.45rem',color:'var(--text-secondary)',flexShrink:0,width:22,textAlign:'left'}}>{v}g</div>
                     </div>
                   ))}
                 </div>
@@ -1344,11 +1343,11 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── EMPTY STATE (no sessions yet) ── */}
         {d && d.totalSessions === 0 && (
-          <div style={{textAlign:'center',padding:'24px',background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:20,marginTop:8}}>
+          <div style={{textAlign:'center',padding:'24px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,marginTop:8}}>
             <div style={{fontSize:'2rem',marginBottom:12}}>💪</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'1rem',color:'var(--text-primary)',marginBottom:6}}>أول تمرين يبدأ من هنا</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-muted)',marginBottom:16}}>ابدأ تمرينك الأول وابني سجلك</div>
-            <button onClick={onStart} style={{background:'#CBA23B',color:'#0C0B0D',border:'none',borderRadius:12,padding:'12px 28px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',cursor:'pointer'}}>
+            <button onClick={onStart} style={{background:'#111111',color:'#FFFFFF',border:'none',borderRadius:12,padding:'12px 28px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',cursor:'pointer'}}>
               يلا نبدأ 🔥
             </button>
           </div>
@@ -1375,7 +1374,7 @@ function AddMusclePanel({ muscles, setMuscles, onClose }) {
           const isOpen = expandedGroup === m.id
           const alreadyHas = muscles.includes(m.id) || subs.some(s => muscles.includes(s))
           return (
-            <div key={m.id} style={{borderRadius:10,overflow:'hidden',border:'1px solid rgba(255,255,255,0.07)',background:'rgba(255,255,255,0.02)'}}>
+            <div key={m.id} style={{borderRadius:10,overflow:'hidden',border:'1px solid rgba(0,0,0,0.08)',background:'var(--card)'}}>
               <div style={{display:'flex',alignItems:'center'}}>
                 {/* Group tap */}
                 <div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',flex:1,cursor:'pointer',opacity:alreadyHas?0.4:1}}
@@ -1383,13 +1382,13 @@ function AddMusclePanel({ muscles, setMuscles, onClose }) {
                   <span style={{fontSize:'1rem',flexShrink:0}}>{m.icon}</span>
                   <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',color:m.color}}>
                     {m.id}
-                    {alreadyHas && <span style={{fontSize:'.6rem',color:'rgba(255,255,255,0.3)',marginLeft:5,fontWeight:400}}>already selected</span>}
+                    {alreadyHas && <span style={{fontSize:'.6rem',color:'var(--text-secondary)',marginInlineStart:5,fontWeight:400}}>already selected</span>}
                   </span>
                 </div>
                 {/* Expand for subs */}
                 {subs.length > 0 && (
                   <button onClick={()=>setExpandedGroup(isOpen ? null : m.id)}
-                    style={{padding:'0 14px',alignSelf:'stretch',background:'none',border:'none',borderLeft:'1px solid rgba(255,255,255,0.05)',color:isOpen?m.color:'rgba(255,255,255,0.2)',cursor:'pointer',display:'flex',alignItems:'center',gap:4,fontSize:'.68rem',fontWeight:600,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>
+                    style={{padding:'0 14px',alignSelf:'stretch',background:'none',border:'none',borderInlineStart:'1px solid rgba(0,0,0,0.08)',color:isOpen?m.color:'var(--text-secondary)',cursor:'pointer',display:'flex',alignItems:'center',gap:4,fontSize:'.68rem',fontWeight:600,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>
                     subs
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{transform:isOpen?'rotate(180deg)':'none',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
                   </button>
@@ -1397,13 +1396,13 @@ function AddMusclePanel({ muscles, setMuscles, onClose }) {
               </div>
               {/* Sub-muscles */}
               {isOpen && (
-                <div style={{padding:'6px 12px 10px',borderTop:'1px solid rgba(255,255,255,0.05)',background:'rgba(0,0,0,0.2)'}}>
+                <div style={{padding:'6px 12px 10px',borderTop:'1px solid rgba(0,0,0,0.06)',background:'rgba(0,0,0,0.02)'}}>
                   <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
                     {subs.map(sub => {
                       const hasSub = muscles.includes(sub)
                       return (
                         <button key={sub} onClick={()=>{ if (!hasSub) addItem(sub) }}
-                          style={{padding:'4px 11px',background:hasSub?'rgba(255,255,255,0.04)':m.color+'18',border:'1px solid '+(hasSub?'rgba(255,255,255,0.06)':m.color+'44'),borderRadius:20,color:hasSub?'rgba(255,255,255,0.25)':m.color,cursor:hasSub?'default':'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.73rem',fontWeight:hasSub?400:600,opacity:hasSub?0.5:1}}>
+                          style={{padding:'4px 11px',background:hasSub?'rgba(0,0,0,0.04)':m.color+'18',border:'1px solid '+(hasSub?'rgba(0,0,0,0.06)':m.color+'44'),borderRadius:20,color:hasSub?'rgba(0,0,0,0.25)':m.color,cursor:hasSub?'default':'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.73rem',fontWeight:hasSub?400:600,opacity:hasSub?0.5:1}}>
                           {hasSub ? '✓ ' : ''}{subLabel}
                         </button>
                       )
@@ -1416,7 +1415,7 @@ function AddMusclePanel({ muscles, setMuscles, onClose }) {
         })}
       </div>
       <button onClick={onClose}
-        style={{width:'100%',padding:'8px',background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:9,color:'rgba(255,255,255,0.35)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem'}}>
+        style={{width:'100%',padding:'8px',background:'transparent',border:'1px solid rgba(0,0,0,0.08)',borderRadius:9,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem'}}>
         Cancel
       </button>
     </div>
@@ -1441,12 +1440,12 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
   const activeSubs = g => (MUSCLE_TREE[g]?.subs||[]).filter(s=>muscles.includes(s))
 
   return (
-    <div style={{padding:'0 0 0',minHeight:'100vh',background:'#09090B'}}>
+    <div style={{padding:'0 0 0',minHeight:'100vh',background:'var(--bg)'}}>
       {/* Header */}
       <div style={{padding:'20px 20px 0',marginBottom:16}}>
-        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.6rem',color:'#CBA23B',letterSpacing:-1,marginBottom:2}}>اختر عضلاتك — يلا نضرب! 🎯</div>
+        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.6rem',color:'var(--text-primary)',letterSpacing:-1,marginBottom:2}}>اختر عضلاتك — يلا نضرب! 🎯</div>
         <input type="date" value={date} max={todayStr()} onChange={e=>setDate(e.target.value)}
-          style={{background:'transparent',border:'none',color:'rgba(255,255,255,0.4)',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',outline:'none',cursor:'pointer',padding:0}}/>
+          style={{background:'transparent',border:'none',color:'var(--text-secondary)',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',outline:'none',cursor:'pointer',padding:0}}/>
       </div>
 
       {/* Muscle grid */}
@@ -1456,7 +1455,7 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
           const subs = activeSubs(m.id)
           const isOpen = expanded===m.id
           return (
-            <div key={m.id} style={{borderRadius:14,overflow:'hidden',background:on?'rgba(0,0,0,0.5)':'rgba(255,255,255,0.02)',border:`1px solid ${on?m.color+'60':'rgba(255,255,255,0.06)'}`,boxShadow:on?`0 0 20px ${m.color}20`:'none',transition:'all .2s'}}>
+            <div key={m.id} style={{borderRadius:14,overflow:'hidden',background:on?'rgba(0,0,0,0.08)':'var(--card)',border:`1px solid ${on?m.color+'60':'rgba(0,0,0,0.08)'}`,boxShadow:on?`0 0 20px ${m.color}20`:'none',transition:'all .2s'}}>
               <div style={{display:'flex',alignItems:'center',gap:0}}>
                 {/* Color bar */}
                 <div style={{width:3,alignSelf:'stretch',background:on?m.color:'transparent',flexShrink:0,transition:'background .2s'}}/>
@@ -1464,8 +1463,8 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
                 <div style={{display:'flex',alignItems:'center',gap:12,padding:'13px 14px',flex:1,cursor:'pointer',minWidth:0}} onClick={()=>toggleGroup(m.id)}>
                   <span style={{fontSize:'1.3rem',flexShrink:0,filter:on?'none':'grayscale(80%) opacity(0.5)'}}>{m.icon}</span>
                   <div style={{minWidth:0,flex:1}}>
-                    <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.92rem',color:on?m.color:'rgba(255,255,255,0.5)',letterSpacing:.5,transition:'color .2s'}}>{(m.label||m.id)}</div>
-                    <div style={{fontSize:'.62rem',color:on&&subs.length?m.color+'99':'rgba(255,255,255,0.2)',marginTop:2,letterSpacing:.3}}>
+                    <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.92rem',color:on?m.color:'var(--text-secondary)',letterSpacing:.5,transition:'color .2s'}}>{(m.label||m.id)}</div>
+                    <div style={{fontSize:'.62rem',color:on&&subs.length?m.color+'99':'var(--text-secondary)',marginTop:2,letterSpacing:.3}}>
                       {subs.length?subs.map(s=>(MUSCLE_TREE[m.id]?.subLabels?.[s]||s)).join(' · '):(MUSCLE_TREE[m.id]?.subs||[]).slice(0,3).map(s=>(MUSCLE_TREE[m.id]?.subLabels?.[s]||s)).join(' · ')}
                     </div>
                   </div>
@@ -1475,7 +1474,7 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
                 </div>
                 {/* Expand button */}
                 <button onClick={()=>setExpanded(isOpen?null:m.id)}
-                  style={{padding:'0 16px',alignSelf:'stretch',background:'none',border:'none',borderLeft:`1px solid ${on?m.color+'30':'rgba(255,255,255,0.05)'}`,color:isOpen?m.color:'rgba(255,255,255,0.2)',cursor:'pointer',fontSize:'.8rem',transition:'all .2s',display:'flex',alignItems:'center'}}>
+                  style={{padding:'0 16px',alignSelf:'stretch',background:'none',border:'none',borderInlineStart:`1px solid ${on?m.color+'30':'rgba(0,0,0,0.08)'}`,color:isOpen?m.color:'var(--text-secondary)',cursor:'pointer',fontSize:'.8rem',transition:'all .2s',display:'flex',alignItems:'center'}}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{transform:isOpen?'rotate(180deg)':'none',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
               </div>
@@ -1488,7 +1487,7 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
                       const sel=muscles.includes(sub)
                       return (
                         <button key={sub} onClick={()=>toggleSub(m.id,sub)}
-                          style={{padding:'5px 14px',background:sel?m.color+'20':'rgba(255,255,255,0.04)',border:`1px solid ${sel?m.color:'rgba(255,255,255,0.1)'}`,borderRadius:20,color:sel?m.color:'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:sel?700:400,transition:'all .15s'}}>
+                          style={{padding:'5px 14px',background:sel?m.color+'20':'rgba(0,0,0,0.04)',border:`1px solid ${sel?m.color:'rgba(0,0,0,0.08)'}`,borderRadius:20,color:sel?m.color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.75rem',fontWeight:sel?700:400,transition:'all .15s'}}>
                           {sub}
                         </button>
                       )
@@ -1516,9 +1515,9 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
       {templates?.length > 0 && (
         <div style={{padding:'0 16px',marginBottom:12}}>
           <button onClick={()=>setShowTemplates(v=>!v)}
-            style={{width:'100%',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            style={{width:'100%',padding:'10px 14px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <span>📋 My Templates ({templates.length})</span>
-            <span style={{color:'rgba(255,255,255,0.25)'}}>{showTemplates?'▲':'▼'}</span>
+            <span style={{color:'var(--text-secondary)'}}>{showTemplates?'▲':'▼'}</span>
           </button>
           {showTemplates && (
             <div style={{marginTop:6,display:'flex',flexDirection:'column',gap:5}}>
@@ -1529,14 +1528,14 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
                   setShowTemplates(false)
                   onNext()
                 }}
-                  style={{padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:10,color:'rgba(255,255,255,0.7)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  style={{padding:'10px 14px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,color:'var(--text-primary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                   <div>
                     <div style={{fontWeight:700}}>{t.name}</div>
-                    <div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>
+                    <div style={{fontSize:'.7rem',color:'var(--text-secondary)',marginTop:2}}>
                       {(t.muscles||[]).join(' · ')} · {(t.exercises||[]).length} exercises
                     </div>
                   </div>
-                  <span style={{color:'#CBA23B',fontSize:'.8rem'}}>←</span>
+                  <span style={{color:'var(--text-primary)',fontSize:'.8rem'}}>←</span>
                 </button>
               ))}
             </div>
@@ -1559,10 +1558,10 @@ function UploadScreen({muscles,setMuscles,addMuscle,setAddMuscle,imgPreview,imgB
   return (
     <div style={{padding:'16px 16px 0'}} className="anim-up">
       {done.length>0&&(
-        <div style={{background:'rgba(203,162,59,0.08)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:14,padding:'12px 16px',marginBottom:14}}>
+        <div style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'12px 16px',marginBottom:14}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-            <div style={{color:'#CBA23B',fontSize:'.82rem',fontWeight:600}}>{done.length} exercise{done.length>1?'s':''} · {fmt(sessTimer)}</div>
-            <button className="btn-sm" style={{background:'rgba(203,162,59,0.15)',borderColor:'rgba(203,162,59,0.4)',color:'#CBA23B'}} onClick={finish} disabled={saving}>{saving?'جاري الحفظ…':'Finish Session'}</button>
+            <div style={{color:'var(--text-primary)',fontSize:'.82rem',fontWeight:600}}>{done.length} exercise{done.length>1?'s':''} · {fmt(sessTimer)}</div>
+            <button className="btn-sm" style={{background:'rgba(0,0,0,0.08)',borderColor:'rgba(0,0,0,0.20)',color:'var(--text-primary)'}} onClick={finish} disabled={saving}>{saving?'جاري الحفظ…':'Finish Session'}</button>
           </div>
           <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>{done.map((ex,i)=><span key={i} className="tag" style={{background:mc(ex.muscle)+'22',color:mc(ex.muscle),border:`1px solid ${mc(ex.muscle)}44`,fontSize:'.65rem'}}>{ex.name}</span>)}</div>
         </div>
@@ -1572,19 +1571,19 @@ function UploadScreen({muscles,setMuscles,addMuscle,setAddMuscle,imgPreview,imgB
         <button className="btn-sm" onClick={()=>setAddMuscle(true)} style={{fontSize:'.7rem',padding:'4px 9px'}}>+ muscle</button>
       </div>
       {addMuscle&&(
-        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:14,padding:'12px',marginBottom:12}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:10}}>ADD MUSCLE / SUB-MUSCLE</div>
+        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'12px',marginBottom:12}}>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:10}}>ADD MUSCLE / SUB-MUSCLE</div>
           <AddMusclePanel muscles={muscles} setMuscles={setMuscles} onClose={()=>setAddMuscle(false)}/>
         </div>
       )}
       {/* Template exercises quick-add */}
       {templateQueue && templateQueue.length > 0 && (
-        <div style={{marginBottom:10,padding:'10px 14px',background:'rgba(203,162,59,0.06)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:12}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(203,162,59,0.6)',marginBottom:8}}>FROM YOUR TEMPLATE - TAP TO LOG</div>
+        <div style={{marginBottom:10,padding:'10px 14px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:12}}>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:8}}>FROM YOUR TEMPLATE - TAP TO LOG</div>
           <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
             {templateQueue.map((ex,i) => (
               <button key={i} onClick={()=>onQuickPick({name:ex.name,muscle:ex.muscle||muscles[0]||'Other'})}
-                style={{padding:'5px 12px',background:'rgba(203,162,59,0.1)',border:'1px solid rgba(203,162,59,0.25)',borderRadius:20,color:'#CBA23B',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem',fontWeight:700,display:'flex',alignItems:'center',gap:5}}>
+                style={{padding:'5px 12px',background:'rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.12)',borderRadius:20,color:'var(--text-primary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem',fontWeight:700,display:'flex',alignItems:'center',gap:5}}>
                 <span style={{width:6,height:6,borderRadius:'50%',background:mc(ex.muscle||'Other'),display:'inline-block',flexShrink:0}}/>
                 {ex.name}
               </button>
@@ -1607,18 +1606,18 @@ function UploadScreen({muscles,setMuscles,addMuscle,setAddMuscle,imgPreview,imgB
         return (
           <div style={{marginBottom:12}}>
             <button onClick={()=>setShowQuickPick(v=>!v)}
-              style={{width:'100%',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              style={{width:'100%',padding:'10px 14px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span>⚡ Recent Exercises ({toShow.length})</span>
-              <span style={{color:'rgba(255,255,255,0.25)'}}>{showQuickPick ? '▲' : '▼'}</span>
+              <span style={{color:'var(--text-secondary)'}}>{showQuickPick ? '▲' : '▼'}</span>
             </button>
             {showQuickPick && (
-              <div style={{marginTop:6,padding:'10px',background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10}}>
+              <div style={{marginTop:6,padding:'10px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10}}>
                 <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
                   {toShow.slice(0, 20).map((ex, i) => (
                     <button key={i} onClick={() => onQuickPick(ex)}
-                      style={{padding:'6px 13px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:20,color:'rgba(255,255,255,0.75)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem',fontWeight:600,display:'flex',alignItems:'center',gap:6,transition:'all .12s'}}
-                      onTouchStart={e=>{e.currentTarget.style.background='rgba(203,162,59,0.12)';e.currentTarget.style.color='#CBA23B'}}
-                      onTouchEnd={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)';e.currentTarget.style.color='rgba(255,255,255,0.75)'}}>
+                      style={{padding:'6px 13px',background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,color:'var(--text-primary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.78rem',fontWeight:600,display:'flex',alignItems:'center',gap:6,transition:'all .12s'}}
+                      onTouchStart={e=>{e.currentTarget.style.background='rgba(0,0,0,0.08)';e.currentTarget.style.color='var(--text-primary)'}}
+                      onTouchEnd={e=>{e.currentTarget.style.background='rgba(0,0,0,0.05)';e.currentTarget.style.color='var(--text-primary)'}}>
                       <span style={{width:7,height:7,borderRadius:'50%',background:mc(ex.muscle||'Other'),flexShrink:0,display:'inline-block'}}/>
                       {ex.name}
                     </button>
@@ -1633,7 +1632,7 @@ function UploadScreen({muscles,setMuscles,addMuscle,setAddMuscle,imgPreview,imgB
       <div onClick={()=>{fileRef.current.removeAttribute('capture');fileRef.current.click()}}
         onDragOver={e=>{e.preventDefault();setDrag(true)}} onDragLeave={()=>setDrag(false)}
         onDrop={e=>{e.preventDefault();setDrag(false);loadImg(e.dataTransfer.files[0])}}
-        style={{border:`2px dashed ${drag?'#CBA23B':imgPreview?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.08)'}`,borderRadius:16,overflow:'hidden',marginBottom:10,cursor:'pointer',minHeight:imgPreview?0:150,display:'flex',alignItems:'center',justifyContent:'center',background:drag?'rgba(203,162,59,0.04)':'rgba(0,0,0,0.2)',transition:'all .2s'}}>
+        style={{border:`2px dashed ${drag?'#111111':imgPreview?'rgba(0,0,0,0.10)':'rgba(0,0,0,0.08)'}`,borderRadius:16,overflow:'hidden',marginBottom:10,cursor:'pointer',minHeight:imgPreview?0:150,display:'flex',alignItems:'center',justifyContent:'center',background:drag?'rgba(0,0,0,0.06)':'rgba(0,0,0,0.04)',transition:'all .2s'}}>
         {imgPreview?(
           <img src={imgPreview} alt="" style={{width:'100%',maxHeight:220,objectFit:'cover',display:'block'}}/>
         ):(
@@ -1649,10 +1648,10 @@ function UploadScreen({muscles,setMuscles,addMuscle,setAddMuscle,imgPreview,imgB
         <button className="btn-ghost" style={{flex:1,padding:'11px'}} onClick={()=>{fileRef.current.setAttribute('capture','environment');fileRef.current.click()}}>📷 Camera</button>
       </div>
       <div style={{display:'flex',alignItems:'center',gap:10,margin:'4px 0 10px'}}>
-        <div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/><div style={{color:'var(--text-muted)',fontSize:'.72rem',fontWeight:600}}>أو اكتب اسم التمرين</div><div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/>
+        <div style={{flex:1,height:1,background:'rgba(0,0,0,0.08)'}}/><div style={{color:'var(--text-secondary)',fontSize:'.72rem',fontWeight:600}}>أو اكتب اسم التمرين</div><div style={{flex:1,height:1,background:'rgba(0,0,0,0.08)'}}/>
       </div>
       <input type="text" placeholder="اسم التمرين — مثال: بنش برس، سكوات…" value={textInput} onChange={e=>setTextInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&analyze()} style={{marginBottom:textInput&&imgPreview?6:12}}/>
-      {textInput&&imgPreview&&<div style={{color:'#CBA23B',fontSize:'.72rem',marginBottom:10,fontWeight:600}}>✓ AI will cross-check photo + text</div>}
+      {textInput&&imgPreview&&<div style={{color:'var(--text-primary)',fontSize:'.72rem',marginBottom:10,fontWeight:600}}>✓ AI will cross-check photo + text</div>}
       {err&&<div style={{color:'#fca5a5',fontSize:'.82rem',marginBottom:10,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
       <button className="btn btn-y" onClick={()=>analyze()} disabled={!imgB64&&!textInput.trim()}>حلّل واكشف التمرين 🧠</button>
     </div>
@@ -1671,13 +1670,13 @@ function AnalyzingScreen({ onCancel }) {
   }, [elapsed])
   return (
     <div style={{minHeight:'60vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,textAlign:'center'}}>
-      <div style={{width:56,height:56,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite',marginBottom:24}}/>
-      <div className="bb" style={{fontSize:'1.5rem',letterSpacing:3,color:'#CBA23B',marginBottom:8}}>جاري التحليل...</div>
+      <div style={{width:56,height:56,border:'3px solid rgba(0,0,0,0.10)',borderTopColor:'#111111',borderRadius:'50%',animation:'spin .8s linear infinite',marginBottom:24}}/>
+      <div className="bb" style={{fontSize:'1.5rem',letterSpacing:3,color:'var(--text-primary)',marginBottom:8}}>جاري التحليل...</div>
       <div style={{color:'var(--text-muted)',fontSize:'.85rem',marginBottom:6}}>نحلل صورتك بدقة…</div>
-      <div style={{color:'rgba(255,255,255,0.2)',fontSize:'.75rem',marginBottom:24}}>{elapsed}s</div>
+      <div style={{color:'var(--text-secondary)',fontSize:'.75rem',marginBottom:24}}>{elapsed}s</div>
       {elapsed > 8 && (
         <button onClick={onCancel}
-          style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:10,padding:'10px 20px',color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem'}}>
+          style={{background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:10,padding:'10px 20px',color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem'}}>
           Cancel & go back
         </button>
       )}
@@ -1691,9 +1690,9 @@ function ConfirmScreen({pex,cidx,total,confirm,skip,reanalyze,textInput,setTextI
       <div style={{color:'var(--text-muted)',fontSize:'.72rem',fontWeight:700,letterSpacing:1,marginBottom:12}}>EXERCISE {cidx+1} OF {total}</div>
       <div className="card" style={{marginBottom:12}}>
         {pex.rawText&&<div style={{color:'var(--text-muted)',fontSize:'.75rem',marginBottom:10}}>Seen in image: <span style={{fontStyle:'italic',color:'var(--text-secondary)'}}>{pex.rawText}</span></div>}
-        {pex.isMachine&&<div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(203,162,59,0.08)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:8,padding:'5px 11px',marginBottom:10,fontSize:'.72rem',color:'#CBA23B',fontWeight:600}}>🏋️ Machine detected</div>}
+        {pex.isMachine&&<div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:8,padding:'5px 11px',marginBottom:10,fontSize:'.72rem',color:'var(--text-primary)',fontWeight:600}}>🏋️ Machine detected</div>}
         {pex.confidence==='low'&&<div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(234,179,8,0.08)',border:'1px solid rgba(234,179,8,0.2)',borderRadius:8,padding:'5px 11px',marginBottom:10,fontSize:'.72rem',color:'#eab308',fontWeight:600}}>⚠ Low confidence</div>}
-        <div style={{height:1,background:'rgba(255,255,255,0.06)',marginBottom:12}}/>
+        <div style={{height:1,background:'rgba(0,0,0,0.08)',marginBottom:12}}/>
         <div style={{marginBottom:10}}>
           <span className="tag" style={{background:mc(pex.muscle)+'22',color:mc(pex.muscle),border:`1px solid ${mc(pex.muscle)}44`,display:'inline-block',marginRight:5}}>{pex.muscle}</span>
           {pex.primaryMuscle&&<span style={{fontSize:'.7rem',color:mc(pex.muscle),fontWeight:700,opacity:.8}}>← {pex.primaryMuscle}</span>}
@@ -1702,12 +1701,12 @@ function ConfirmScreen({pex,cidx,total,confirm,skip,reanalyze,textInput,setTextI
         {(pex.secondaryMuscles?.length>0||pex.otherMuscles?.length>0)&&(
           <div style={{marginBottom:8}}>
             {pex.secondaryMuscles?.length>0&&(
-              <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.45)',marginBottom:3}}>
-                <span style={{fontWeight:700,color:'rgba(255,255,255,0.5)'}}>Secondary:</span> {pex.secondaryMuscles.join(', ')}
+              <div style={{fontSize:'.72rem',color:'var(--text-secondary)',marginBottom:3}}>
+                <span style={{fontWeight:700,color:'var(--text-secondary)'}}>Secondary:</span> {pex.secondaryMuscles.join(', ')}
               </div>
             )}
             {pex.otherMuscles?.length>0&&(
-              <div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)'}}>
+              <div style={{fontSize:'.7rem',color:'var(--text-secondary)'}}>
                 <span style={{fontWeight:700}}>Also works:</span> {pex.otherMuscles.join(', ')}
               </div>
             )}
@@ -1731,7 +1730,7 @@ function ConfirmScreen({pex,cidx,total,confirm,skip,reanalyze,textInput,setTextI
         <div style={{display:'flex',gap:8}}>
           <input type="text" placeholder="اكتب اسم التمرين الصح…" value={textInput} onChange={e=>setTextInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&analyze(imgB64?'both':'text')}/>
           <button onClick={()=>analyze(imgB64?'both':'text')} disabled={!textInput.trim()}
-            style={{background:'#CBA23B',border:'none',borderRadius:8,padding:'0 14px',fontSize:'.82rem',cursor:'pointer',color:'#0C0B0D',fontWeight:800,whiteSpace:'nowrap',opacity:textInput.trim()?1:.4}}>تأكيد ✓</button>
+            style={{background:'#111111',border:'none',borderRadius:8,padding:'0 14px',fontSize:'.82rem',cursor:'pointer',color:'#FFFFFF',fontWeight:800,whiteSpace:'nowrap',opacity:textInput.trim()?1:.4}}>تأكيد ✓</button>
         </div>
       </div>
     </div>
@@ -1740,11 +1739,11 @@ function ConfirmScreen({pex,cidx,total,confirm,skip,reanalyze,textInput,setTextI
 
 function LoggingHeader({sessTimer,exTimer,curName}) {
   return (
-    <div style={{background:'rgba(9,9,11,0.9)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'10px 16px',display:'flex',gap:0,position:'sticky',top:0,zIndex:50,backdropFilter:'blur(20px)'}}>
-      {[['جلستك',fmt(sessTimer),'#CBA23B'],['التمرين',fmt(exTimer),'rgba(255,255,255,0.5)'],['الآن',curName||'-','rgba(255,255,255,0.35)']].map(([l,v,c])=>(
+    <div style={{background:'rgba(244,244,245,0.9)',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'10px 16px',display:'flex',gap:0,position:'sticky',top:0,zIndex:50,backdropFilter:'blur(20px)'}}>
+      {[['جلستك',fmt(sessTimer),'var(--text-primary)'],['التمرين',fmt(exTimer),'var(--text-secondary)'],['الآن',curName||'-','var(--text-secondary)']].map(([l,v,c])=>(
         <div key={l} style={{flex:1,textAlign:'center'}}>
           <div className="bb" style={{fontSize:'1.1rem',color:c,lineHeight:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',padding:'0 4px'}}>{v}</div>
-          <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.25)',letterSpacing:1,marginTop:2}}>{l}</div>
+          <div style={{fontSize:'.55rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:2}}>{l}</div>
         </div>
       ))}
     </div>
@@ -1781,10 +1780,10 @@ function LoggingScreen({cur,curSets,sessTimer,exTimer,rest,restOn,setRest,setRes
         <div style={{marginBottom:14}}>
           {curSets.map((s,i)=>(
             <div key={i} className="setrow">
-              <span className="bb" style={{color:'#CBA23B',fontSize:'.82rem',minWidth:46}}>SET {i+1}</span>
+              <span className="bb" style={{color:'var(--text-primary)',fontSize:'.82rem',minWidth:46}}>SET {i+1}</span>
               <span style={{fontSize:'.9rem',flex:1,color:'var(--text-primary)'}}>{s.weight} kg × {s.reps} reps</span>
               <span style={{color:'var(--text-muted)',fontSize:'.68rem',display:'flex',flexDirection:'column',alignItems:'flex-end',gap:1}}>
-                {s.duration>0 && <span style={{color:'#CBA23B',opacity:.7}}>rep: {fmt(s.duration)}</span>}
+                {s.duration>0 && <span style={{color:'var(--text-primary)',opacity:.7}}>rep: {fmt(s.duration)}</span>}
                 {s.total_duration>0 && <span>total: {fmt(s.total_duration)}</span>}
               </span>
               <button className="btn-icon" style={{width:28,height:28,borderRadius:8,fontSize:'.78rem'}} onClick={()=>setEditing({idx:i,w:s.weight,r:s.reps})}>✏️</button>
@@ -1796,13 +1795,13 @@ function LoggingScreen({cur,curSets,sessTimer,exTimer,rest,restOn,setRest,setRes
 
       {/* Rest timer */}
       {restOn&&(
-        <div style={{background:'rgba(203,162,59,0.06)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:14,padding:'12px 14px',marginBottom:12}}>
+        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'12px 14px',marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-            <span className="bb" style={{fontSize:'2rem',color:'#CBA23B',minWidth:54,lineHeight:1}}>{rest}s</span>
+            <span className="bb" style={{fontSize:'2rem',color:'var(--text-primary)',minWidth:54,lineHeight:1}}>{rest}s</span>
             <div style={{flex:1}}>
-              <div style={{fontSize:'.65rem',color:'rgba(255,255,255,0.4)',fontWeight:700,letterSpacing:1,marginBottom:5}}>وقت الراحة</div>
-              <div style={{height:5,background:'rgba(255,255,255,0.08)',borderRadius:3}}>
-                <div style={{height:'100%',background:'#CBA23B',width:Math.round((rest/restDuration)*100)+'%',transition:'width 1s linear',borderRadius:3}}/>
+              <div style={{fontSize:'.65rem',color:'var(--text-secondary)',fontWeight:700,letterSpacing:1,marginBottom:5}}>وقت الراحة</div>
+              <div style={{height:5,background:'rgba(0,0,0,0.08)',borderRadius:3}}>
+                <div style={{height:'100%',background:'#111111',width:Math.round((rest/restDuration)*100)+'%',transition:'width 1s linear',borderRadius:3}}/>
               </div>
             </div>
             <button className="btn-icon" onClick={()=>{clearInterval(restTick.current);setRestOn(false)}}>✕</button>
@@ -1810,7 +1809,7 @@ function LoggingScreen({cur,curSets,sessTimer,exTimer,rest,restOn,setRest,setRes
           <div style={{display:'flex',gap:5}}>
             {[60,90,120,180].map(d=>(
               <button key={d} onClick={()=>{setRestDuration(d);startRest(d)}}
-                style={{flex:1,padding:'5px 0',background:restDuration===d?'rgba(203,162,59,0.15)':'rgba(255,255,255,0.04)',border:'1px solid '+(restDuration===d?'rgba(203,162,59,0.35)':'rgba(255,255,255,0.08)'),borderRadius:8,color:restDuration===d?'#CBA23B':'rgba(255,255,255,0.35)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.72rem',fontWeight:700}}>
+                style={{flex:1,padding:'5px 0',background:restDuration===d?'rgba(0,0,0,0.10)':'rgba(0,0,0,0.04)',border:'1px solid '+(restDuration===d?'rgba(0,0,0,0.20)':'rgba(0,0,0,0.08)'),borderRadius:8,color:restDuration===d?'var(--text-primary)':'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.72rem',fontWeight:700}}>
                 {d}s
               </button>
             ))}
@@ -1832,7 +1831,7 @@ function LoggingScreen({cur,curSets,sessTimer,exTimer,rest,restOn,setRest,setRes
       {/* Cancel options */}
       <div style={{display:'flex',gap:8,marginTop:8}}>
         <button onClick={cancelExercise}
-          style={{flex:1,padding:'12px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.15)',borderRadius:10,color:'rgba(255,255,255,0.7)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.82rem'}}>
+          style={{flex:1,padding:'12px',background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:10,color:'var(--text-primary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.82rem'}}>
           ↩ Skip Exercise
         </button>
         <button onClick={()=>setShowCancelConfirm(true)}
@@ -1848,7 +1847,7 @@ function BetweenScreen({done,sessTimer,muscles,setMuscles,addMuscle,setAddMuscle
   return (
     <div style={{padding:'16px 16px 0'}} className="anim-up">
       <div style={{marginBottom:16}}>
-        <div className="bb" style={{fontSize:'1.4rem',color:'#CBA23B',lineHeight:1}}>خلصت؟ يلا على اللي بعده. 💪</div>
+        <div className="bb" style={{fontSize:'1.4rem',color:'var(--text-primary)',lineHeight:1}}>خلصت؟ يلا على اللي بعده. 💪</div>
         <div style={{color:'var(--text-muted)',fontSize:'.82rem',marginTop:4}}>{done.length} تمرين · {fmt(sessTimer)}</div>
         <div style={{display:'flex',gap:4,flexWrap:'wrap',marginTop:8}}>
           {done.map((ex,i)=><span key={i} className="tag" style={{background:mc(ex.muscle)+'22',color:mc(ex.muscle),border:`1px solid ${mc(ex.muscle)}44`,fontSize:'.65rem'}}>{ex.name}</span>)}
@@ -1882,7 +1881,7 @@ function BetweenScreen({done,sessTimer,muscles,setMuscles,addMuscle,setAddMuscle
       <button className="btn-ghost btn" onClick={finish} disabled={saving}>{saving?'جاري الحفظ…':'أنهِ التمرين ✓'}</button>
       {onSaveTemplate && (
         <button onClick={onSaveTemplate}
-          style={{width:'100%',padding:'10px',background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.15)',borderRadius:10,color:'rgba(203,162,59,0.6)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.78rem',marginTop:4}}>
+          style={{width:'100%',padding:'10px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,color:'var(--text-secondary)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.78rem',marginTop:4}}>
           ⭐ Save as Template
         </button>
       )}
@@ -1898,13 +1897,13 @@ function DoneScreen({sessionReport,reportError,onRetry,onDashboard,onRestart}) {
     <div style={{padding:'24px 16px 0'}} className="anim-up">
       <div style={{textAlign:'center',marginBottom:24}}>
         <div style={{fontSize:'3rem',marginBottom:10}}>🔥</div>
-        <div className="bb" style={{fontSize:'2rem',color:'#CBA23B',lineHeight:1}}>إنجاز جديد 🔥</div>
+        <div className="bb" style={{fontSize:'2rem',color:'var(--text-primary)',lineHeight:1}}>إنجاز جديد 🔥</div>
         <div className="bb" style={{fontSize:'2.5rem',lineHeight:1,marginBottom:8}}>خلصت؟ يلا على اللي بعده. 💪</div>
       </div>
       {sessionReport?(
         <div className="anim-in">
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:12}}>
-            {[['التقييم',sessionReport.overall_rating+'/10','#CBA23B'],['الشدة',sessionReport.intensity_score+'/10','#ef4444'],['الحجم التدريبي',sessionReport.volume_score+'/10','#3b82f6'],['التوازن',sessionReport.balance_score+'/10','#22c55e']].map(([l,v,c])=>(
+            {[['التقييم',sessionReport.overall_rating+'/10','var(--text-primary)'],['الشدة',sessionReport.intensity_score+'/10','#ef4444'],['الحجم التدريبي',sessionReport.volume_score+'/10','#3b82f6'],['التوازن',sessionReport.balance_score+'/10','#22c55e']].map(([l,v,c])=>(
               <div key={l} className="stat-card"><div className="bb" style={{fontSize:'1.1rem',color:c,lineHeight:1}}>{v}</div><div style={{fontSize:'.55rem',color:'var(--text-muted)',letterSpacing:1,marginTop:3}}>{l.toUpperCase()}</div></div>
             ))}
           </div>
@@ -1918,7 +1917,7 @@ function DoneScreen({sessionReport,reportError,onRetry,onDashboard,onRestart}) {
                     <span style={{fontSize:'.82rem',color:'var(--text-primary)',fontWeight:600}}>{m}</span>
                     <span style={{fontSize:'.75rem',color:d.coverage_score>=7?'#4ade80':d.coverage_score>=4?'#eab308':'#ef4444',fontWeight:700}}>{d.coverage_score}/10</span>
                   </div>
-                  <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:2}}><div style={{height:'100%',width:`${d.coverage_score*10}%`,background:d.coverage_score>=7?'#4ade80':d.coverage_score>=4?'#eab308':'#ef4444',borderRadius:2,transition:'width .8s ease'}}/></div>
+                  <div style={{height:4,background:'rgba(0,0,0,0.08)',borderRadius:2}}><div style={{height:'100%',width:`${d.coverage_score*10}%`,background:d.coverage_score>=7?'#4ade80':d.coverage_score>=4?'#eab308':'#ef4444',borderRadius:2,transition:'width .8s ease'}}/></div>
                   {d.note&&<div style={{fontSize:'.7rem',color:'var(--text-muted)',marginTop:2}}>{d.note}</div>}
                 </div>
               ))}
@@ -1948,15 +1947,15 @@ function DoneScreen({sessionReport,reportError,onRetry,onDashboard,onRestart}) {
             <div style={{fontSize:'.78rem',color:'var(--text-muted)',lineHeight:1.4}}>{reportError}</div>
           </div>
           {onRetry && (
-            <button onClick={onRetry} style={{padding:'10px 24px',background:'rgba(203,162,59,0.1)',border:'1px solid rgba(203,162,59,0.3)',borderRadius:10,color:'#CBA23B',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',cursor:'pointer'}}>
+            <button onClick={onRetry} style={{padding:'10px 24px',background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:10,color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',cursor:'pointer'}}>
               ↺ Retry Analysis
             </button>
           )}
         </div>
       ):(
         <div style={{textAlign:'center',padding:'16px 0 20px'}}>
-          <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,padding:'10px 18px',color:'var(--text-muted)',fontSize:'.85rem'}}>
-            <div style={{width:14,height:14,border:'2px solid rgba(203,162,59,0.3)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
+          <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,padding:'10px 18px',color:'var(--text-secondary)',fontSize:'.85rem'}}>
+            <div style={{width:14,height:14,border:'2px solid rgba(0,0,0,0.10)',borderTopColor:'#111111',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
             Analyzing your session…
           </div>
         </div>
@@ -1969,8 +1968,8 @@ function DoneScreen({sessionReport,reportError,onRetry,onDashboard,onRestart}) {
 
 function Splash() {
   return (
-    <div style={{minHeight:'100vh',background:'#09090B',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{width:36,height:36,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
+    <div style={{minHeight:'100vh',background:'var(--bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{width:36,height:36,border:'3px solid rgba(0,0,0,0.10)',borderTopColor:'#111111',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
     </div>
   )
 }
