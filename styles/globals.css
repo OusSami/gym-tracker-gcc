@@ -19,42 +19,68 @@ body {
   text-align: right;
 }
 
-/* ── Design tokens ── */
+/* ── Design tokens — v3 Blush + Beige ── */
 :root {
-  /* legacy gold/onyx accents — kept for inline-style back-compat */
-  --accent:        #CBA23B;
-  --accent-dim:    rgba(203,162,59,0.13);
-  --accent-glow:   rgba(203,162,59,0.07);
-  --accent-gold2:  #E8C96A;
-  --surface-hover: rgba(255,255,255,0.06);
-  --border:        rgba(203,162,59,0.13);
-  --border-accent: rgba(203,162,59,0.45);
-  --text-muted:    #A1A1AA;
-  --r-sm: 10px;
-  --r-md: 16px;
-  --r-lg: 20px;
-  --r-xl: 28px;
-  --shadow-glow:   0 0 40px rgba(203,162,59,0.10);
-  --onyx-1: #09090B;
-  --onyx-2: #111009;
-  --onyx-3: #1A1710;
-  --onyx-4: #251F14;
+  /* Surfaces */
+  --surface:        #F7F1EC;   /* page bg, warm beige */
+  --card:           #FFFFFF;   /* cards */
+  --surface-inset:  #F7E9DF;   /* inset fills, soft cream */
+  --surface-hover:  rgba(216,155,122,0.08);
 
-  /* ── v2 design tokens ── */
-  --surface:        #F4F4F5;
-  --card:           #FFFFFF;
-  --text-primary:   #111111;
-  --text-secondary: #71717A;
-  --accent-protein: #EC4899;
-  --accent-lipid:   #22C55E;
-  --accent-carb:    #3B82F6;
+  /* Text */
+  --text-primary:   #3D2A1F;   /* warm near-black */
+  --text-secondary: #8A6A4F;   /* muted taupe */
+  --text-muted:     #B09070;   /* lighter taupe */
+
+  /* Accents — terracotta family */
+  --accent:         #D89B7A;   /* primary terracotta */
+  --accent-soft:    #ECCDBA;   /* light fill */
+  --accent-faint:   #F7E9DF;   /* faintest fill */
+  --accent-dim:     rgba(216,155,122,0.15);
+  --accent-glow:    rgba(216,155,122,0.09);
+
+  /* Buttons */
+  --btn-primary-bg: #1A1A1A;
+  --btn-primary-fg: #FFFFFF;
+
+  /* Content accents */
+  --macro-protein:  #3B82F6;
+  --macro-carb:     #F59E0B;
+  --macro-fat:      #8B5CF6;
+
+  /* Spiritual sections — reverent treatment */
+  --spiritual-bg:   #F3E7D4;
+  --spiritual-fg:   #8A5A2B;
+
+  /* Challenge accent */
+  --challenge:      #7F77DD;
+
+  /* Borders */
+  --border:         rgba(216,155,122,0.20);
+  --border-subtle:  rgba(61,42,31,0.08);
+  --border-accent:  rgba(216,155,122,0.38);
+
+  /* Shadows — warm-tinted, soft */
+  --shadow-card:    0 2px 14px rgba(168,120,90,0.10);
+  --shadow-glow:    0 0 40px rgba(216,155,122,0.12);
+
+  /* Radii */
   --radius-sm:      8px;
   --radius-md:      16px;
   --radius-lg:      22px;
   --radius-pill:    9999px;
-  --shadow-card:    0 2px 16px rgba(0,0,0,0.07);
+  --r-sm: 8px;  --r-md: 16px;  --r-lg: 22px;  --r-xl: 28px;
+
+  /* Spacing */
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
   --space-4: 16px; --space-6: 24px; --space-8: 32px;
+
+  /* Legacy — kept for back-compat with pages using inline styles */
+  --accent-gold2:  #E8C96A;
+  --accent-protein: #3B82F6;
+  --accent-carb:    #F59E0B;
+  --accent-lipid:   #8B5CF6;
+  --onyx-1: #1A1A1A; --onyx-2: #111009; --onyx-3: #1A1710; --onyx-4: #251F14;
 }
 
 /* ── Animations ── */
@@ -129,14 +155,14 @@ body {
 
 /* secondary — white outlined pill */
 .btn-ghost {
-  background: var(--card); border: 1.5px solid #D4D4D8;
+  background: var(--card); border: 1.5px solid var(--accent-soft);
   color: var(--text-primary);
   font-family:'Tajawal','DM Sans',sans-serif;
   font-weight:500; font-size:.95rem; letter-spacing:0;
   padding-block: 13px; padding-inline: 20px;
   border-radius: var(--radius-pill);
 }
-.btn-ghost:hover { border-color:#A1A1AA; color:#111111; background:var(--card); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--text-primary); background:var(--accent-faint); }
 
 .btn-sm {
   background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.10);
@@ -175,11 +201,11 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
 input[type=date]::-webkit-calendar-picker-indicator { filter: none; cursor: pointer; }
 input:focus, select:focus, textarea:focus {
-  border-color: rgba(0,0,0,0.30);
-  background: rgba(0,0,0,0.03);
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.07);
+  border-color: var(--accent);
+  background: rgba(247,241,236,0.60);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
-::placeholder { color: #A1A1AA; }
+::placeholder { color: var(--text-muted); }
 select { background: rgba(0,0,0,0.04); cursor: pointer; }
 
 /* ── Tags / pills ── */
@@ -193,13 +219,13 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
 /* ── Set rows — RTL: accent border on inline-end ── */
 .setrow {
   display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px; background: rgba(0,0,0,0.03);
+  padding: 10px 14px; background: var(--surface-inset);
   border-radius: 10px;
-  border-inline-end: 2px solid rgba(0,0,0,0.18);
+  border-inline-end: 2px solid var(--accent);
   border-inline-start: none;
   margin-bottom: 6px; transition: background .15s;
 }
-.setrow:hover { background: rgba(0,0,0,0.06); }
+.setrow:hover { background: var(--accent-faint); }
 
 /* ── Muscle cards ── */
 .mcard {
@@ -310,7 +336,7 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
 
 /* ── Shimmer loading ── */
 .shimmer {
-  background: linear-gradient(270deg, rgba(0,0,0,.03) 25%, rgba(0,0,0,.07) 50%, rgba(0,0,0,.03) 75%);
+  background: linear-gradient(270deg, rgba(168,120,90,.04) 25%, rgba(168,120,90,.09) 50%, rgba(168,120,90,.04) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--radius-sm);
@@ -346,15 +372,15 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
 /* ── Accent glow dot ── */
 .glow-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(0,0,0,0.50);
-  box-shadow: none;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-soft);
   animation: pulse 2s ease-in-out infinite;
 }
 
 /* ── Image placeholder ── */
 /* IMG-PLACEHOLDER: base class — replace background/child with real <img> later */
 .img-placeholder {
-  background: #E8E8E8;
+  background: var(--accent-soft);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -370,7 +396,7 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.18);
+  color: rgba(61,42,31,0.22);
   font-family: 'DM Sans', 'Space Grotesk', sans-serif;
 }
 
@@ -447,6 +473,68 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
   left: auto;
   right: auto;
 }
+
+/* ── Spiritual card — reverent, warm cream ── */
+.spiritual-card {
+  background: var(--spiritual-bg);
+  border: 1px solid rgba(138,90,43,0.18);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+}
+.spiritual-card .spiritual-text {
+  font-family: 'Scheherazade New', 'Amiri', 'Traditional Arabic', serif;
+  font-size: clamp(1.1rem,4vw,1.45rem);
+  font-weight: 900;
+  color: var(--spiritual-fg);
+  line-height: 1.65;
+  direction: rtl;
+}
+.spiritual-card .spiritual-sub {
+  font-family: 'Tajawal', sans-serif;
+  font-size: .82rem;
+  color: rgba(138,90,43,0.75);
+  line-height: 1.5;
+  margin-block-start: 8px;
+}
+
+/* ── Challenge card ── */
+.challenge-card {
+  background: rgba(127,119,221,0.06);
+  border: 1px solid rgba(127,119,221,0.18);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.challenge-card .challenge-icon {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  background: rgba(127,119,221,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0;
+}
+.challenge-card .challenge-label {
+  font-family: 'Tajawal', sans-serif;
+  font-size: .68rem; font-weight: 700;
+  color: rgba(127,119,221,0.90);
+  margin-block-end: 4px;
+  letter-spacing: .5px;
+}
+.challenge-card .challenge-text {
+  font-family: 'Tajawal', sans-serif;
+  font-size: .95rem; font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Nav/tab bar — warm surface ── */
+.nav-bar {
+  background: rgba(247,241,236,0.96) !important;
+  border-block-end-color: rgba(216,155,122,0.18) !important;
+}
+.tab-item.active { color: var(--text-primary); }
+.tab-item { color: var(--text-muted); }
 
 /* ── Modal overlay ── */
 .modal-overlay {
