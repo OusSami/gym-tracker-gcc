@@ -112,7 +112,7 @@ function TimedExercise({exercise, index, total, label, color, onDone, sex}) {
         {/* Timer ring */}
         <div style={{position:'relative',width:84,height:84,margin:'0 auto 14px'}}>
           <svg width="84" height="84" viewBox="0 0 84 84" style={{transform:'rotate(-90deg)'}}>
-            <circle cx="42" cy="42" r="36" fill="none" stroke="rgba(0,0,0,0.10)" strokeWidth="7"/>
+            <circle cx="42" cy="42" r="36" fill="none" stroke="var(--accent-soft)" strokeWidth="7"/>
             <circle cx="42" cy="42" r="36" fill="none" stroke={c2} strokeWidth="7"
               strokeDasharray={`${pct/100*2*Math.PI*36} ${2*Math.PI*36}`} strokeLinecap="round"
               style={{transition:'stroke-dasharray .9s linear'}}/>
@@ -155,7 +155,7 @@ function RestTimer({seconds, onDone}) {
       <div style={{fontSize:'.65rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:2,marginBottom:12,textTransform:'uppercase'}}>⏱️ راحة بين المجموعات</div>
       <div style={{position:'relative',width:100,height:100,margin:'0 auto 14px'}}>
         <svg width="100" height="100" viewBox="0 0 100 100" style={{transform:'rotate(-90deg)'}}>
-          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(0,0,0,0.10)" strokeWidth="8"/>
+          <circle cx="50" cy="50" r="44" fill="none" stroke="var(--accent-soft)" strokeWidth="8"/>
           <circle cx="50" cy="50" r="44" fill="none" stroke={G} strokeWidth="8"
             strokeDasharray={`${pct/100*2*Math.PI*44} ${2*Math.PI*44}`} strokeLinecap="round"
             style={{transition:'stroke-dasharray .9s linear'}}/>
@@ -394,9 +394,9 @@ function WorkoutTracker({workout, sex, onComplete, profile, userId, programId, d
   if(phase==='intro') return (
     <div>
       {/* Islamic phrase */}
-      <div style={{background:'rgba(0,0,0,0.03)',border:`1px solid ${G}20`,borderRadius:20,padding:'28px 20px',marginBottom:16,textAlign:'center'}}>
-        <div style={{fontFamily:"'Scheherazade New','Amiri',serif",fontSize:'clamp(1.3rem,4.5vw,1.8rem)',fontWeight:700,color:G,lineHeight:1.7,marginBottom:10,direction:'rtl'}}>{phrase.ar}</div>
-        <div style={{fontSize:'.82rem',color:'var(--text-secondary)',fontFamily:F}}>{phrase.sub}</div>
+      <div className="spiritual-card" style={{marginBottom:16}}>
+        <div className="spiritual-text">{phrase.ar}</div>
+        <div className="spiritual-sub">{phrase.sub}</div>
       </div>
 
       {/* Stats strip */}
@@ -941,17 +941,17 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
       <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
 
       {/* ── Sticky top bar ── */}
-      <div style={{background:'rgba(255,255,255,0.92)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBlockEnd:'1px solid rgba(0,0,0,0.07)',padding:'12px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
+      <div style={{background:'rgba(247,241,236,0.96)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBlockEnd:'1px solid var(--border-subtle)',padding:'12px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
         <div>
           <div style={{fontWeight:800,fontSize:'.88rem',color:'var(--text-primary)'}}>{program.roadmap?.program_name||program.package_name}</div>
           <div style={{fontSize:'.62rem',color:'var(--text-secondary)'}}>اليوم {currentDay} من {totalDays}</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:8}}>
-          {generating&&<div style={{width:12,height:12,border:'2px solid rgba(0,0,0,0.08)',borderTopColor:G,borderRadius:'50%',animation:'spin .8s linear infinite'}}/>}
-          <div style={{height:3,width:54,background:'rgba(0,0,0,0.08)',borderRadius:10,overflow:'hidden'}}>
-            <div style={{height:'100%',width:pct+'%',background:'#111111',borderRadius:10,transition:'width .6s'}}/>
+          {generating&&<div style={{width:12,height:12,border:'2px solid var(--border-subtle)',borderTopColor:'var(--accent)',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>}
+          <div style={{height:3,width:54,background:'var(--accent-soft)',borderRadius:10,overflow:'hidden'}}>
+            <div style={{height:'100%',width:pct+'%',background:'var(--accent)',borderRadius:10,transition:'width .6s'}}/>
           </div>
-          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.88rem',color:G}}>{pct}%</div>
+          <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'.88rem',color:'var(--accent)'}}>{pct}%</div>
         </div>
       </div>
 
@@ -964,9 +964,9 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
           <div style={{
             background:isRest
               ?'linear-gradient(135deg,rgba(59,130,246,0.08) 0%,rgba(59,130,246,0.02) 100%)'
-              :'linear-gradient(135deg,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.02) 55%,transparent 100%)',
-            border:`1px solid ${isRest?'rgba(59,130,246,0.25)':'rgba(0,0,0,0.10)'}`,
-            borderRadius:22,padding:'20px 18px',marginBottom:10,position:'relative',overflow:'hidden',
+              :'linear-gradient(135deg,var(--accent-faint) 0%,var(--card) 55%,var(--card) 100%)',
+            border:`1px solid ${isRest?'rgba(59,130,246,0.25)':'var(--border-subtle)'}`,
+            borderRadius:22,padding:'20px 18px',marginBottom:10,position:'relative',overflow:'hidden',boxShadow:'var(--shadow-card)',
           }}>
             {/* ambient glow */}
             <div style={{position:'absolute',top:-60,insetInlineEnd:-20,width:200,height:200,background:isRest?'rgba(59,130,246,0.04)':'rgba(0,0,0,0.03)',borderRadius:'50%',filter:'blur(55px)',pointerEvents:'none'}}/>
@@ -988,8 +988,8 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
             {!isRest&&(
               <div style={{display:'flex',gap:6,marginBottom:11,overflowX:'auto',scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}}>
                 {[[todayTarget.session_type||'لياقة','النوع'],[(todayTarget.intensity_target||5)+'/10','الشدة'],[(todayTarget.estimated_duration_min||30)+' د','المدة'],[(todayTarget.sets_target||10)+' مج','الحجم']].map(([v,l])=>(
-                  <div key={l} style={{background:'rgba(0,0,0,0.05)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,padding:'7px 11px',textAlign:'center',flexShrink:0}}>
-                    <div style={{fontFamily:'monospace',fontWeight:800,fontSize:'.8rem',color:G,lineHeight:1}}>{v}</div>
+                  <div key={l} style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:10,padding:'7px 11px',textAlign:'center',flexShrink:0}}>
+                    <div style={{fontFamily:'monospace',fontWeight:800,fontSize:'.8rem',color:'var(--accent)',lineHeight:1}}>{v}</div>
                     <div style={{fontSize:'.55rem',color:'var(--text-secondary)',marginTop:3}}>{l}</div>
                   </div>
                 ))}
@@ -1037,7 +1037,7 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
             {/* Workout card */}
             <div
               onClick={()=>workout&&!isRest&&!checkinDone&&setView('workout_detail')}
-              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'15px 13px',cursor:workout&&!isRest&&!checkinDone?'pointer':'default',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden'}}
+              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'15px 13px',cursor:workout&&!isRest&&!checkinDone?'pointer':'default',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden',boxShadow:'var(--shadow-card)'}}
               onTouchStart={e=>{if(workout&&!isRest&&!checkinDone)e.currentTarget.style.transform='scale(.97)'}}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{position:'absolute',bottom:-18,insetInlineStart:-18,width:70,height:70,background:'rgba(0,0,0,0.03)',borderRadius:'50%'}}/>
@@ -1056,20 +1056,20 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
               ):workout?.exercises?(
                 <>
                   <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:2}}>
-                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.55rem',color:G,lineHeight:1}}>{workout.exercises.length}</div>
+                    <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.55rem',color:'var(--accent)',lineHeight:1}}>{workout.exercises.length}</div>
                     <div style={{fontSize:'.6rem',color:'var(--text-secondary)'}}>تمرين</div>
                   </div>
                   <div style={{fontSize:'.58rem',color:'var(--text-secondary)',marginBottom:9}}>{workout.estimated_duration_min||35} دقيقة</div>
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:5}}>
                     {workout.exercises.slice(0,4).map((ex,i)=>(
-                      <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBottom:i<Math.min(3,workout.exercises.length-1)?5:0,borderBottom:i<Math.min(3,workout.exercises.length-1)?'1px solid rgba(0,0,0,0.06)':'none'}}>
+                      <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBottom:i<Math.min(3,workout.exercises.length-1)?5:0,borderBottom:i<Math.min(3,workout.exercises.length-1)?'1px solid var(--border-subtle)':'none'}}>
                         <div style={{fontSize:'.66rem',color:'var(--text-secondary)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,paddingInlineEnd:4}}>{ex.name}</div>
-                        <div style={{fontFamily:'monospace',fontSize:'.6rem',color:G,fontWeight:700,flexShrink:0}}>{ex.sets}×{ex.reps}</div>
+                        <div style={{fontFamily:'monospace',fontSize:'.6rem',color:'var(--accent)',fontWeight:700,flexShrink:0}}>{ex.sets}×{ex.reps}</div>
                       </div>
                     ))}
                     {workout.exercises.length>4&&<div style={{fontSize:'.55rem',color:'var(--text-secondary)',marginTop:2}}>+{workout.exercises.length-4} أخرى</div>}
                   </div>
-                  <div style={{marginTop:9,fontSize:'.66rem',color:G,fontWeight:700}}>ابدأ ←</div>
+                  <div style={{marginTop:9,fontSize:'.66rem',color:'var(--accent)',fontWeight:700}}>ابدأ ←</div>
                 </>
               ):(
                 <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.7rem',color:'var(--text-secondary)'}}>جاري التحضير...</div>
@@ -1079,7 +1079,7 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
             {/* Nutrition / Meal plan card */}
             <div
               onClick={()=>router.push('/meals')}
-              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'15px 13px',cursor:'pointer',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden'}}
+              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'15px 13px',cursor:'pointer',display:'flex',flexDirection:'column',minHeight:215,WebkitTapHighlightColor:'transparent',position:'relative',overflow:'hidden',boxShadow:'var(--shadow-card)'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.97)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{position:'absolute',bottom:-18,insetInlineStart:-18,width:70,height:70,background:'rgba(34,197,94,0.04)',borderRadius:'50%'}}/>
@@ -1109,13 +1109,13 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
                   </div>
                   <div style={{fontSize:'.58rem',color:'var(--text-secondary)',marginBottom:9}}>هدفك اليومي</div>
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:7}}>
-                    {[['بروتين','#3b82f6',goals.protein_g],['كارب','#f97316',goals.carbs_g],['دهن','#a855f7',goals.fat_g]].map(([l,c,v])=>(
+                    {[['بروتين','var(--macro-protein)',goals.protein_g],['كارب','var(--macro-carb)',goals.carbs_g],['دهن','var(--macro-fat)',goals.fat_g]].map(([l,c,v])=>(
                       <div key={l}>
                         <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
                           <div style={{fontSize:'.6rem',color:c,fontWeight:700}}>{l}</div>
                           <div style={{fontFamily:'monospace',fontSize:'.56rem',color:'var(--text-secondary)'}}>{v}g</div>
                         </div>
-                        <div style={{height:3,background:'rgba(0,0,0,0.08)',borderRadius:2}}>
+                        <div style={{height:3,background:'var(--surface-inset)',borderRadius:2}}>
                           <div style={{height:'100%',width:'62%',background:c,borderRadius:2,opacity:.8}}/>
                         </div>
                       </div>
@@ -1138,33 +1138,33 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
               <div
                 onClick={()=>router.push('/progress')}
                 className="prog-card"
-                style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,padding:'17px 17px',marginBottom:10,cursor:'pointer',WebkitTapHighlightColor:'transparent',transition:'transform .15s'}}>
+                style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:20,padding:'17px 17px',marginBottom:10,cursor:'pointer',WebkitTapHighlightColor:'transparent',transition:'transform .15s',boxShadow:'var(--shadow-card)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:13}}>
                   <div style={{fontSize:'.58rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1.5,textTransform:'uppercase'}}>تقدمي في البرنامج</div>
-                  <div style={{fontSize:'.62rem',color:'var(--text-secondary)'}}>التفاصيل ←</div>
+                  <div style={{fontSize:'.62rem',color:'var(--accent)'}}>التفاصيل ←</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:13}}>
                   {/* Progress ring */}
                   <svg width={76} height={76} style={{flexShrink:0}}>
-                    <circle cx={38} cy={38} r={R} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={5}/>
-                    <circle cx={38} cy={38} r={R} fill="none" stroke={G} strokeWidth={5}
+                    <circle cx={38} cy={38} r={R} fill="none" stroke="var(--accent-soft)" strokeWidth={5}/>
+                    <circle cx={38} cy={38} r={R} fill="none" stroke="var(--accent)" strokeWidth={5}
                       strokeDasharray={`${(pct/100)*C} ${C}`} strokeLinecap="round"
                       transform="rotate(-90 38 38)"
                       style={{transition:'stroke-dasharray 1.2s ease'}}/>
-                    <text x={38} y={43} textAnchor="middle" fill={G} fontSize={13} fontWeight="900" fontFamily="monospace">{pct}%</text>
+                    <text x={38} y={43} textAnchor="middle" fill="var(--accent)" fontSize={13} fontWeight="900" fontFamily="monospace">{pct}%</text>
                   </svg>
                   {/* Stats */}
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:9}}>
                     <div style={{display:'flex',gap:0}}>
                       {[[completedCount,'مكتمل','#22c55e'],[totalDays-completedCount,'متبقي','var(--text-secondary)']].map(([v,l,c],i)=>(
-                        <div key={l} style={{flex:1,paddingInlineEnd:i===0?12:0,paddingInlineStart:i===1?12:0,borderInlineStart:i===1?'1px solid rgba(0,0,0,0.08)':undefined,textAlign:i===0?'right':'left'}}>
+                        <div key={l} style={{flex:1,paddingInlineEnd:i===0?12:0,paddingInlineStart:i===1?12:0,borderInlineStart:i===1?'1px solid var(--border-subtle)':undefined,textAlign:i===0?'right':'left'}}>
                           <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.35rem',color:c,lineHeight:1}}>{v}</div>
                           <div style={{fontSize:'.58rem',color:'var(--text-secondary)',marginTop:3}}>{l}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{height:4,background:'rgba(0,0,0,0.08)',borderRadius:10,overflow:'hidden'}}>
-                      <div style={{height:'100%',width:pct+'%',background:'#111111',borderRadius:10,transition:'width .7s ease'}}/>
+                    <div style={{height:4,background:'var(--accent-soft)',borderRadius:10,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:pct+'%',background:'var(--accent)',borderRadius:10,transition:'width .7s ease'}}/>
                     </div>
                   </div>
                 </div>
@@ -1172,7 +1172,7 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
                 <div style={{display:'flex',gap:2.5}}>
                   {Array.from({length:Math.min(totalDays,30)},(_,i)=>{
                     const dayNum=i+1, rec=dayRecords.find(d=>d.day_number===dayNum), s=rec?.checkin_status, isCur=dayNum===currentDay
-                    return <div key={i} style={{flex:1,height:5,borderRadius:3,background:s==='completed'?'#22c55e':s==='partial'?'#f97316':s==='missed'?'rgba(239,68,68,0.4)':isCur?G:'rgba(0,0,0,0.08)',transition:'background .3s',boxShadow:isCur?`0 0 8px ${G}bb`:s==='completed'?'0 0 4px rgba(34,197,94,0.5)':'none'}}/>
+                    return <div key={i} style={{flex:1,height:5,borderRadius:3,background:s==='completed'?'#22c55e':s==='partial'?'#f97316':s==='missed'?'rgba(239,68,68,0.4)':isCur?'var(--accent)':'var(--border-subtle)',transition:'background .3s',boxShadow:isCur?'0 0 8px var(--accent-soft)':s==='completed'?'0 0 4px rgba(34,197,94,0.5)':'none'}}/>
                   })}
                 </div>
               </div>
@@ -1185,9 +1185,9 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
           {program.roadmap?.weekly_overview?.length>0&&(()=>{
             const w=program.roadmap.weekly_overview[Math.min(Math.ceil(currentDay/7)-1,program.roadmap.weekly_overview.length-1)]
             return w?(
-              <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:15,padding:'13px 16px'}}>
+              <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:15,padding:'13px 16px',boxShadow:'var(--shadow-card)'}}>
                 <div style={{fontSize:'.56rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:2,textTransform:'uppercase',marginBottom:6}}>هدف هذا الأسبوع</div>
-                <div style={{fontWeight:800,fontSize:'.88rem',color:G,marginBottom:4}}>{w.theme}</div>
+                <div style={{fontWeight:800,fontSize:'.88rem',color:'var(--accent)',marginBottom:4}}>{w.theme}</div>
                 <div style={{fontSize:'.74rem',color:'var(--text-secondary)',lineHeight:1.65}}>{w.key_objective}</div>
               </div>
             ):null
