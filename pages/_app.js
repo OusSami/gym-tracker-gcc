@@ -66,8 +66,8 @@ function StatusGate({ children }) {
   }, [router.pathname])
 
   if (!checked && !PUBLIC_ROUTES.includes(router.pathname)) return (
-    <div style={{minHeight:'100vh',background:'#09090B',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{width:32,height:32,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
+    <div style={{minHeight:'100vh',background:'var(--surface)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{width:32,height:32,border:'3px solid var(--accent-soft)',borderTopColor:'var(--accent)',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
@@ -103,14 +103,14 @@ function PWABanner() {
   }
 
   return (
-    <div style={{position:'fixed',bottom:80,left:16,right:16,zIndex:500,background:'#1A1710',border:'1px solid rgba(203,162,59,0.3)',borderRadius:16,padding:'14px 16px',display:'flex',alignItems:'center',gap:12,direction:'rtl',boxShadow:'0 8px 32px rgba(0,0,0,0.5)'}}>
+    <div style={{position:'fixed',bottom:80,insetInlineStart:16,insetInlineEnd:16,zIndex:500,background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'14px 16px',display:'flex',alignItems:'center',gap:12,direction:'rtl',boxShadow:'var(--shadow-card)'}}>
       <div style={{fontSize:'1.6rem',flexShrink:0}}>📲</div>
       <div style={{flex:1}}>
-        <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'#ECE3CF'}}>نزّل التطبيق على شاشتك</div>
-        <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'#6B5F47'}}>وصول أسرع بدون متصفح</div>
+        <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'var(--text-primary)'}}>نزّل التطبيق على شاشتك</div>
+        <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)'}}>وصول أسرع بدون متصفح</div>
       </div>
-      <button onClick={install} style={{background:'#CBA23B',color:'#09090B',border:'none',borderRadius:10,padding:'8px 16px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.8rem',cursor:'pointer',flexShrink:0}}>تثبيت</button>
-      <button onClick={()=>{setShow(false);localStorage.setItem('pwa_dismissed','1')}} style={{background:'none',border:'none',color:'#6B5F47',cursor:'pointer',fontSize:'1.2rem',flexShrink:0,lineHeight:1}}>×</button>
+      <button onClick={install} style={{background:'var(--btn-primary-bg)',color:'var(--btn-primary-fg)',border:'none',borderRadius:10,padding:'8px 16px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.8rem',cursor:'pointer',flexShrink:0}}>تثبيت</button>
+      <button onClick={()=>{setShow(false);localStorage.setItem('pwa_dismissed','1')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.2rem',flexShrink:0,lineHeight:1}}>×</button>
     </div>
   )
 }
@@ -126,7 +126,7 @@ export default function App({ Component, pageProps }) {
       <Head>
         <title>GYM TRACKER GCC</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <meta name="theme-color" content="#0C0B0D" />
+        <meta name="theme-color" content="#F7F1EC" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="description" content="برنامج تمرين مخصص بالذكاء الاصطناعي للخليج" />

@@ -174,7 +174,7 @@ function GifPlayer({ src, color, name }) {
   // Use a key trick to pause/resume GIF (GIFs can't be paused natively in HTML)
   // We show a static screenshot when "paused" - simplified: just show/hide
   return (
-    <div style={{position:'relative',background:'rgba(0,0,0,0.06)',minHeight:220}}>
+    <div style={{position:'relative',background:'var(--surface-inset)',minHeight:220}}>
       {!loaded && !err && (
         <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:10}}>
           <div style={{width:36,height:36,border:`3px solid ${color}33`,borderTopColor:color,borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
@@ -188,7 +188,7 @@ function GifPlayer({ src, color, name }) {
           alt={name}
           onLoad={() => setLoaded(true)}
           onError={() => setErr(true)}
-          style={{width:'100%',maxHeight:280,objectFit:'contain',display:loaded?'block':'none',background:'rgba(0,0,0,0.06)'}}
+          style={{width:'100%',maxHeight:280,objectFit:'contain',display:loaded?'block':'none',background:'transparent'}}
         />
       ) : (
         <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:8,padding:16}}>
@@ -391,7 +391,7 @@ function ExerciseDetail({ ex, onClose, sex = 'male' }) {
           </div>
         )}
 
-        <button onClick={onClose} style={{width:'100%',padding:'15px',background:color,border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#0C0B0D',cursor:'pointer'}}>Got it ✓</button>
+        <button onClick={onClose} style={{width:'100%',padding:'15px',background:'var(--btn-primary-bg)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'var(--btn-primary-fg)',cursor:'pointer'}}>Got it ✓</button>
       </div>
     </div>
   )
