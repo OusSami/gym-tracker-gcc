@@ -1056,7 +1056,11 @@ function HomeScreen({ user, quote, onStart, router }) {
       const proteinTarget = nutriGoals?.protein_g || 150
       const carbsTarget = nutriGoals?.carbs_g || 250
       const fatTarget = nutriGoals?.fat_g || 65
-      setHomeData({ streak, weekSessions, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, proteinTarget, carbsTarget, fatTarget, bfPct, bmi, dailyPhrase, sex, todayCalories: 0, todayProtein: 0, todayCarbs: 0, todayFat: 0 })
+      const weekDays = Array.from({length: 7}, (_, i) => {
+        const day = new Date(weekStart); day.setDate(day.getDate() + i); day.setHours(0,0,0,0)
+        return { ts: day.getTime(), hasSession: sessionDays.has(day.getTime()), isToday: day.getTime() === today.getTime() }
+      })
+      setHomeData({ streak, weekSessions, weekDays, latestW, monthChange, unit, goal, totalSessions: sessions.length, calorieTarget, proteinTarget, carbsTarget, fatTarget, bfPct, bmi, dailyPhrase, sex, todayCalories: 0, todayProtein: 0, todayCarbs: 0, todayFat: 0 })
 
     }).catch(() => {})
   }, [user?.id])
@@ -1084,283 +1088,248 @@ function HomeScreen({ user, quote, onStart, router }) {
   return (
     <div style={{padding:'0 0 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
 
-      {/* IMG-PLACEHOLDER: home-hero · 16:9 · full-width */}
-      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
-
-      <div style={{padding:'20px 16px 0',position:'relative',zIndex:1}}>
-
-        {/* ── GREETING ── */}
-        <div style={{marginBottom:22,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-          <div>
-            <div style={{color:'var(--text-secondary)',fontSize:'.78rem',marginBottom:4,fontFamily:"'Tajawal',sans-serif"}}>{greeting}</div>
-            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2rem',lineHeight:1.05,letterSpacing:'-0.5px',color:'var(--text-primary)'}}>
-              {firstName && <span>{firstName}</span>}
-              {!firstName && <span>أهلاً 👋</span>}
-            </div>
-          </div>
-          {d && d.streak > 0 && (
-            <div style={{background:'rgba(0,0,0,0.06)',border:'1px solid rgba(0,0,0,0.12)',borderRadius:14,padding:'8px 14px',textAlign:'center',minWidth:70}}>
-              <div style={{fontSize:'1.2rem',lineHeight:1}}>🔥</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.1rem',color:'var(--text-primary)',lineHeight:1.1}}>{d.streak}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-muted)'}}>يوم</div>
-            </div>
-          )}
-        </div>
-
-        {/* ── HERO CARD ── */}
-        <div onClick={onStart}
-          style={{background:'linear-gradient(135deg,rgba(0,0,0,0.04) 0%,rgba(0,0,0,0.02) 60%,transparent 100%)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:24,padding:'26px 22px',marginBottom:14,cursor:'pointer',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
-          onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
-          onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-          <div style={{position:'absolute',right:-20,top:-20,width:130,height:130,background:'rgba(0,0,0,0.04)',borderRadius:'50%'}}/>
-          <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'1.05rem',color:'var(--text-primary)',lineHeight:1.5,marginBottom:20,maxWidth:260,textAlign:'right'}}>{hero}</div>
-          <div style={{display:'inline-flex',alignItems:'center',gap:8,background:'#111111',color:'#FFFFFF',padding:'12px 22px',borderRadius:12,fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.98rem'}}>
-            يلا نبدأ 💪
+      {/* ── 1. HERO BLOCK — lifestyle image with overlaid greeting ── */}
+      <div style={{position:'relative',marginBottom:0}}>
+        {/* IMG-PLACEHOLDER: home-hero · 16:9 · full-width */}
+        <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 28px 28px'}}/>
+        {/* Gradient overlay so text is legible */}
+        <div style={{position:'absolute',bottom:0,insetInline:0,height:'65%',background:'linear-gradient(to top,rgba(0,0,0,0.52) 0%,transparent 100%)',borderRadius:'0 0 28px 28px',pointerEvents:'none'}}/>
+        {/* Greeting overlaid at bottom-start */}
+        <div style={{position:'absolute',bottom:20,insetInlineStart:20,direction:'rtl'}}>
+          <div style={{color:'rgba(255,255,255,0.80)',fontSize:'.78rem',fontFamily:"'Tajawal',sans-serif",marginBottom:4}}>{greeting}</div>
+          <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.9rem',color:'#FFFFFF',lineHeight:1.05}}>
+            {firstName || 'أهلاً 👋'}
           </div>
         </div>
+        {/* Streak badge — top-end corner */}
+        {d?.streak > 0 && (
+          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)'}}>
+            <div style={{fontSize:'.95rem',lineHeight:1}}>🔥</div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
+          </div>
+        )}
+      </div>
 
-        {/* ── ACTIVE PROGRAM CARD ── */}
+      {/* ── CTA BUTTON — black pill below hero ── */}
+      <div style={{padding:'14px 16px 0',direction:'rtl'}}>
+        <button onClick={onStart}
+          style={{width:'100%',background:'#111111',color:'#FFFFFF',border:'none',borderRadius:9999,padding:'16px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',cursor:'pointer',transition:'opacity .15s'}}
+          onTouchStart={e=>e.currentTarget.style.opacity='.7'}
+          onTouchEnd={e=>e.currentTarget.style.opacity='1'}>
+          يلا نبدأ 💪
+        </button>
+      </div>
+
+      <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
+
+        {/* ── 2. HORIZONTAL STAT CARDS — scrollable row ── */}
+        <div style={{display:'flex',gap:10,overflowX:'auto',marginInline:-16,paddingInline:16,paddingBottom:6,scrollbarWidth:'none',WebkitOverflowScrolling:'touch',marginBottom:14}}>
+          {[
+            {icon:'🏋️',label:'تمارين هذا الأسبوع',value:d?d.weekSessions:'—',color:'var(--text-primary)'},
+            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:'—',color:'#3b82f6',click:()=>router.push('/weight')},
+            {icon:'📈',label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:'—',color:d?.monthChange<0?'#4ade80':d?.monthChange>0?'#ef4444':'var(--text-primary)'},
+            {icon:'🎯',label:'هدفك الحالي',value:d?.goal||'—',color:'var(--text-primary)',small:true},
+          ].map((stat,i)=>(
+            <div key={i} onClick={stat.click}
+              style={{flexShrink:0,width:136,background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:20,padding:'16px 14px',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:stat.click?'pointer':'default'}}>
+              <div style={{fontSize:'1.2rem',marginBottom:8}}>{stat.icon}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:stat.small?'.8rem':'1.5rem',color:stat.color,lineHeight:1.2,marginBottom:4}}>{stat.value}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-secondary)',lineHeight:1.3}}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── 3. ACTIVE PROGRAM CARD ── */}
         {activeProgram?.program && (
           <div onClick={() => router.push('/program?id=' + activeProgram.program.id)}
-            style={{background:'linear-gradient(135deg,rgba(0,0,0,0.03),rgba(0,0,0,0.02))',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,padding:'16px 20px',marginBottom:14,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
+            style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'0 2px 12px rgba(0,0,0,0.05)',WebkitTapHighlightColor:'transparent'}}
             onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
             onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
               <div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.65rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',color:'var(--text-primary)',marginBottom:2}}>{activeProgram.program.package_name}</div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.75rem',color:'var(--text-muted)'}}>
-                  اليوم {activeProgram.program.current_day} من {activeProgram.program.total_days} · {activeProgram.completedDays || 0} أيام مكتملة
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
+                <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.05rem',color:'var(--text-primary)',marginBottom:2}}>{activeProgram.program.package_name}</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)'}}>
+                  اليوم {activeProgram.program.current_day} من {activeProgram.program.total_days} · {activeProgram.completedDays||0} مكتملة
                 </div>
               </div>
-              <div style={{textAlign:'center',flexShrink:0}}>
-                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.6rem',color:'var(--text-primary)',lineHeight:1}}>
-                  {Math.round(((activeProgram.completedDays||0) / (activeProgram.program.total_days||21)) * 100)}%
+              <div style={{background:'rgba(0,0,0,0.04)',borderRadius:12,padding:'10px 14px',textAlign:'center',flexShrink:0}}>
+                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.5rem',color:'var(--text-primary)',lineHeight:1}}>
+                  {Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100)}%
                 </div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-muted)',marginTop:2}}>مكتمل</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.55rem',color:'var(--text-secondary)',marginTop:2}}>مكتمل</div>
               </div>
             </div>
-            {/* Progress bar */}
-            <div style={{height:5,background:'rgba(0,0,0,0.08)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-              <div style={{height:'100%',background:'#111111',borderRadius:10,transition:'width .5s',
-                width: Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100) + '%'}}/>
+            <div style={{height:4,background:'rgba(0,0,0,0.07)',borderRadius:10,overflow:'hidden',marginBottom:12}}>
+              <div style={{height:'100%',background:'#111111',borderRadius:10,transition:'width .5s',width:Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100)+'%'}}/>
             </div>
-            {/* Day dots — last 7 */}
-            <div style={{display:'flex',gap:5}}>
+            <div style={{display:'flex',gap:4}}>
               {Array.from({length:Math.min(activeProgram.program.total_days||21,14)},(_,i)=>{
-                const dayNum = i+1
-                const isDone = dayNum < (activeProgram.program.current_day||1)
-                const isCurrent = dayNum === (activeProgram.program.current_day||1)
-                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'#111111':isDone?'rgba(0,0,0,0.30)':'rgba(0,0,0,0.08)',transition:'background .2s'}}/>
+                const dayNum=i+1,isDone=dayNum<(activeProgram.program.current_day||1),isCurrent=dayNum===(activeProgram.program.current_day||1)
+                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'#111111':isDone?'rgba(0,0,0,0.28)':'rgba(0,0,0,0.07)',transition:'background .2s'}}/>
               })}
             </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.75rem',color:'var(--text-secondary)',marginTop:10,fontWeight:600}}>
-              اضغط لتبدأ تمرين اليوم →
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)',marginTop:12,fontWeight:600}}>اضغط لتبدأ تمرين اليوم ←</div>
+          </div>
+        )}
+
+        {/* ── No program nudge ── */}
+        {!activeProgram?.program && d && d.totalSessions===0 && (
+          <div onClick={()=>router.push('/program')}
+            style={{background:'rgba(168,85,247,0.05)',border:'1px solid rgba(168,85,247,0.15)',borderRadius:20,padding:'14px 18px',marginBottom:14,cursor:'pointer',display:'flex',alignItems:'center',gap:14}}>
+            <div style={{fontSize:'1.6rem',flexShrink:0}}>🔬</div>
+            <div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'#a855f7',marginBottom:2}}>ابدأ برنامجك الأول</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.73rem',color:'var(--text-secondary)'}}>تمارين بيتية + خطة أكل خليجية مخصصة</div>
             </div>
           </div>
         )}
 
-        {/* ── Daily Islamic Phrase ── */}
+        {/* ── 4. DAILY CHALLENGE — keep identity, light restyle ── */}
+        <div style={{background:'rgba(168,85,247,0.05)',border:'1px solid rgba(168,85,247,0.14)',borderRadius:20,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',gap:14}}>
+          <div style={{width:44,height:44,borderRadius:14,background:'rgba(168,85,247,0.10)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',flexShrink:0}}>🔥</div>
+          <div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.68rem',color:'rgba(168,85,247,0.85)',marginBottom:4,letterSpacing:.5}}>تحدي اليوم</div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem',color:'var(--text-primary)'}}>{challenge}</div>
+          </div>
+        </div>
+
+        {/* ── 5. CALORIES CARD — full-width, standalone ── */}
+        {(() => {
+          const cal = todayMeals?.calories ?? 0
+          const target = d?.calorieTarget || 2000
+          const pct = Math.min(1, cal / target)
+          const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#111111'
+          const r = 24, circ = 2 * Math.PI * r
+          const remaining = Math.max(0, target - cal)
+          const ptgt = d?.proteinTarget || 150
+          const ctgt = d?.carbsTarget || 250
+          const ftgt = d?.fatTarget || 65
+          return (
+            <div onClick={() => router.push('/meals')}
+              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'0 2px 12px rgba(0,0,0,0.05)',WebkitTapHighlightColor:'transparent'}}
+              onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
+              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-secondary)',fontWeight:700,marginBottom:14,letterSpacing:1,textTransform:'uppercase'}}>السعرات اليوم</div>
+              <div style={{display:'flex',alignItems:'center',gap:20,marginBottom:14}}>
+                <svg width={64} height={64} style={{flexShrink:0}}>
+                  <circle cx={32} cy={32} r={r} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth={4}/>
+                  <circle cx={32} cy={32} r={r} fill="none" stroke={arcColor} strokeWidth={4}
+                    strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+                    strokeLinecap="round" transform="rotate(-90 32 32)"
+                    style={{filter:`drop-shadow(0 0 5px ${arcColor}55)`,transition:'stroke-dashoffset .5s'}}/>
+                  <text x={32} y={37} textAnchor="middle" fill={arcColor} fontSize={10} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
+                </svg>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'1.9rem',color:arcColor,lineHeight:1}}>{todayMeals===null?'...':cal}</div>
+                  <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)',marginTop:2}}>من {target} سعرة</div>
+                  {remaining>0
+                    ? <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.7rem',color:'#4ade80',marginTop:3,fontWeight:700}}>باقي {remaining} سعرة</div>
+                    : <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.7rem',color:'#4ade80',marginTop:3,fontWeight:700}}>وصلت الهدف ✓</div>
+                  }
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:8,flexShrink:0}}>
+                  {[['بروتين','#3b82f6'],[' كارب','#f97316'],['دهن','#a855f7']].map(([l,c])=>(
+                    <div key={l} style={{display:'flex',alignItems:'center',gap:5}}>
+                      <div style={{width:7,height:7,borderRadius:'50%',background:c,flexShrink:0}}/>
+                      <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',fontWeight:700,color:'var(--text-secondary)'}}>{l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:'flex',flexDirection:'column',gap:5}}>
+                {[['بروتين','#3b82f6',todayMeals?.protein||0,ptgt],['كارب','#f97316',todayMeals?.carbs||0,ctgt],['دهن','#a855f7',todayMeals?.fat||0,ftgt]].map(([l,c,v,t])=>(
+                  <div key={l} style={{display:'flex',alignItems:'center',gap:8,direction:'rtl'}}>
+                    <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',fontWeight:700,color:c,flexShrink:0,width:36,textAlign:'start'}}>{l}</div>
+                    <div style={{flex:1,height:4,background:'rgba(0,0,0,0.06)',borderRadius:3,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:Math.min(100,t>0?Math.round((v/t)*100):0)+'%',background:c,borderRadius:3,transition:'width .5s',minWidth:v>0?4:0}}/>
+                    </div>
+                    <div style={{fontFamily:'monospace',fontSize:'.58rem',color:'var(--text-secondary)',flexShrink:0,width:38,textAlign:'end'}}>{v}/{t}g</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* ── 6. WEEKLY PLANNER STRIP ── */}
+        {d?.weekDays && (
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'16px 18px',marginBottom:14,boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.74rem',color:'var(--text-secondary)'}}>هذا الأسبوع</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.76rem',color:'var(--text-primary)'}}>{d.weekSessions} تمرين</div>
+            </div>
+            <div style={{display:'flex',gap:4,justifyContent:'space-between'}}>
+              {d.weekDays.map(({ts,hasSession,isToday},i)=>{
+                const DAYS=['أح','إث','ث','أر','خ','ج','س']
+                const dd=new Date(ts)
+                return (
+                  <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
+                    <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.55rem',color:isToday?'var(--text-primary)':'var(--text-secondary)',fontWeight:isToday?800:500}}>{DAYS[dd.getDay()]}</div>
+                    <div style={{width:34,height:34,borderRadius:'50%',background:hasSession?'#111111':isToday?'rgba(0,0,0,0.06)':'rgba(0,0,0,0.03)',border:isToday&&!hasSession?'2px solid rgba(0,0,0,0.20)':'1px solid transparent',display:'flex',alignItems:'center',justifyContent:'center',color:hasSession?'#fff':isToday?'var(--text-primary)':'var(--text-secondary)',fontSize:hasSession?'.7rem':'.63rem',fontFamily:"'Tajawal',sans-serif",fontWeight:700,transition:'background .2s'}}>
+                      {hasSession?'✓':dd.getDate()}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── 7. DAILY ISLAMIC PHRASE ── */}
         {d?.dailyPhrase && (
-          <div style={{
-            background:'var(--card)',
-            border:'1px solid rgba(0,0,0,0.08)',
-            borderRadius:18,
-            padding:'18px 20px',
-            marginBottom:14,
-            textAlign:'center',
-          }}>
-            <div style={{
-              fontFamily:"'Scheherazade New','Amiri','Traditional Arabic',serif",
-              fontSize:'clamp(1.1rem,4vw,1.5rem)',
-              fontWeight:900,
-              color:'var(--text-primary)',
-              lineHeight:1.6,
-              marginBottom:8,
-              textShadow:'none',
-              direction:'rtl',
-            }}>
+          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'20px 22px',marginBottom:14,textAlign:'center',boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+            <div style={{fontFamily:"'Scheherazade New','Amiri','Traditional Arabic',serif",fontSize:'clamp(1.1rem,4vw,1.5rem)',fontWeight:900,color:'var(--text-primary)',lineHeight:1.6,marginBottom:8,direction:'rtl'}}>
               {d.dailyPhrase.ar}
             </div>
-            <div style={{
-              fontFamily:"'Tajawal',sans-serif",
-              fontSize:'.82rem',
-              color:'var(--text-secondary)',
-              lineHeight:1.6,
-            }}>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',lineHeight:1.6}}>
               {d.dailyPhrase.sub}
             </div>
           </div>
         )}
 
-        {/* ── No program nudge ── */}
-        {!activeProgram?.program && d && d.totalSessions === 0 && (
-          <div onClick={()=>router.push('/program')}
-            style={{background:'rgba(168,85,247,0.06)',border:'1px solid rgba(168,85,247,0.2)',borderRadius:18,padding:'14px 18px',marginBottom:14,cursor:'pointer',display:'flex',alignItems:'center',gap:14}}>
-            <div style={{fontSize:'1.6rem',flexShrink:0}}>🔬</div>
-            <div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'#a855f7',marginBottom:2}}>ابدأ برنامجك الأول</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.73rem',color:'var(--text-muted)'}}>تمارين بيتية + خطة أكل خليجية مخصصة</div>
-            </div>
-          </div>
-        )}
-
-        {/* ── KPI GRID ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14}}>
-          {/* Weekly sessions */}
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
-            <div style={{position:'absolute',top:-10,left:-10,width:60,height:60,background:'rgba(0,0,0,0.04)',borderRadius:'50%'}}/>
-            <div style={{fontSize:'1.3rem',marginBottom:8}}>🏋️</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:'var(--text-primary)',lineHeight:1}}>
-              {d ? d.weekSessions : '—'}
-            </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>تمارين هذا الأسبوع</div>
-          </div>
-
-          {/* Latest weight */}
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}
-            onClick={()=>router.push('/weight')} >
-            <div style={{position:'absolute',top:-10,left:-10,width:60,height:60,background:'rgba(59,130,246,0.06)',borderRadius:'50%'}}/>
-            <div style={{fontSize:'1.3rem',marginBottom:8}}>⚖️</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:'#3b82f6',lineHeight:1}}>
-              {d?.latestW ? d.latestW.weight_kg : '—'}
-            </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>آخر وزن · {d?.unit||'كجم'}</div>
-          </div>
-
-          {/* Monthly change */}
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
-            <div style={{fontSize:'1.3rem',marginBottom:8}}>📈</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.6rem',color:d?.monthChange < 0 ? '#4ade80' : d?.monthChange > 0 ? '#ef4444' : 'var(--text-primary)',lineHeight:1}}>
-              {d?.monthChange !== null && d?.monthChange !== undefined ? (d.monthChange > 0 ? '+' : '') + d.monthChange : '—'}
-            </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>التغير هذا الشهر</div>
-          </div>
-
-          {/* Goal */}
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',position:'relative',overflow:'hidden'}}>
-            <div style={{fontSize:'1.3rem',marginBottom:8}}>🎯</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.82rem',color:'var(--text-primary)',lineHeight:1.4}}>
-              {d?.goal || '—'}
-            </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>هدفك الحالي</div>
+        {/* ── 8. GYM QUOTE — photo-backed tip card ── */}
+        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,overflow:'hidden',marginBottom:14,boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+          {/* IMG-PLACEHOLDER: home-tip · 16:9 · gym lifestyle tip photo */}
+          <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:0}}/>
+          <div style={{padding:'16px 18px'}}>
+            <div style={{color:'var(--text-secondary)',fontSize:'.6rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
+            <div style={{color:'var(--text-primary)',fontFamily:"'Tajawal',sans-serif",fontSize:'.9rem',lineHeight:1.75,fontWeight:500}}>"{coach}"</div>
           </div>
         </div>
 
-        {/* ── STREAK CARD ── */}
-        {d && d.streak > 2 && (
-          <div style={{background:'linear-gradient(135deg,rgba(239,68,68,0.08) 0%,rgba(0,0,0,0.02) 100%)',border:'1px solid rgba(239,68,68,0.18)',borderRadius:16,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',color:'var(--text-primary)'}}>سلسلة الالتزام</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-muted)',marginTop:2}}>استمر. لا تقطع السلسلة.</div>
-            </div>
-            <div style={{textAlign:'center'}}>
-              <div style={{fontSize:'1.5rem'}}>🔥</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.4rem',color:'#ef4444',lineHeight:1}}>{d.streak}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-muted)'}}>يوم متواصل</div>
-            </div>
-          </div>
-        )}
-
-        {/* ── TODAY'S CHALLENGE ── */}
-        <div style={{background:'rgba(168,85,247,0.06)',border:'1px solid rgba(168,85,247,0.18)',borderRadius:16,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',gap:14}}>
-          <div style={{fontSize:'1.8rem',flexShrink:0}}>🔥</div>
-          <div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'rgba(168,85,247,0.9)',marginBottom:4,letterSpacing:.5}}>تحدي اليوم</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem',color:'var(--text-primary)'}}>{challenge}</div>
-          </div>
-        </div>
-
-        {/* ── COACH MESSAGE ── */}
-        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'14px 18px',marginBottom:14}}>
-          <div style={{color:'var(--text-primary)',fontSize:'.65rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
-          <div style={{color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif",fontSize:'.88rem',lineHeight:1.7}}>"{coach}"</div>
-        </div>
-
-        {/* ── QUICK ACCESS ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+        {/* ── 9. QUICK ACCESS — 3 equal tiles ── */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
           {[
-            {icon:'📊',label:'تابع تقدمك بالأرقام',sub:'شوف الفرق بنفسك',path:'/dashboard',color:'#3b82f6'},
-            {icon:'📅',label:'برنامجي',sub:'برامج تدريبية مخصصة',path:'/program',color:'#22c55e'},
-            {icon:'🔬',label:'تحليل جسمي',sub:'صورة أو قياسات — اختر ما يناسبك',path:'/assessment',color:'#a855f7'},
-          ].map(({icon,label,sub,path,color})=>(
+            {icon:'📊',label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
+            {icon:'📅',label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
+            {icon:'🔬',label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
+          ].map(({icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'18px 16px',cursor:'pointer',transition:'all .2s',position:'relative',overflow:'hidden',WebkitTapHighlightColor:'transparent'}}
-              onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
+              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',WebkitTapHighlightColor:'transparent'}}
+              onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{position:'absolute',bottom:-15,right:-15,width:60,height:60,background:color+'18',borderRadius:'50%'}}/>
-              <div style={{fontSize:'1.8rem',marginBottom:10}}>{icon}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',marginBottom:4}}>{label}</div>
-              <div style={{fontSize:'.7rem',color:'var(--text-muted)',lineHeight:1.4,fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
+              <div style={{fontSize:'1.6rem',marginBottom:8}}>{icon}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)',marginBottom:3}}>{label}</div>
+              <div style={{fontSize:'.6rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
           ))}
-          {/* Calories card — Arabic */}
-          {(() => {
-            const cal = todayMeals?.calories ?? 0
-            const target = d?.calorieTarget || 2000
-            const pct = Math.min(1, cal / target)
-            const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#111111'
-            const r = 20, circ = 2 * Math.PI * r
-            const remaining = Math.max(0, target - cal)
-            const ptgt = d?.proteinTarget || 150
-            const ctgt = d?.carbsTarget || 250
-            const ftgt = d?.fatTarget || 65
-            return (
-              <div onClick={() => router.push('/meals')}
-                style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'14px 12px',position:'relative',overflow:'hidden',cursor:'pointer',WebkitTapHighlightColor:'transparent',display:'flex',flexDirection:'column',gap:7,direction:'rtl'}}
-                onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
-                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                {/* Header */}
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-secondary)',fontWeight:700}}>السعرات اليوم</div>
-                {/* Ring + calories */}
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <div>
-                    <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'1.25rem',color:arcColor,lineHeight:1,textShadow:`0 0 14px ${arcColor}44`}}>{todayMeals === null ? '...' : cal}</div>
-                    <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'var(--text-secondary)',marginTop:2}}>من {target} سعرة</div>
-                    {remaining > 0
-                      ? <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'rgba(74,222,128,0.75)',marginTop:2}}>باقي {remaining}</div>
-                      : <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#4ade80',marginTop:2}}>وصلت الهدف ✓</div>
-                    }
-                  </div>
-                  <svg width={48} height={48}>
-                    <circle cx={24} cy={24} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={3.5}/>
-                    <circle cx={24} cy={24} r={r} fill="none" stroke={arcColor} strokeWidth={3.5}
-                      strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
-                      strokeLinecap="round" transform="rotate(-90 24 24)"
-                      style={{filter:`drop-shadow(0 0 4px ${arcColor}88)`}}/>
-                    <text x={24} y={28} textAnchor="middle" fill={arcColor} fontSize={8} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
-                  </svg>
-                </div>
-                {/* Macro bars — Arabic labels on right (RTL) */}
-                <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                  {[['بروتين','#3b82f6',todayMeals?.protein||0,ptgt],['كارب','#f97316',todayMeals?.carbs||0,ctgt],['دهن','#a855f7',todayMeals?.fat||0,ftgt]].map(([l,c,v,t])=>(
-                    <div key={l} style={{display:'flex',alignItems:'center',gap:4}}>
-                      <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',fontWeight:700,color:c,flexShrink:0,width:24,textAlign:'right'}}>{l}</div>
-                      <div style={{flex:1,height:3,background:'rgba(0,0,0,0.08)',borderRadius:2,overflow:'hidden'}}>
-                        <div style={{height:'100%',width:Math.min(100,t>0?Math.round((v/t)*100):0)+'%',background:c,borderRadius:2,boxShadow:`0 0 5px ${c}55`,minWidth:v>0?3:0}}/>
-                      </div>
-                      <div style={{fontFamily:'monospace',fontSize:'.45rem',color:'var(--text-secondary)',flexShrink:0,width:22,textAlign:'left'}}>{v}g</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })()}
         </div>
 
-        {/* ── EMPTY STATE (no sessions yet) ── */}
+        {/* ── 10. EMPTY STATE ── */}
         {d && d.totalSessions === 0 && (
-          <div style={{textAlign:'center',padding:'24px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:24,marginTop:8,boxShadow:'var(--shadow-card)'}}>
-            <div style={{fontSize:'2rem',marginBottom:12}}>💪</div>
+          <div style={{textAlign:'center',padding:'28px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:24,marginBottom:8,boxShadow:'var(--shadow-card)'}}>
+            <div style={{fontSize:'2.2rem',marginBottom:12}}>💪</div>
             <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.1rem',color:'var(--text-primary)',marginBottom:6}}>أول تمرين يبدأ من هنا</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',marginBottom:16}}>ابدأ تمرينك الأول وابني سجلك</div>
-            <button onClick={onStart} className="btn btn-y" style={{width:'auto',paddingInline:32}}>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',marginBottom:18}}>ابدأ تمرينك الأول وابني سجلك</div>
+            <button onClick={onStart} style={{background:'#111111',color:'#FFFFFF',border:'none',borderRadius:9999,padding:'13px 32px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',cursor:'pointer'}}>
               يلا نبدأ 🔥
             </button>
           </div>
         )}
 
-      </div>{/* end padding wrapper */}
+      </div>
     </div>
   )
 }
