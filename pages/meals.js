@@ -427,12 +427,12 @@ export default function Meals() {
   return (
     <div style={{minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary)'}}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box}
-        input,textarea{background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:var(--text-primary);padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s}
-        input:focus,textarea:focus{border-color:rgba(0,0,0,0.30);background:rgba(0,0,0,0.03)}
-        ::placeholder{color:rgba(0,0,0,0.25)}
+        input,textarea{background:var(--surface-inset);border:1px solid var(--border-subtle);color:var(--text-primary);padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s}
+        input:focus,textarea:focus{border-color:var(--accent);background:var(--surface-inset);box-shadow:0 0 0 3px var(--accent-dim)}
+        ::placeholder{color:var(--text-muted)}
         .ptab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.85rem;font-weight:600;padding:10px 12px;cursor:pointer;transition:all .2s}
-        .ptab.on{color:var(--text-primary);border-bottom-color:var(--text-primary)}
-        .mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.08)}
+        .ptab.on{color:var(--accent);border-bottom-color:var(--accent)}
+        .mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-subtle)}
         .mrow:last-child{border-bottom:none}
       `}</style>
       <TopNav title="التغذية" user={user} back="/" onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
@@ -442,15 +442,15 @@ export default function Meals() {
 
       {/* Meals screen title */}
       <div style={{paddingInline:16,paddingBlockStart:16,paddingBlockEnd:8}}>
-        <div className="screen-title">تغذيتك</div>
-        <div className="screen-sub">تابع سعراتك ووجباتك اليومية</div>
+        <div className="screen-title">التغذية</div>
+        <div className="screen-sub">نورّس أهدافك</div>
       </div>
 
       {/* Edit meal modal */}
       {editMeal && <EditModal meal={editMeal} onSave={updateMeal} onClose={()=>setEditMeal(null)} onReanalyze={async(id,data)=>{await updateMeal(id,data);}} NUTRIENTS={NUTRIENTS}/>}
 
       {/* Date nav */}
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',background:'rgba(0,0,0,0.03)',borderBottom:'1px solid rgba(0,0,0,0.07)'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',background:'var(--surface-inset)',borderBottom:'1px solid var(--border-subtle)'}}>
         <button onClick={prevDay} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>‹</button>
         <div style={{textAlign:'center'}}>
           <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem'}}>{isToday?'اليوم 📅':new Date(viewDate+'T12:00:00').toLocaleDateString('ar-SA',{weekday:'long',month:'long',day:'numeric'})}</div>
@@ -458,7 +458,7 @@ export default function Meals() {
         <button onClick={nextDay} disabled={isToday} style={{background:'none',border:'none',color:isToday?'rgba(0,0,0,0.25)':'var(--text-secondary)',cursor:isToday?'default':'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>›</button>
       </div>
 
-      <div style={{display:'flex',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'0 16px'}}>
+      <div style={{display:'flex',borderBottom:'1px solid var(--border-subtle)',padding:'0 16px'}}>
         <button className={`ptab${tab==='plan'?' on':''}`} onClick={()=>setTab('plan')}>🍽️ خطة اليوم</button>
         <button className={`ptab${tab==='daily'?' on':''}`} onClick={()=>setTab('daily')}>أكلك اليوم</button>
         <button className={`ptab${tab==='add'?' on':''}`} onClick={()=>{setTab('add');resetAdd()}}>+ سجّل وجبة</button>
@@ -478,41 +478,62 @@ export default function Meals() {
               </div>
             ) : mealPlan ? (<>
               {/* Calorie goal header */}
-              <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.06)',borderRadius:16,padding:'14px 16px',marginBottom:12}}>
+              <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:16,padding:'14px 16px',marginBottom:12,boxShadow:'var(--shadow-card)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
                   <div style={{fontWeight:700,fontSize:'.85rem'}}>هدف السعرات</div>
-                  <div style={{fontWeight:900,color:'var(--text-primary)',fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
+                  <div style={{fontWeight:900,color:'var(--accent)',fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
                 </div>
-                <div style={{height:5,background:'rgba(0,0,0,0.08)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-                  <div style={{height:'100%',width:'100%',background:'linear-gradient(90deg,#111111,#444444)',borderRadius:10}}/>
+                <div style={{height:5,background:'var(--accent-soft)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
+                  <div style={{height:'100%',width:'100%',background:'linear-gradient(90deg,var(--accent),var(--accent-soft))',borderRadius:10}}/>
                 </div>
                 <div style={{display:'flex',gap:12,fontSize:'.72rem'}}>
-                  {[['بروتين',mealPlan.total_protein+'g','#3b82f6'],['كارب','—g','#f97316'],['دهون','—g','#22c55e']].map(([l,v,c])=>(
+                  {[['بروتين',mealPlan.total_protein+'g','var(--macro-protein)'],['كارب','—g','var(--macro-carb)'],['دهون','—g','var(--macro-fat)']].map(([l,v,c])=>(
                     <div key={l} style={{display:'flex',gap:4}}><span style={{color:c,fontWeight:700,fontFamily:'monospace'}}>{v}</span><span style={{color:'var(--text-secondary)'}}>{l}</span></div>
                   ))}
                 </div>
                 {mealPlan.tip&&<div style={{marginTop:10,fontSize:'.76rem',color:'var(--text-secondary)',lineHeight:1.6}}>💡 {mealPlan.tip}</div>}
               </div>
+
+              {/* Theme tiles — horizontal scroll */}
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:8}}>استكشفي</div>
+                <div style={{display:'flex',gap:8,overflowX:'auto',paddingBlockEnd:4,scrollbarWidth:'none'}}>
+                  {[['خليجي','theme-gulf'],['عالي البروتين','theme-protein'],['نباتي','theme-veg'],['خفيف','theme-light']].map(([label,id])=>(
+                    <div key={id} style={{flexShrink:0,width:100,borderRadius:12,overflow:'hidden',border:'1px solid var(--border-subtle)',background:'var(--card)',boxShadow:'var(--shadow-card)'}}>
+                      {/* IMG-PLACEHOLDER: {id} · 1:1 · food theme thumbnail */}
+                      <div className="img-placeholder" style={{width:'100%',aspectRatio:'1/1',borderRadius:0}}/>
+                      <div style={{padding:'6px 8px',fontSize:'.7rem',fontWeight:700,color:'var(--text-primary)'}}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Meal list */}
               {(mealPlan.plan||[]).map((meal,i)=>(
-                <div key={i} style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'14px 16px',marginBottom:9}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                    <div style={{fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)'}}>{meal.meal_time}</div>
-                    <div style={{fontFamily:'monospace',fontWeight:700,color:'var(--text-primary)',fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
-                  </div>
-                  <div style={{fontWeight:800,fontSize:'.9rem',marginBottom:3}}>{meal.food?.name_ar}</div>
-                  <div style={{fontSize:'.72rem',color:'var(--text-secondary)',marginBottom:8}}>{meal.food?.portion_desc}</div>
-                  <div style={{display:'flex',gap:10,fontSize:'.68rem'}}>
-                    {[['B',meal.protein_g+'g','#3b82f6'],['C',meal.carbs_g+'g','#f97316'],['F',meal.fat_g+'g','#22c55e']].map(([l,v,c])=>(
-                      <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'var(--text-secondary)'}}>{l==='B'?'بروتين':l==='C'?'كارب':'دهون'}</span></div>
-                    ))}
+                <div key={i} style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:16,marginBottom:9,overflow:'hidden',boxShadow:'var(--shadow-card)'}}>
+                  <div style={{display:'flex',gap:12,alignItems:'center'}}>
+                    {/* IMG-PLACEHOLDER: meal-plan-{i} · 1:1 · meal thumbnail */}
+                    <div className="img-placeholder" style={{width:72,height:72,borderRadius:0,flexShrink:0}}/>
+                    <div style={{flex:1,padding:'12px 14px 12px 0'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3}}>
+                        <div style={{fontWeight:700,fontSize:'.72rem',color:'var(--text-secondary)'}}>{meal.meal_time}</div>
+                        <div style={{fontFamily:'monospace',fontWeight:700,color:'var(--accent)',fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
+                      </div>
+                      <div style={{fontWeight:800,fontSize:'.88rem',marginBottom:2,color:'var(--text-primary)'}}>{meal.food?.name_ar}</div>
+                      <div style={{fontSize:'.68rem',color:'var(--text-secondary)',marginBottom:6}}>{meal.food?.portion_desc}</div>
+                      <div style={{display:'flex',gap:8,fontSize:'.65rem'}}>
+                        {[['B',meal.protein_g+'g','var(--macro-protein)'],['C',meal.carbs_g+'g','var(--macro-carb)'],['F',meal.fat_g+'g','var(--macro-fat)']].map(([l,v,c])=>(
+                          <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'var(--text-secondary)'}}>{l==='B'?'بروتين':l==='C'?'كارب':'دهون'}</span></div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
               {/* Log button */}
               <button onClick={()=>{setTab('add');resetAdd()}}
-                style={{width:'100%',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',color:'#22c55e',borderRadius:12,padding:'13px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
-                🍽️ سجّل ما أكلته اليوم ←
+                style={{width:'100%',background:'var(--accent-dim)',border:'1px solid var(--accent-soft)',color:'var(--accent)',borderRadius:12,padding:'13px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
+                🍽️ سجّل ما أكلتِه اليوم ←
               </button>
             </>) : (
               <div style={{textAlign:'center',padding:'60px 0',color:'var(--text-secondary)'}}>
@@ -531,7 +552,7 @@ export default function Meals() {
             <CalorieRing calories={totals.calories||0} goal={G.calories} protein={totals.protein_g||0} carbs={totals.carbs_g||0} fat={totals.fat_g||0} G={G}/>
 
             {/* Water */}
-            <div style={{background:'rgba(6,182,212,0.06)',border:'1px solid rgba(6,182,212,0.18)',borderRadius:14,padding:'13px 16px',marginBottom:12}}>
+            <div style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:14,padding:'13px 16px',marginBottom:12}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
                 <div>
                   <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(6,182,212,0.6)',marginBottom:2}}>الماء</div>
@@ -556,7 +577,7 @@ export default function Meals() {
               const mCal = mls.reduce((a,m)=>a+(m.total_calories||0),0)
               const open = expandMeal===mt.id
               return (
-                <div key={mt.id} style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,marginBottom:8,overflow:'hidden'}}>
+                <div key={mt.id} style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:14,marginBottom:8,overflow:'hidden',boxShadow:'var(--shadow-card)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',cursor:'pointer'}} onClick={()=>setExpandMeal(open?null:mt.id)}>
                     <div style={{display:'flex',alignItems:'center',gap:8}}>
                       <span style={{fontSize:'1.2rem'}}>{mt.icon}</span>
@@ -574,11 +595,11 @@ export default function Meals() {
                     </div>
                   </div>
                   {open && (
-                    <div style={{borderTop:'1px solid rgba(0,0,0,0.08)',padding:'10px 14px'}}>
+                    <div style={{borderTop:'1px solid var(--border-subtle)',padding:'10px 14px'}}>
                       {mls.length===0
                         ? <div style={{color:'var(--text-secondary)',fontSize:'.8rem',padding:'6px 0'}}>ما سجّلت شي بعد — يلا ابدأ!</div>
                         : mls.map(m=>(
-                          <div key={m.id} style={{borderBottom:'1px solid rgba(0,0,0,0.08)',paddingBottom:10,marginBottom:10}}>
+                          <div key={m.id} style={{borderBottom:'1px solid var(--border-subtle)',paddingBottom:10,marginBottom:10}}>
                             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:4}}>
                               <div style={{flex:1}}>
                                 <div style={{fontWeight:600,fontSize:'.88rem'}}>{m.meal_name||'Meal'}</div>
@@ -658,7 +679,7 @@ export default function Meals() {
                 {/* ── GCC FOOD DATABASE ── */}
                 <div style={{marginBottom:12}}>
                   <button onClick={()=>setShowGcc(v=>!v)}
-                    style={{width:'100%',padding:'11px 14px',background:showGcc?'rgba(0,0,0,0.06)':'var(--card)',border:`1px solid ${showGcc?'rgba(0,0,0,0.18)':'rgba(0,0,0,0.08)'}`,borderRadius:12,color:showGcc?'var(--text-primary)':'var(--text-secondary)',cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all .15s'}}>
+                    style={{width:'100%',padding:'11px 14px',background:showGcc?'var(--btn-primary-bg)':'var(--card)',border:`1px solid ${showGcc?'var(--btn-primary-bg)':'var(--border-subtle)'}`,borderRadius:24,color:showGcc?'var(--btn-primary-fg)':'var(--text-secondary)',cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all .15s'}}>
                     <span>🍽️ قاعدة بيانات الأكل الخليجي</span>
                     <span style={{fontSize:'.7rem',opacity:.6}}>{showGcc?'▲':'▼'} 250+ وجبة</span>
                   </button>
@@ -679,7 +700,7 @@ export default function Meals() {
                         <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:8}}>
                           {[['أطباق رئيسية','🍛'],['فطور','☀️'],['بروتين','💪'],['مشروبات','🥤'],['حلويات','🍯'],['فواكه','🍊']].map(([cat,icon])=>(
                             <button key={cat} onClick={()=>searchGcc(cat)}
-                              style={{background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-secondary)',padding:'5px 10px',borderRadius:20,cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',fontWeight:600}}>
+                              style={{background:'var(--accent-faint)',border:'1px solid var(--accent-soft)',color:'var(--accent)',padding:'5px 10px',borderRadius:20,cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',fontWeight:600}}>
                               {icon} {cat}
                             </button>
                           ))}
@@ -690,9 +711,9 @@ export default function Meals() {
                         <div style={{display:'flex',flexDirection:'column',gap:5,maxHeight:280,overflowY:'auto'}}>
                           {gccResults.map(food=>(
                             <div key={food.id} onClick={()=>useGccFood(food)}
-                              style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 14px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:10,cursor:'pointer',transition:'all .15s'}}
-                              onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(0,0,0,0.18)'}
-                              onMouseLeave={e=>e.currentTarget.style.borderColor='rgba(0,0,0,0.08)'}>
+                              style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 14px',background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:10,cursor:'pointer',transition:'all .15s'}}
+                              onMouseEnter={e=>e.currentTarget.style.borderColor='var(--accent-soft)'}
+                              onMouseLeave={e=>e.currentTarget.style.borderColor='var(--border-subtle)'}>
                               <div style={{flex:1,minWidth:0}}>
                                 <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',marginBottom:2}}>{food.name_ar}</div>
                                 <div style={{fontSize:'.68rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{food.serving_desc_ar||food.serving_size_g+'g'} · {food.category}</div>
@@ -852,7 +873,7 @@ export default function Meals() {
         {tab==='nutrients' && (
           <div style={{paddingTop:14}}>
             {/* Calorie summary */}
-            <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:14,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:14,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center',boxShadow:'var(--shadow-card)'}}>
               <div>
                 <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:4}}>سعراتك اليوم</div>
                 <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.8rem',color:'var(--text-primary)',lineHeight:1}}>{Math.round(totals.calories||0)}</div>
@@ -868,7 +889,7 @@ export default function Meals() {
               return (
                 <div key={group} style={{marginBottom:14}}>
                   <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:10}}>{groupLabels[group].toUpperCase()}</div>
-                  <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'10px 14px'}}>
+                  <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:14,padding:'10px 14px',boxShadow:'var(--shadow-card)'}}>
                     {groupNutrients.map((n, i) => {
                       const val = totals[n.key]||0
                       const goalVal = G[n.key]||0
@@ -885,7 +906,7 @@ export default function Meals() {
                             </div>
                           </div>
                           {goalVal>0&&(
-                            <div style={{height:4,background:'rgba(0,0,0,0.08)',borderRadius:2,overflow:'hidden',position:'relative'}}>
+                            <div style={{height:4,background:'var(--surface-inset)',borderRadius:2,overflow:'hidden',position:'relative'}}>
                               <div style={{height:'100%',width:`${Math.min(100,p)}%`,background:over?'#ef4444':n.color,borderRadius:2,transition:'width .5s ease'}}/>
                               {over&&<div style={{position:'absolute',top:0,left:`${Math.min(100,Math.round((goalVal/Math.max(val,goalVal))*100))}%`,width:2,height:'100%',background:'rgba(0,0,0,0.30)'}}/>}
                             </div>
@@ -963,7 +984,7 @@ export default function Meals() {
                 )}
 
                 {/* Overall score */}
-                <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:16,padding:'16px',marginBottom:14}}>
+                <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:16,padding:'16px',marginBottom:14,boxShadow:'var(--shadow-card)'}}>
                   <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:12}}>
                     {/* Score ring */}
                     <div style={{flexShrink:0}}>
@@ -974,7 +995,7 @@ export default function Meals() {
                         const col = score>=8?'#4ade80':score>=6?'#eab308':score>=4?'#f97316':'#ef4444'
                         return (
                           <svg width={88} height={88} viewBox="0 0 88 88">
-                            <circle cx={44} cy={44} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={8}/>
+                            <circle cx={44} cy={44} r={r} fill="none" stroke="var(--accent-soft)" strokeWidth={8}/>
                             <circle cx={44} cy={44} r={r} fill="none" stroke={col} strokeWidth={8}
                               strokeDasharray={`${pct*circ} ${circ}`} strokeLinecap="round" transform="rotate(-90 44 44)"/>
                             <text x={44} y={40} textAnchor="middle" fill={col} fontSize={18} fontFamily="'Space Grotesk','Tajawal',sans-serif" fontWeight={900}>{score}</text>
@@ -1026,7 +1047,7 @@ export default function Meals() {
                       const score = mr?.score || 0
                       const scoreCol = score>=8?'#4ade80':score>=6?'#eab308':score>=4?'#f97316':'#ef4444'
                       return (
-                        <div key={mt} style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'13px 14px',marginBottom:8}}>
+                        <div key={mt} style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:14,padding:'13px 14px',marginBottom:8,boxShadow:'var(--shadow-card)'}}>
                           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
                             <div style={{display:'flex',alignItems:'center',gap:8}}>
                               <span style={{fontSize:'1.1rem'}}>{mealInfo?.icon}</span>
@@ -1106,7 +1127,7 @@ export default function Meals() {
 
                 {/* Tomorrow tips */}
                 {report.tomorrow_tips?.length > 0 && (
-                  <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,padding:'13px 14px',marginBottom:16}}>
+                  <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:14,padding:'13px 14px',marginBottom:16}}>
                     <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:10}}>نصيحة للجلسة الجاية</div>
                     {report.tomorrow_tips.map((t,i) => (
                       <div key={i} style={{display:'flex',gap:8,marginBottom:7}}>
@@ -1139,16 +1160,16 @@ function CalorieRing({ calories, goal, protein, carbs, fat, G }) {
   const over = calories > goal
   const r = 42, circ = 2*Math.PI*r
   return (
-    <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:18,padding:'16px',marginBottom:12}}>
+    <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px',marginBottom:12,boxShadow:'var(--shadow-card)'}}>
       <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:14}}>
         <div style={{flexShrink:0}}>
           <svg width={100} height={100} viewBox="0 0 100 100">
-            <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={9}/>
-            <circle cx={50} cy={50} r={r} fill="none" stroke={over?'#ef4444':'#111111'} strokeWidth={9}
+            <circle cx={50} cy={50} r={r} fill="none" stroke="var(--accent-soft)" strokeWidth={9}/>
+            <circle cx={50} cy={50} r={r} fill="none" stroke={over?'#ef4444':'var(--accent)'} strokeWidth={9}
               strokeDasharray={`${pct*circ} ${circ}`} strokeLinecap="round"
               transform="rotate(-90 50 50)" style={{transition:'stroke-dasharray .6s'}}/>
-            <text x={50} y={46} textAnchor="middle" fill={over?'#ef4444':'#111111'} fontSize={15} fontFamily="'Space Grotesk','Tajawal',sans-serif" fontWeight={800}>{Math.round(calories)}</text>
-            <text x={50} y={60} textAnchor="middle" fill="rgba(0,0,0,0.35)" fontSize={9} fontFamily="'DM Sans','Tajawal',sans-serif">سعرة</text>
+            <text x={50} y={46} textAnchor="middle" fill={over?'#ef4444':'var(--text-primary)'} fontSize={15} fontFamily="'Space Grotesk','Tajawal',sans-serif" fontWeight={800}>{Math.round(calories)}</text>
+            <text x={50} y={60} textAnchor="middle" fill="var(--text-muted)" fontSize={9} fontFamily="'DM Sans','Tajawal',sans-serif">سعرة</text>
           </svg>
         </div>
         <div style={{flex:1}}>
@@ -1158,10 +1179,10 @@ function CalorieRing({ calories, goal, protein, carbs, fat, G }) {
               ? <span style={{color:'#4ade80'}}>{goal-calories} سعرة باقيين لك</span>
               : <span style={{color:'#ef4444'}}>{calories-goal} سعرة زادت</span>}
           </div>
-          {[['بروتين',protein,G.protein_g,'#3b82f6'],['كارب',carbs,G.carbs_g,'#f97316'],['دهن',fat,G.fat_g,'#a855f7']].map(([l,v,g,c])=>(
+          {[['بروتين',protein,G.protein_g,'var(--macro-protein)'],['كارب',carbs,G.carbs_g,'var(--macro-carb)'],['دهن',fat,G.fat_g,'var(--macro-fat)']].map(([l,v,g,c])=>(
             <div key={l} style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
               <span style={{fontSize:'.65rem',fontWeight:800,color:c,minWidth:10}}>{l}</span>
-              <div style={{flex:1,height:5,background:'rgba(0,0,0,0.08)',borderRadius:3,overflow:'hidden'}}>
+              <div style={{flex:1,height:5,background:'var(--surface-inset)',borderRadius:3,overflow:'hidden'}}>
                 <div style={{height:'100%',width:`${Math.min(100,g>0?(v/g)*100:0)}%`,background:c,borderRadius:3,transition:'width .5s'}}/>
               </div>
               <span style={{fontSize:'.65rem',color:'var(--text-secondary)',minWidth:52,textAlign:'right'}}>{Math.round(v||0)}g / {g}g</span>
@@ -1169,15 +1190,15 @@ function CalorieRing({ calories, goal, protein, carbs, fat, G }) {
           ))}
         </div>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,paddingTop:12,borderTop:'1px solid rgba(0,0,0,0.08)'}}>
-        {[['البروتين',protein,'g','#3b82f6'],['الكارب',carbs,'g','#f97316'],['الدهن',fat,'g','#a855f7']].map(([l,v,u,c])=>(
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,paddingTop:12,borderTop:'1px solid var(--border-subtle)'}}>
+        {[['البروتين',protein,'g','var(--macro-protein)'],['الكارب',carbs,'g','var(--macro-carb)'],['الدهن',fat,'g','var(--macro-fat)']].map(([l,v,u,c])=>(
           <div key={l} style={{textAlign:'center'}}>
             <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:c,lineHeight:1}}>{Math.round(v||0)}<span style={{fontSize:'.58rem',opacity:.6,marginLeft:1}}>{u}</span></div>
             <div style={{fontSize:'.56rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:3,fontWeight:700}}>{l.toUpperCase()}</div>
           </div>
         ))}
         <div style={{textAlign:'center'}}>
-          <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'var(--text-primary)',lineHeight:1}}>{Math.round(pct*100)}<span style={{fontSize:'.58rem',opacity:.6}}>%</span></div>
+          <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'var(--accent)',lineHeight:1}}>{Math.round(pct*100)}<span style={{fontSize:'.58rem',opacity:.6}}>%</span></div>
           <div style={{fontSize:'.56rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:3,fontWeight:700}}>من الهدف</div>
         </div>
       </div>
