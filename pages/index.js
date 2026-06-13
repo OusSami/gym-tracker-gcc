@@ -1124,17 +1124,17 @@ function HomeScreen({ user, quote, onStart, router }) {
       <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
 
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable row ── */}
-        <div style={{display:'flex',gap:10,overflowX:'auto',marginInline:-16,paddingInline:16,paddingBottom:6,scrollbarWidth:'none',WebkitOverflowScrolling:'touch',marginBottom:14}}>
+        <div style={{display:'flex',gap:10,overflowX:'auto',marginInline:-16,paddingInlineStart:16,paddingInlineEnd:16,paddingBottom:6,scrollbarWidth:'none',WebkitOverflowScrolling:'touch',marginBottom:14}}>
           {[
             {icon:'🏋️',label:'تمارين هذا الأسبوع',value:d?d.weekSessions:'—',color:'var(--text-primary)'},
-            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:'—',color:'#3b82f6',click:()=>router.push('/weight')},
+            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:'—',color:'var(--macro-protein)',click:()=>router.push('/weight')},
             {icon:'📈',label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:'—',color:d?.monthChange<0?'#4ade80':d?.monthChange>0?'#ef4444':'var(--text-primary)'},
             {icon:'🎯',label:'هدفك الحالي',value:d?.goal||'—',color:'var(--text-primary)',small:true},
           ].map((stat,i)=>(
             <div key={i} onClick={stat.click}
-              style={{flexShrink:0,width:136,background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:20,padding:'16px 14px',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:stat.click?'pointer':'default'}}>
+              style={{flexShrink:0,width:140,background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:20,padding:'16px 14px',boxShadow:'var(--shadow-card)',cursor:stat.click?'pointer':'default'}}>
               <div style={{fontSize:'1.2rem',marginBottom:8}}>{stat.icon}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:stat.small?'.8rem':'1.5rem',color:stat.color,lineHeight:1.2,marginBottom:4}}>{stat.value}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:stat.small?'.82rem':'1.5rem',color:stat.color,lineHeight:1.2,marginBottom:4}}>{stat.value}</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-secondary)',lineHeight:1.3}}>{stat.label}</div>
             </div>
           ))}
@@ -1143,34 +1143,34 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── 3. ACTIVE PROGRAM CARD ── */}
         {activeProgram?.program && (
           <div onClick={() => router.push('/program?id=' + activeProgram.program.id)}
-            style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'0 2px 12px rgba(0,0,0,0.05)',WebkitTapHighlightColor:'transparent'}}
+            style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
             onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
             onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
               <div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',fontWeight:700,color:'var(--text-secondary)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',fontWeight:700,color:'var(--accent)',letterSpacing:1.5,marginBottom:4,textTransform:'uppercase'}}>برنامجك النشط</div>
                 <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.05rem',color:'var(--text-primary)',marginBottom:2}}>{activeProgram.program.package_name}</div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)'}}>
                   اليوم {activeProgram.program.current_day} من {activeProgram.program.total_days} · {activeProgram.completedDays||0} مكتملة
                 </div>
               </div>
-              <div style={{background:'rgba(0,0,0,0.04)',borderRadius:12,padding:'10px 14px',textAlign:'center',flexShrink:0}}>
-                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.5rem',color:'var(--text-primary)',lineHeight:1}}>
+              <div style={{background:'var(--surface-inset)',borderRadius:12,padding:'10px 14px',textAlign:'center',flexShrink:0}}>
+                <div style={{fontFamily:'monospace',fontWeight:900,fontSize:'1.5rem',color:'var(--accent)',lineHeight:1}}>
                   {Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100)}%
                 </div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.55rem',color:'var(--text-secondary)',marginTop:2}}>مكتمل</div>
               </div>
             </div>
-            <div style={{height:4,background:'rgba(0,0,0,0.07)',borderRadius:10,overflow:'hidden',marginBottom:12}}>
-              <div style={{height:'100%',background:'#111111',borderRadius:10,transition:'width .5s',width:Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100)+'%'}}/>
+            <div style={{height:4,background:'var(--accent-soft)',borderRadius:10,overflow:'hidden',marginBottom:12}}>
+              <div style={{height:'100%',background:'var(--accent)',borderRadius:10,transition:'width .5s',width:Math.round(((activeProgram.completedDays||0)/(activeProgram.program.total_days||21))*100)+'%'}}/>
             </div>
             <div style={{display:'flex',gap:4}}>
               {Array.from({length:Math.min(activeProgram.program.total_days||21,14)},(_,i)=>{
                 const dayNum=i+1,isDone=dayNum<(activeProgram.program.current_day||1),isCurrent=dayNum===(activeProgram.program.current_day||1)
-                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'#111111':isDone?'rgba(0,0,0,0.28)':'rgba(0,0,0,0.07)',transition:'background .2s'}}/>
+                return <div key={i} style={{flex:1,height:4,borderRadius:2,background:isCurrent?'var(--accent)':isDone?'var(--accent-soft)':'var(--accent-faint)',transition:'background .2s'}}/>
               })}
             </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)',marginTop:12,fontWeight:600}}>اضغط لتبدأ تمرين اليوم ←</div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--accent)',marginTop:12,fontWeight:600}}>اضغط لتبدأ تمرين اليوم ←</div>
           </div>
         )}
 
@@ -1186,12 +1186,12 @@ function HomeScreen({ user, quote, onStart, router }) {
           </div>
         )}
 
-        {/* ── 4. DAILY CHALLENGE — keep identity, light restyle ── */}
-        <div style={{background:'rgba(168,85,247,0.05)',border:'1px solid rgba(168,85,247,0.14)',borderRadius:20,padding:'16px 20px',marginBottom:14,display:'flex',alignItems:'center',gap:14}}>
-          <div style={{width:44,height:44,borderRadius:14,background:'rgba(168,85,247,0.10)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',flexShrink:0}}>🔥</div>
+        {/* ── 4. DAILY CHALLENGE ── */}
+        <div className="challenge-card" style={{marginBottom:14}}>
+          <div className="challenge-icon">🔥</div>
           <div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.68rem',color:'rgba(168,85,247,0.85)',marginBottom:4,letterSpacing:.5}}>تحدي اليوم</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem',color:'var(--text-primary)'}}>{challenge}</div>
+            <div className="challenge-label">تحدي اليوم</div>
+            <div className="challenge-text">{challenge}</div>
           </div>
         </div>
 
@@ -1200,7 +1200,7 @@ function HomeScreen({ user, quote, onStart, router }) {
           const cal = todayMeals?.calories ?? 0
           const target = d?.calorieTarget || 2000
           const pct = Math.min(1, cal / target)
-          const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : '#111111'
+          const arcColor = pct >= 1 ? '#ef4444' : pct >= 0.75 ? '#f97316' : 'var(--accent)'
           const r = 24, circ = 2 * Math.PI * r
           const remaining = Math.max(0, target - cal)
           const ptgt = d?.proteinTarget || 150
@@ -1208,17 +1208,17 @@ function HomeScreen({ user, quote, onStart, router }) {
           const ftgt = d?.fatTarget || 65
           return (
             <div onClick={() => router.push('/meals')}
-              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'0 2px 12px rgba(0,0,0,0.05)',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-secondary)',fontWeight:700,marginBottom:14,letterSpacing:1,textTransform:'uppercase'}}>السعرات اليوم</div>
               <div style={{display:'flex',alignItems:'center',gap:20,marginBottom:14}}>
                 <svg width={64} height={64} style={{flexShrink:0}}>
-                  <circle cx={32} cy={32} r={r} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth={4}/>
+                  <circle cx={32} cy={32} r={r} fill="none" stroke="var(--accent-soft)" strokeWidth={4}/>
                   <circle cx={32} cy={32} r={r} fill="none" stroke={arcColor} strokeWidth={4}
                     strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
                     strokeLinecap="round" transform="rotate(-90 32 32)"
-                    style={{filter:`drop-shadow(0 0 5px ${arcColor}55)`,transition:'stroke-dashoffset .5s'}}/>
+                    style={{transition:'stroke-dashoffset .5s'}}/>
                   <text x={32} y={37} textAnchor="middle" fill={arcColor} fontSize={10} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
                 </svg>
                 <div style={{flex:1}}>
@@ -1230,7 +1230,7 @@ function HomeScreen({ user, quote, onStart, router }) {
                   }
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:8,flexShrink:0}}>
-                  {[['بروتين','#3b82f6'],[' كارب','#f97316'],['دهن','#a855f7']].map(([l,c])=>(
+                  {[['بروتين','var(--macro-protein)'],[' كارب','var(--macro-carb)'],['دهن','var(--macro-fat)']].map(([l,c])=>(
                     <div key={l} style={{display:'flex',alignItems:'center',gap:5}}>
                       <div style={{width:7,height:7,borderRadius:'50%',background:c,flexShrink:0}}/>
                       <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',fontWeight:700,color:'var(--text-secondary)'}}>{l}</div>
@@ -1239,10 +1239,10 @@ function HomeScreen({ user, quote, onStart, router }) {
                 </div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:5}}>
-                {[['بروتين','#3b82f6',todayMeals?.protein||0,ptgt],['كارب','#f97316',todayMeals?.carbs||0,ctgt],['دهن','#a855f7',todayMeals?.fat||0,ftgt]].map(([l,c,v,t])=>(
+                {[['بروتين','var(--macro-protein)',todayMeals?.protein||0,ptgt],['كارب','var(--macro-carb)',todayMeals?.carbs||0,ctgt],['دهن','var(--macro-fat)',todayMeals?.fat||0,ftgt]].map(([l,c,v,t])=>(
                   <div key={l} style={{display:'flex',alignItems:'center',gap:8,direction:'rtl'}}>
                     <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',fontWeight:700,color:c,flexShrink:0,width:36,textAlign:'start'}}>{l}</div>
-                    <div style={{flex:1,height:4,background:'rgba(0,0,0,0.06)',borderRadius:3,overflow:'hidden'}}>
+                    <div style={{flex:1,height:4,background:'var(--surface-inset)',borderRadius:3,overflow:'hidden'}}>
                       <div style={{height:'100%',width:Math.min(100,t>0?Math.round((v/t)*100):0)+'%',background:c,borderRadius:3,transition:'width .5s',minWidth:v>0?4:0}}/>
                     </div>
                     <div style={{fontFamily:'monospace',fontSize:'.58rem',color:'var(--text-secondary)',flexShrink:0,width:38,textAlign:'end'}}>{v}/{t}g</div>
@@ -1255,10 +1255,10 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── 6. WEEKLY PLANNER STRIP ── */}
         {d?.weekDays && (
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'16px 18px',marginBottom:14,boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+          <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'16px 18px',marginBottom:14,boxShadow:'var(--shadow-card)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.74rem',color:'var(--text-secondary)'}}>هذا الأسبوع</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.76rem',color:'var(--text-primary)'}}>{d.weekSessions} تمرين</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.76rem',color:'var(--accent)'}}>{d.weekSessions} تمرين</div>
             </div>
             <div style={{display:'flex',gap:4,justifyContent:'space-between'}}>
               {d.weekDays.map(({ts,hasSession,isToday},i)=>{
@@ -1267,7 +1267,7 @@ function HomeScreen({ user, quote, onStart, router }) {
                 return (
                   <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
                     <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.55rem',color:isToday?'var(--text-primary)':'var(--text-secondary)',fontWeight:isToday?800:500}}>{DAYS[dd.getDay()]}</div>
-                    <div style={{width:34,height:34,borderRadius:'50%',background:hasSession?'#111111':isToday?'rgba(0,0,0,0.06)':'rgba(0,0,0,0.03)',border:isToday&&!hasSession?'2px solid rgba(0,0,0,0.20)':'1px solid transparent',display:'flex',alignItems:'center',justifyContent:'center',color:hasSession?'#fff':isToday?'var(--text-primary)':'var(--text-secondary)',fontSize:hasSession?'.7rem':'.63rem',fontFamily:"'Tajawal',sans-serif",fontWeight:700,transition:'background .2s'}}>
+                    <div style={{width:34,height:34,borderRadius:'50%',background:hasSession?'var(--accent)':isToday?'var(--accent-faint)':'transparent',border:isToday&&!hasSession?'2px solid var(--accent-soft)':hasSession?'none':'1px solid var(--border-subtle)',display:'flex',alignItems:'center',justifyContent:'center',color:hasSession?'#fff':isToday?'var(--accent)':'var(--text-secondary)',fontSize:hasSession?'.7rem':'.63rem',fontFamily:"'Tajawal',sans-serif",fontWeight:700,transition:'background .2s'}}>
                       {hasSession?'✓':dd.getDate()}
                     </div>
                   </div>
@@ -1277,29 +1277,25 @@ function HomeScreen({ user, quote, onStart, router }) {
           </div>
         )}
 
-        {/* ── 7. DAILY ISLAMIC PHRASE ── */}
+        {/* ── 7. DAILY ISLAMIC PHRASE — reverent treatment ── */}
         {d?.dailyPhrase && (
-          <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,padding:'20px 22px',marginBottom:14,textAlign:'center',boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
-            <div style={{fontFamily:"'Scheherazade New','Amiri','Traditional Arabic',serif",fontSize:'clamp(1.1rem,4vw,1.5rem)',fontWeight:900,color:'var(--text-primary)',lineHeight:1.6,marginBottom:8,direction:'rtl'}}>
-              {d.dailyPhrase.ar}
-            </div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',lineHeight:1.6}}>
-              {d.dailyPhrase.sub}
-            </div>
+          <div className="spiritual-card" style={{marginBottom:14}}>
+            <div className="spiritual-text">{d.dailyPhrase.ar}</div>
+            <div className="spiritual-sub">{d.dailyPhrase.sub}</div>
           </div>
         )}
 
         {/* ── 8. GYM QUOTE — photo-backed tip card ── */}
-        <div style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:22,overflow:'hidden',marginBottom:14,boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+        <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,overflow:'hidden',marginBottom:14,boxShadow:'var(--shadow-card)'}}>
           {/* IMG-PLACEHOLDER: home-tip · 16:9 · gym lifestyle tip photo */}
           <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:0}}/>
           <div style={{padding:'16px 18px'}}>
-            <div style={{color:'var(--text-secondary)',fontSize:'.6rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
+            <div style={{color:'var(--accent)',fontSize:'.6rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
             <div style={{color:'var(--text-primary)',fontFamily:"'Tajawal',sans-serif",fontSize:'.9rem',lineHeight:1.75,fontWeight:500}}>"{coach}"</div>
           </div>
         </div>
 
-        {/* ── 9. QUICK ACCESS — 3 equal tiles ── */}
+        {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
           {[
             {icon:'📊',label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
@@ -1307,7 +1303,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             {icon:'🔬',label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
           ].map(({icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{fontSize:'1.6rem',marginBottom:8}}>{icon}</div>
@@ -1319,11 +1315,11 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── 10. EMPTY STATE ── */}
         {d && d.totalSessions === 0 && (
-          <div style={{textAlign:'center',padding:'28px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:24,marginBottom:8,boxShadow:'var(--shadow-card)'}}>
+          <div style={{textAlign:'center',padding:'28px',background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:24,marginBottom:8,boxShadow:'var(--shadow-card)'}}>
             <div style={{fontSize:'2.2rem',marginBottom:12}}>💪</div>
             <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.1rem',color:'var(--text-primary)',marginBottom:6}}>أول تمرين يبدأ من هنا</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',marginBottom:18}}>ابدأ تمرينك الأول وابني سجلك</div>
-            <button onClick={onStart} style={{background:'#111111',color:'#FFFFFF',border:'none',borderRadius:9999,padding:'13px 32px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',cursor:'pointer'}}>
+            <button onClick={onStart} style={{background:'var(--btn-primary-bg)',color:'var(--btn-primary-fg)',border:'none',borderRadius:9999,padding:'13px 32px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',cursor:'pointer'}}>
               يلا نبدأ 🔥
             </button>
           </div>
