@@ -1177,10 +1177,10 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── No program nudge ── */}
         {!activeProgram?.program && d && d.totalSessions===0 && (
           <div onClick={()=>router.push('/program')}
-            style={{background:'rgba(168,85,247,0.05)',border:'1px solid rgba(168,85,247,0.15)',borderRadius:20,padding:'14px 18px',marginBottom:14,cursor:'pointer',display:'flex',alignItems:'center',gap:14}}>
+            style={{background:'var(--accent-faint)',border:'1px solid var(--border-accent)',borderRadius:20,padding:'14px 18px',marginBottom:14,cursor:'pointer',display:'flex',alignItems:'center',gap:14}}>
             <div style={{fontSize:'1.6rem',flexShrink:0}}>🔬</div>
             <div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'#a855f7',marginBottom:2}}>ابدأ برنامجك الأول</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:'var(--accent)',marginBottom:2}}>ابدأ برنامجك الأول</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.73rem',color:'var(--text-secondary)'}}>تمارين بيتية + خطة أكل خليجية مخصصة</div>
             </div>
           </div>
@@ -1942,7 +1942,7 @@ function DoneScreen({sessionReport,reportError,onRetry,onDashboard,onRestart}) {
 
 function Splash() {
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{minHeight:'100vh',background:'var(--surface)',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{width:36,height:36,border:'3px solid rgba(0,0,0,0.10)',borderTopColor:'#111111',borderRadius:'50%',animation:'spin .8s linear infinite'}}/>
     </div>
   )
