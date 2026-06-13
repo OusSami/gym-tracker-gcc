@@ -1090,10 +1090,9 @@ function HomeScreen({ user, quote, onStart, router }) {
 
       {/* ── 1. HERO BLOCK — lifestyle image with overlaid greeting ── */}
       <div style={{position:'relative',marginBottom:0}}>
-        {/* IMG-PLACEHOLDER: home-hero · 16:9 · full-width */}
-        <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 28px 28px'}}/>
-        {/* Gradient overlay so text is legible */}
-        <div style={{position:'absolute',bottom:0,insetInline:0,height:'65%',background:'linear-gradient(to top,rgba(0,0,0,0.52) 0%,transparent 100%)',borderRadius:'0 0 28px 28px',pointerEvents:'none'}}/>
+        <img src="/home-hero.png" alt="" style={{width:'100%',aspectRatio:'16/9',objectFit:'cover',borderRadius:'0 0 28px 28px',display:'block'}}/>
+        {/* Scrim: var(--surface) at base edge → dark behind text → transparent at top */}
+        <div style={{position:'absolute',bottom:0,insetInline:0,height:'70%',background:'linear-gradient(to top,var(--surface) 0%,rgba(0,0,0,0.62) 16%,rgba(0,0,0,0.38) 45%,transparent 100%)',borderRadius:'0 0 28px 28px',pointerEvents:'none'}}/>
         {/* Greeting overlaid at bottom-start */}
         <div style={{position:'absolute',bottom:20,insetInlineStart:20,direction:'rtl'}}>
           <div style={{color:'rgba(255,255,255,0.80)',fontSize:'.78rem',fontFamily:"'Tajawal',sans-serif",marginBottom:4}}>{greeting}</div>
