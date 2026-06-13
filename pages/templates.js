@@ -98,13 +98,16 @@ export default function TemplatesPage() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input:focus{border-color:rgba(0,0,0,0.30)!important;background:rgba(0,0,0,0.04)!important}`}</style>
       <TopNav title="قوالبي" user={user} back="/" onSignOut={() => supabase.auth.signOut().then(() => router.push('/'))} />
 
+      {/* IMG-PLACEHOLDER: templates-hero · 21:9 · workout templates hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'21/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px calc(90px + env(safe-area-inset-bottom))' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
-            <div style={{ fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '1.1rem' }}>قوالبي</div>
-            <div style={{ fontSize: '.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>احفظ تمارينك المفضلة وابدأها بضغطة واحدة</div>
+            <div className="screen-title" style={{fontSize:'1.6rem'}}>قوالبي</div>
+            <div className="screen-sub">احفظ تمارينك المفضلة وابدأها بضغطة واحدة</div>
           </div>
           <button onClick={openNew}
             style={{ padding: '9px 16px', background: '#111111', border: 'none', borderRadius: 9999, fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '.82rem', color: '#FFFFFF', cursor: 'pointer' }}>

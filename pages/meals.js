@@ -428,7 +428,7 @@ export default function Meals() {
     <div style={{minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary)'}}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box}
         input,textarea{background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:var(--text-primary);padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s}
-        input:focus,textarea:focus{border-color:var(--accent);background:rgba(0,0,0,0.04)}
+        input:focus,textarea:focus{border-color:rgba(0,0,0,0.30);background:rgba(0,0,0,0.03)}
         ::placeholder{color:rgba(0,0,0,0.25)}
         .ptab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.85rem;font-weight:600;padding:10px 12px;cursor:pointer;transition:all .2s}
         .ptab.on{color:var(--text-primary);border-bottom-color:var(--text-primary)}
@@ -437,11 +437,20 @@ export default function Meals() {
       `}</style>
       <TopNav title="التغذية" user={user} back="/" onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
 
+      {/* IMG-PLACEHOLDER: meals-hero · 16:9 · food lifestyle hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
+      {/* Meals screen title */}
+      <div style={{paddingInline:16,paddingBlockStart:16,paddingBlockEnd:8}}>
+        <div className="screen-title">تغذيتك</div>
+        <div className="screen-sub">تابع سعراتك ووجباتك اليومية</div>
+      </div>
+
       {/* Edit meal modal */}
       {editMeal && <EditModal meal={editMeal} onSave={updateMeal} onClose={()=>setEditMeal(null)} onReanalyze={async(id,data)=>{await updateMeal(id,data);}} NUTRIENTS={NUTRIENTS}/>}
 
       {/* Date nav */}
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',background:'rgba(0,0,0,0.04)',borderBottom:'1px solid rgba(0,0,0,0.08)'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',background:'rgba(0,0,0,0.03)',borderBottom:'1px solid rgba(0,0,0,0.07)'}}>
         <button onClick={prevDay} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>‹</button>
         <div style={{textAlign:'center'}}>
           <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem'}}>{isToday?'اليوم 📅':new Date(viewDate+'T12:00:00').toLocaleDateString('ar-SA',{weekday:'long',month:'long',day:'numeric'})}</div>
@@ -614,10 +623,14 @@ export default function Meals() {
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                   {MEAL_TYPES.map(mt=>(
                     <div key={mt.id} onClick={()=>{setMealType(mt.id);setAddStep('capture')}}
-                      style={{background:`${mt.color}0c`,border:`1px solid ${mt.color}2a`,borderRadius:16,padding:'20px 16px',cursor:'pointer',textAlign:'center'}}
+                      className="cat-tile"
                       onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'} onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                      <div style={{fontSize:'2.2rem',marginBottom:8}}>{mt.icon}</div>
-                      <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,color:mt.color}}>{mt.label}</div>
+                      {/* IMG-PLACEHOLDER: meal-type-{mt.id} · 4:3 · meal category photo */}
+                      <div className="img-placeholder tile-img-slot" style={{aspectRatio:'4/3',borderRadius:0}}/>
+                      <div className="tile-label" style={{display:'flex',alignItems:'center',gap:8}}>
+                        <span style={{fontSize:'1.1rem'}}>{mt.icon}</span>
+                        <span style={{color:mt.color}}>{mt.label}</span>
+                      </div>
                     </div>
                   ))}
                 </div>

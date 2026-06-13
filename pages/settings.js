@@ -111,6 +111,9 @@ export default function SettingsPage() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box}`}</style>
       <TopNav title="الإعدادات" back="/" user={user} onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
 
+      {/* IMG-PLACEHOLDER: settings-hero · 21:9 · settings screen banner */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'21/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
       <div style={{maxWidth:480,margin:'0 auto',padding:'20px 16px calc(90px + env(safe-area-inset-bottom))'}}>
 
         {/* Profile card */}

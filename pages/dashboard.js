@@ -622,22 +622,31 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
         *{box-sizing:border-box}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .bb{font-family:'Bebas Neue','Noto Kufi Arabic',sans-serif;letter-spacing:2px}
-        .card{background:var(--card);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:18px}
-        .card-sm{background:var(--card);border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:14px}
+        .bb{font-family:'Noto Kufi Arabic','Tajawal',sans-serif;font-weight:900}
+        .card{background:var(--card);border:1px solid rgba(0,0,0,0.07);border-radius:22px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+        .card-sm{background:var(--card);border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
         .tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.68rem;font-weight:600;letter-spacing:.5px}
-        .setrow{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface);border-radius:8px;border-left:3px solid #e8ff47;margin-bottom:5px}
-        .btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-family:'Bebas Neue','Noto Kufi Arabic',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;transition:all .15s;text-align:center}
-        .btn-y{background:#e8ff47;color:#111111}.btn-y:hover:not(:disabled){background:#d4eb30}.btn-y:disabled{opacity:.35;cursor:not-allowed}
-        .btn-d{background:var(--card);border:1px solid rgba(0,0,0,0.08);color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.85rem;letter-spacing:0;padding:12px}.btn-d:hover{border-color:rgba(0,0,0,0.20);color:var(--text-primary)}
-        .btn-sm{background:var(--card);border:1px solid rgba(0,0,0,0.08);color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.75rem;padding:7px 13px;border-radius:8px;cursor:pointer;transition:all .15s}.btn-sm:hover{border-color:rgba(0,0,0,0.20);color:var(--text-primary)}
-        .ctab{background:transparent;border:1px solid rgba(0,0,0,0.10);border-radius:6px;color:#71717A;font-family:'DM Sans','Tajawal',sans-serif;font-size:.75rem;padding:6px 13px;cursor:pointer;transition:all .15s}
-        .ctab.on{background:#e8ff47;color:#111111;border-color:#111111}
+        .setrow{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(0,0,0,0.03);border-radius:10px;border-inline-end:3px solid rgba(0,0,0,0.18);margin-bottom:5px}
+        .btn{display:block;width:100%;padding:15px;border:none;border-radius:9999px;font-family:'Tajawal','Noto Kufi Arabic',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center}
+        .btn-y{background:#111111;color:#FFFFFF}.btn-y:hover:not(:disabled){background:#333}.btn-y:disabled{opacity:.35;cursor:not-allowed}
+        .btn-d{background:var(--card);border:1.5px solid rgba(0,0,0,0.12);color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.85rem;padding:12px;border-radius:9999px;cursor:pointer;transition:all .15s}.btn-d:hover{border-color:rgba(0,0,0,0.30);color:var(--text-primary)}
+        .btn-sm{background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.10);color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.75rem;padding:7px 13px;border-radius:9999px;cursor:pointer;transition:all .15s}.btn-sm:hover{background:rgba(0,0,0,0.09);color:var(--text-primary)}
+        .ctab{background:transparent;border:1px solid rgba(0,0,0,0.10);border-radius:9999px;color:#71717A;font-family:'DM Sans','Tajawal',sans-serif;font-size:.75rem;padding:6px 14px;cursor:pointer;transition:all .15s}
+        .ctab.on{background:#111111;color:#FFFFFF;border-color:#111111}
         .tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;padding:10px 16px;cursor:pointer;transition:all .15s;font-weight:500}
         .tab.on{color:var(--text-primary);border-bottom-color:var(--text-primary)}
       `}</style>
 
       <TopNav title="أرقامي" user={user} onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
+
+      {/* IMG-PLACEHOLDER: dashboard-hero · 21:9 · progress hero banner */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'21/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
+      {/* Dashboard screen title */}
+      <div className="screen-header">
+        <div className="screen-title">أرقامك</div>
+        <div className="screen-sub">تابع تقدمك وشوف الفرق بنفسك</div>
+      </div>
 
       {sessions.length === 0 ? (
         <div style={{textAlign:'center',paddingTop:80,color:'#555',padding:'80px 20px'}}>

@@ -165,18 +165,15 @@ export default function BodyAnalysis() {
         ::placeholder{color:rgba(0,0,0,0.25)}
       `}</style>
 
+      {/* IMG-PLACEHOLDER: body-hero · 16:9 · body analysis hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px'}}/>
+
       {/* Header */}
-      <div style={{padding:'22px 20px 0',display:'flex',alignItems:'center',gap:12,marginBottom:4}}>
-        <button onClick={()=>router.push('/')} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.2rem',padding:0}}>←</button>
-        <div>
-          <div style={{display:'flex',alignItems:'baseline',gap:6}}>
-            <span className="bb" style={{fontSize:'1.6rem',color:'var(--text-primary)'}}>جسمك</span>
-            <span className="bb" style={{fontSize:'1.6rem'}}>تحليل الأداء</span>
-          </div>
-          <div style={{height:2,background:'linear-gradient(90deg,rgba(0,0,0,0.15),transparent)',marginTop:3}}/>
-        </div>
+      <div className="screen-header">
+        <button onClick={()=>router.push('/')} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.2rem',padding:'0 0 8px',display:'block'}}>←</button>
+        <div className="screen-title">تحليل جسمك</div>
+        <div className="screen-sub">AI-powered physique analysis · Track your transformation</div>
       </div>
-      <div style={{color:'var(--text-secondary)',fontSize:'.8rem',padding:'6px 20px 16px'}}>AI-powered physique analysis · Track your transformation</div>
 
       {/* Tabs */}
       <div style={{display:'flex',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'0 20px',marginBottom:20}}>

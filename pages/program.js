@@ -937,8 +937,11 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
         .prog-card:active{transform:scale(.985)}
       `}</style>
 
+      {/* IMG-PLACEHOLDER: program-hero · 16:9 · workout program hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
       {/* ── Sticky top bar ── */}
-      <div style={{background:'var(--card)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'12px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
+      <div style={{background:'rgba(255,255,255,0.92)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBlockEnd:'1px solid rgba(0,0,0,0.07)',padding:'12px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
         <div>
           <div style={{fontWeight:800,fontSize:'.88rem',color:'var(--text-primary)'}}>{program.roadmap?.program_name||program.package_name}</div>
           <div style={{fontSize:'.62rem',color:'var(--text-secondary)'}}>اليوم {currentDay} من {totalDays}</div>

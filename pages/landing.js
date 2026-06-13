@@ -95,21 +95,23 @@ export default function Landing() {
       `}</style>
 
       {/* COUNTDOWN BAR */}
-      <div style={{background:'rgba(0,0,0,0.04)',borderBottom:'1px solid rgba(0,0,0,0.10)',padding:'10px 20px',textAlign:'center',fontSize:'.82rem',fontWeight:700}}>
+      <div style={{background:'rgba(0,0,0,0.04)',borderBlockEnd:'1px solid rgba(0,0,0,0.10)',padding:'10px 20px',textAlign:'center',fontSize:'.82rem',fontWeight:700}}>
         ⚡ &nbsp;سعر التأسيس ينتهي خلال&nbsp;
         <span style={{color:'var(--text-primary)',fontFamily:"'IBM Plex Mono',monospace",fontSize:'.95rem',letterSpacing:1}}>{mm}:{ss}</span>
         &nbsp; — 149 ر.س بدلاً من 299 ر.س
       </div>
 
       {/* NAV */}
-      <nav style={{position:'sticky',top:0,zIndex:100,background:'var(--surface)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      <nav style={{position:'sticky',top:0,zIndex:100,background:'rgba(255,255,255,0.92)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBlockEnd:'1px solid rgba(0,0,0,0.07)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{fontWeight:900,fontSize:'1.05rem',letterSpacing:1}}>GYM<span style={{color:'var(--text-primary)'}}>TRACKER</span> GCC</div>
         <a href="#checkout" style={{background:'transparent',border:'1px solid rgba(0,0,0,0.20)',color:'var(--text-primary)',padding:'10px 20px',borderRadius:11,fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',cursor:'pointer'}}>ابدأ الآن</a>
       </nav>
 
       {/* ── HERO ── */}
-      <section className="sec" style={{position:'relative',overflow:'hidden',paddingTop:64,paddingBottom:80}}>
-        <div style={{position:'absolute',top:-80,left:'50%',transform:'translateX(-50%)',width:700,height:500,background:'radial-gradient(ellipse,rgba(0,0,0,0.04) 0%,transparent 68%)',pointerEvents:'none'}}/>
+      <section className="sec" style={{position:'relative',overflow:'hidden',paddingTop:0,paddingBottom:80}}>
+        {/* IMG-PLACEHOLDER: landing-hero · 16:9 · landing page lifestyle hero */}
+        <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 28px 28px',marginBottom:48}}/>
+        <div style={{position:'absolute',top:0,insetInlineStart:'50%',transform:'translateX(-50%)',width:700,height:500,background:'radial-gradient(ellipse,rgba(0,0,0,0.04) 0%,transparent 68%)',pointerEvents:'none'}}/>
         <div className="mx" style={{textAlign:'center',position:'relative'}}>
           <div className="rv" style={{display:'inline-flex',alignItems:'center',gap:8,background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:100,padding:'6px 14px',fontSize:'.73rem',fontWeight:700,color:'var(--text-primary)',marginBottom:22}}>
             <span className="glow"/> الباقة التأسيسية · أول 500 عضو فقط
@@ -123,7 +125,7 @@ export default function Landing() {
               <div style={{fontSize:'2.4rem',fontWeight:900,color:'var(--text-primary)',lineHeight:1,fontFamily:"'IBM Plex Mono',monospace"}}>149</div>
               <div style={{fontSize:'.78rem',color:'var(--text-secondary)'}}>ر.س / شهر</div>
             </div>
-            <div style={{borderRight:'1px solid rgba(0,0,0,0.08)',paddingRight:16,textAlign:'right'}}>
+            <div style={{borderInlineEnd:'1px solid rgba(0,0,0,0.08)',paddingInlineEnd:16,textAlign:'end'}}>
               <div style={{fontSize:'.95rem',color:'var(--text-secondary)',textDecoration:'line-through'}}>299 ر.س</div>
               <div style={{fontSize:'.72rem',color:'var(--text-primary)',fontWeight:700}}>وفّر 150 ر.س</div>
               <div style={{fontSize:'.68rem',color:'var(--text-secondary)'}}>عرض محدود</div>
@@ -365,7 +367,7 @@ export default function Landing() {
                 <div style={{fontSize:'3.2rem',fontWeight:900,color:'var(--text-primary)',lineHeight:1,fontFamily:"'IBM Plex Mono',monospace"}}>149</div>
                 <div style={{fontSize:'.8rem',color:'var(--text-secondary)'}}>ر.س / شهر</div>
               </div>
-              <div style={{borderRight:'1px solid rgba(0,0,0,0.08)',paddingRight:16,textAlign:'right'}}>
+              <div style={{borderInlineEnd:'1px solid rgba(0,0,0,0.08)',paddingInlineEnd:16,textAlign:'end'}}>
                 <div style={{fontSize:'1rem',color:'var(--text-secondary)',textDecoration:'line-through'}}>299 ر.س</div>
                 <div style={{fontSize:'.75rem',color:'var(--text-primary)',fontWeight:700}}>وفّر 150 ر.س</div>
                 <div style={{fontSize:'.7rem',color:'var(--text-secondary)'}}>عرض تأسيسي محدود</div>
@@ -415,7 +417,7 @@ export default function Landing() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{borderTop:'1px solid rgba(0,0,0,0.08)',padding:'28px 20px',textAlign:'center'}}>
+      <footer style={{borderBlockStart:'1px solid rgba(0,0,0,0.08)',padding:'28px 20px',textAlign:'center'}}>
         <div style={{fontWeight:900,fontSize:'.95rem',marginBottom:12}}>GYM<span style={{color:'var(--text-primary)'}}>TRACKER</span> GCC</div>
         <div style={{fontSize:'.72rem',color:'var(--text-secondary)',display:'flex',gap:22,justifyContent:'center',flexWrap:'wrap'}}>
           <a href="#">الشروط والأحكام</a><a href="#">سياسة الخصوصية</a><a href="#">تواصل معنا</a>
@@ -424,7 +426,7 @@ export default function Landing() {
       </footer>
 
       {/* STICKY BAR */}
-      <div style={{position:'fixed',bottom:0,insetInline:0,zIndex:200,background:'var(--surface)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(0,0,0,0.10)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:14}}>
+      <div style={{position:'fixed',bottom:0,insetInline:0,zIndex:200,background:'rgba(255,255,255,0.96)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBlockStart:'1px solid rgba(0,0,0,0.07)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:14}}>
         <div>
           <div style={{fontSize:'.68rem',color:'var(--text-secondary)'}}>الباقة التأسيسية</div>
           <div style={{fontWeight:900,fontSize:'1.15rem',color:'var(--text-primary)'}}>149 ر.س / شهر</div>

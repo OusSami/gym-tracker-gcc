@@ -99,10 +99,13 @@ export default function Packages() {
       `}</style>
 
       {/* TOP BAR */}
-      <div style={{ background:'linear-gradient(180deg,rgba(244,244,245,0.98),rgba(244,244,245,0.8))', backdropFilter:'blur(20px)', borderBottom:`1px solid rgba(0,0,0,0.08)`, padding:'13px 18px', display:'flex', alignItems:'center', gap:12, position:'sticky', top:0, zIndex:50 }}>
+      <div style={{ background:'rgba(255,255,255,0.92)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBlockEnd:'1px solid rgba(0,0,0,0.07)', padding:'13px 18px', display:'flex', alignItems:'center', gap:12, position:'sticky', top:0, zIndex:50 }}>
         <button onClick={() => router.back()} style={{ background:'none', border:'none', color:'var(--text-secondary)', cursor:'pointer', fontSize:'1.1rem', padding:'4px 8px', lineHeight:1 }}>←</button>
         <div style={{ fontWeight:800, fontSize:'.92rem', color:'var(--text-primary)' }}>برنامجي</div>
       </div>
+
+      {/* IMG-PLACEHOLDER: packages-hero · 16:9 · workout packages hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
 
       <div style={{ maxWidth:460, margin:'0 auto', padding:'24px 18px 100px' }}>
 

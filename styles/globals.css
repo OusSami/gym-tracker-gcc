@@ -175,9 +175,9 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
 input[type=date]::-webkit-calendar-picker-indicator { filter: none; cursor: pointer; }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--accent);
-  background: rgba(203,162,59,0.04);
-  box-shadow: 0 0 0 3px rgba(203,162,59,0.10);
+  border-color: rgba(0,0,0,0.30);
+  background: rgba(0,0,0,0.03);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.07);
 }
 ::placeholder { color: #A1A1AA; }
 select { background: rgba(0,0,0,0.04); cursor: pointer; }
@@ -190,15 +190,16 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
   font-size: .72rem; font-weight: 700; letter-spacing: .3px;
 }
 
-/* ── Set rows — RTL: gold border on inline-end (right in RTL) ── */
+/* ── Set rows — RTL: accent border on inline-end ── */
 .setrow {
   display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px; background: rgba(0,0,0,0.04);
-  border-radius: 10px; border-right: 2px solid var(--accent);
-  border-left: none;
+  padding: 10px 14px; background: rgba(0,0,0,0.03);
+  border-radius: 10px;
+  border-inline-end: 2px solid rgba(0,0,0,0.18);
+  border-inline-start: none;
   margin-bottom: 6px; transition: background .15s;
 }
-.setrow:hover { background: rgba(0,0,0,0.07); }
+.setrow:hover { background: rgba(0,0,0,0.06); }
 
 /* ── Muscle cards ── */
 .mcard {
@@ -210,18 +211,19 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
   direction: rtl;
   box-shadow: var(--shadow-card);
 }
-.mcard.sel { background: var(--accent-dim); border-color: var(--accent); }
+.mcard.sel { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.30); }
 .mcard:hover:not(.sel) { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.18); }
 
 /* ── Navigation top bar ── */
 .nav-bar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(9,9,11,0.88);
+  background: var(--card);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-block-end: 1px solid rgba(0,0,0,0.07);
   padding-inline: 16px; height: 56px;
   display: flex; align-items: center; justify-content: space-between;
   direction: rtl;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
 }
 
 /* ── Bottom tab bar — primitive ── */
@@ -278,7 +280,7 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
   cursor: pointer; transition: all .15s; text-align: right;
   direction: rtl;
 }
-.alt:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.alt:hover { border-color: rgba(0,0,0,0.25); color: var(--text-primary); background: rgba(0,0,0,0.04); }
 
 /* ── Dropdown ── */
 .dropdown {
@@ -344,9 +346,106 @@ select { background: rgba(0,0,0,0.04); cursor: pointer; }
 /* ── Accent glow dot ── */
 .glow-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent), 0 0 20px rgba(203,162,59,0.45);
+  background: rgba(0,0,0,0.50);
+  box-shadow: none;
   animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Image placeholder ── */
+/* IMG-PLACEHOLDER: base class — replace background/child with real <img> later */
+.img-placeholder {
+  background: #E8E8E8;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  flex-shrink: 0;
+}
+.img-placeholder::after {
+  content: 'image';
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.18);
+  font-family: 'DM Sans', 'Space Grotesk', sans-serif;
+}
+
+/* ── Screen header (large title + muted subtitle) ── */
+.screen-header {
+  padding-block: 24px 16px;
+  padding-inline: 20px;
+}
+.screen-title {
+  font-family: 'Noto Kufi Arabic', 'Tajawal', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-block-end: 4px;
+}
+.screen-sub {
+  font-family: 'Tajawal', 'DM Sans', sans-serif;
+  font-size: .875rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* ── Hero section wrapper ── */
+.hero-section {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+/* ── Photo card (image slot + content) ── */
+.photo-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.16,1,.3,1);
+}
+.photo-card:active { transform: scale(.97); }
+.photo-card .photo-card-body { padding: 14px 16px; }
+
+/* ── Category tile (image top + label below) ── */
+.cat-tile {
+  background: var(--card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.16,1,.3,1);
+  display: flex;
+  flex-direction: column;
+}
+.cat-tile:active { transform: scale(.97); }
+.cat-tile .tile-img-slot {
+  width: 100%;
+}
+.cat-tile .tile-label {
+  padding-block: 10px;
+  padding-inline: 14px;
+  font-family: 'Tajawal', 'DM Sans', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Dropdown fix — use logical properties ── */
+.dropdown {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+  left: auto;
+  right: auto;
 }
 
 /* ── Modal overlay ── */

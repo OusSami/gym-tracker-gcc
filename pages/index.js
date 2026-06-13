@@ -691,11 +691,13 @@ function WarmupScreen({ muscles, onStart, onSkip }) {
     <div style={{minHeight:'100dvh',background:'var(--surface)',color:'var(--text-primary)',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
       {/* Scrollable content */}
       <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',padding:'env(safe-area-inset-top) 16px 16px'}}>
+        {/* IMG-PLACEHOLDER: warmup-hero · 16:9 · warmup screen header */}
+        <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:20,marginBottom:16,marginTop:8}}/>
         {/* Header */}
-        <div style={{paddingTop:20}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:6}}>قبل المعركة</div>
-          <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'2.2rem',letterSpacing:2,color:'#f97316',lineHeight:1}}>الإحماء</div>
-          <div style={{fontSize:'.78rem',color:'var(--text-secondary)',marginTop:4}}>جهّز جسمك — الإحماء يحمي مكاسبك ويرفع أداءك</div>
+        <div style={{paddingTop:4}}>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:4}}>قبل المعركة</div>
+          <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2rem',lineHeight:1.05,color:'var(--text-primary)'}}>الإحماء</div>
+          <div style={{fontSize:'.82rem',color:'var(--text-secondary)',marginTop:4}}>جهّز جسمك — الإحماء يحمي مكاسبك ويرفع أداءك</div>
         </div>
 
         {/* Timer */}
@@ -768,11 +770,13 @@ function StretchScreen({ muscles, onDone, onSkip }) {
     <div style={{minHeight:'100dvh',background:'var(--surface)',color:'var(--text-primary)',display:'flex',flexDirection:'column',maxWidth:480,margin:'0 auto',width:'100%'}}>
       {/* Scrollable content */}
       <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',padding:'env(safe-area-inset-top) 16px 16px'}}>
+        {/* IMG-PLACEHOLDER: stretch-hero · 16:9 · stretch screen header */}
+        <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:20,marginBottom:16,marginTop:8}}/>
         {/* Header */}
-        <div style={{paddingTop:20}}>
-          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:6}}>ما شاء الله! أنهيت جلستك 🏆</div>
-          <div style={{fontFamily:"'Bebas Neue','Noto Kufi Arabic',sans-serif",fontSize:'2.2rem',letterSpacing:2,color:'#4ade80',lineHeight:1}}>وقت التمديد</div>
-          <div style={{fontSize:'.78rem',color:'var(--text-secondary)',marginTop:4}}>التمديد يضاعف تعافيك — لا تتخطّاه</div>
+        <div style={{paddingTop:4}}>
+          <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:3,color:'rgba(0,0,0,0.25)',marginBottom:4}}>ما شاء الله! أنهيت جلستك 🏆</div>
+          <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2rem',lineHeight:1.05,color:'var(--text-primary)'}}>وقت التمديد</div>
+          <div style={{fontSize:'.82rem',color:'var(--text-secondary)',marginTop:4}}>التمديد يضاعف تعافيك — لا تتخطّاه</div>
         </div>
 
         {/* Timer + progress */}
@@ -871,16 +875,16 @@ function AuthScreen() {
   const INPUT_S = {background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',color:'var(--text-primary)',padding:'14px 16px',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.95rem',borderRadius:12,outline:'none',width:'100%',transition:'border .2s',marginBottom:10}
 
   return (
-    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px',background:'var(--surface)',overflow:'hidden',position:'relative'}}>
-      <div style={{position:'absolute',top:'15%',insetInline:0,width:400,height:400,margin:'0 auto',background:'radial-gradient(circle, rgba(0,0,0,0.04) 0%, transparent 70%)',pointerEvents:'none'}}/>
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--surface)',overflow:'hidden',direction:'rtl'}}>
+      {/* IMG-PLACEHOLDER: auth-hero · 4:3 · top hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'4/3',borderRadius:'0 0 32px 32px',flexShrink:0,maxHeight:'45vh'}}/>
 
+      <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',padding:'28px 24px',overflowY:'auto'}}>
       <div style={{width:'100%',maxWidth:360,position:'relative',zIndex:1}}>
         {/* Logo */}
-        <div style={{textAlign:'center',marginBottom:28}}>
-          <div style={{width:72,height:72,background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.10)',borderRadius:22,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',fontSize:'2rem'}}>🏋️</div>
-          <div className="bb" style={{fontSize:'2.8rem',color:'var(--text-primary)',lineHeight:.95}}>جيم</div>
-          <div className="bb" style={{fontSize:'2.8rem',lineHeight:.95,marginBottom:6}}>تراكر</div>
-          <div style={{color:'var(--text-secondary)',fontSize:'.8rem'}}>جسمك. مسؤوليتك. 🏆</div>
+        <div style={{textAlign:'center',marginBottom:24}}>
+          <div style={{fontFamily:"'Noto Kufi Arabic',sans-serif",fontWeight:900,fontSize:'2.4rem',color:'var(--text-primary)',lineHeight:1}}>جيم تراكر</div>
+          <div style={{color:'var(--text-secondary)',fontSize:'.85rem',marginTop:6}}>جسمك. مسؤوليتك. 🏆</div>
         </div>
 
         {err && <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:10,padding:'10px 14px',color:'#fca5a5',fontSize:'.82rem',marginBottom:12,lineHeight:1.5}}>{err}</div>}
@@ -905,7 +909,7 @@ function AuthScreen() {
               style={{width:'100%',padding:'15px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:14,fontSize:'.95rem',fontFamily:"'Space Grotesk','Tajawal',sans-serif",cursor:'pointer',fontWeight:700,color:'var(--text-primary)'}}>
               Create Account
             </button>
-            <div style={{color:'var(--text-secondary)',fontSize:'.72rem',textAlign:'center',marginTop:16}}>Free · No credit card · Your data stays yours</div>
+            <div style={{color:'var(--text-secondary)',fontSize:'.72rem',textAlign:'center',marginTop:16}}>مجاناً · بدون بطاقة بنكية · بياناتك خاصة بك</div>
           </div>
         )}
 
@@ -949,6 +953,7 @@ function AuthScreen() {
           </div>
         )}
       </div>
+      </div>{/* end flex:1 scroller */}
     </div>
   )
 }
@@ -1077,18 +1082,20 @@ function HomeScreen({ user, quote, onStart, router }) {
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || ''
 
   return (
-    <div style={{padding:'20px 16px 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
-      {/* BG glow */}
-      <div style={{position:'fixed',top:0,left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:520,height:300,background:'radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.02) 0%, transparent 70%)',pointerEvents:'none',zIndex:0}}/>
+    <div style={{padding:'0 0 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
 
-      <div style={{position:'relative',zIndex:1}}>
+      {/* IMG-PLACEHOLDER: home-hero · 16:9 · full-width */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
+      <div style={{padding:'20px 16px 0',position:'relative',zIndex:1}}>
 
         {/* ── GREETING ── */}
         <div style={{marginBottom:22,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
           <div>
-            <div style={{color:'var(--text-muted)',fontSize:'.78rem',marginBottom:3,fontFamily:"'Tajawal',sans-serif"}}>{greeting}</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.5rem',color:'var(--text-primary)'}}>
+            <div style={{color:'var(--text-secondary)',fontSize:'.78rem',marginBottom:4,fontFamily:"'Tajawal',sans-serif"}}>{greeting}</div>
+            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2rem',lineHeight:1.05,letterSpacing:'-0.5px',color:'var(--text-primary)'}}>
               {firstName && <span>{firstName}</span>}
+              {!firstName && <span>أهلاً 👋</span>}
             </div>
           </div>
           {d && d.streak > 0 && (
@@ -1343,17 +1350,17 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── EMPTY STATE (no sessions yet) ── */}
         {d && d.totalSessions === 0 && (
-          <div style={{textAlign:'center',padding:'24px',background:'rgba(0,0,0,0.04)',border:'1px solid rgba(0,0,0,0.08)',borderRadius:20,marginTop:8}}>
+          <div style={{textAlign:'center',padding:'24px',background:'var(--card)',border:'1px solid rgba(0,0,0,0.07)',borderRadius:24,marginTop:8,boxShadow:'var(--shadow-card)'}}>
             <div style={{fontSize:'2rem',marginBottom:12}}>💪</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'1rem',color:'var(--text-primary)',marginBottom:6}}>أول تمرين يبدأ من هنا</div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-muted)',marginBottom:16}}>ابدأ تمرينك الأول وابني سجلك</div>
-            <button onClick={onStart} style={{background:'#111111',color:'#FFFFFF',border:'none',borderRadius:12,padding:'12px 28px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',cursor:'pointer'}}>
+            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.1rem',color:'var(--text-primary)',marginBottom:6}}>أول تمرين يبدأ من هنا</div>
+            <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.82rem',color:'var(--text-secondary)',marginBottom:16}}>ابدأ تمرينك الأول وابني سجلك</div>
+            <button onClick={onStart} className="btn btn-y" style={{width:'auto',paddingInline:32}}>
               يلا نبدأ 🔥
             </button>
           </div>
         )}
 
-      </div>
+      </div>{/* end padding wrapper */}
     </div>
   )
 }
@@ -1440,12 +1447,14 @@ function SetupScreen({date,setDate,muscles,setMuscles,onNext,onBack,templates,sh
   const activeSubs = g => (MUSCLE_TREE[g]?.subs||[]).filter(s=>muscles.includes(s))
 
   return (
-    <div style={{padding:'0 0 0',minHeight:'100vh',background:'var(--bg)'}}>
+    <div style={{padding:'0 0 0',minHeight:'100vh',background:'var(--surface)'}}>
       {/* Header */}
-      <div style={{padding:'20px 20px 0',marginBottom:16}}>
-        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.6rem',color:'var(--text-primary)',letterSpacing:-1,marginBottom:2}}>اختر عضلاتك — يلا نضرب! 🎯</div>
+      <div className="screen-header">
+        {/* IMG-PLACEHOLDER: setup-hero · 21:9 · setup screen banner */}
+        <div className="img-placeholder" style={{width:'100%',aspectRatio:'21/9',borderRadius:20,marginBottom:16}}/>
+        <div className="screen-title">اختر عضلاتك 🎯</div>
         <input type="date" value={date} max={todayStr()} onChange={e=>setDate(e.target.value)}
-          style={{background:'transparent',border:'none',color:'var(--text-secondary)',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',outline:'none',cursor:'pointer',padding:0}}/>
+          style={{background:'transparent',border:'none',color:'var(--text-secondary)',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',outline:'none',cursor:'pointer',padding:0,marginBlockStart:4}}/>
       </div>
 
       {/* Muscle grid */}

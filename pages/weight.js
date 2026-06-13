@@ -112,6 +112,9 @@ export default function WeightPage() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input[type=date]::-webkit-calendar-picker-indicator{filter:none}`}</style>
       <TopNav title="الوزن" user={user} back="/dashboard" onSignOut={() => supabase.auth.signOut().then(() => router.push('/'))} />
 
+      {/* IMG-PLACEHOLDER: weight-hero · 16:9 · weight tracking hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px calc(90px + env(safe-area-inset-bottom))' }}>
 
         {/* Log weight */}

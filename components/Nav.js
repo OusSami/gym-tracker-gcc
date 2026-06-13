@@ -26,8 +26,9 @@ export function TopNav({ title, back, user, onSignOut }) {
   return (
     <div style={{
       position:'sticky', top:0, zIndex:100,
-      background:'var(--card)',
-      boxShadow:'0 1px 0 rgba(0,0,0,0.08)',
+      background:'rgba(255,255,255,0.92)',
+      backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
+      borderBlockEnd:'1px solid rgba(0,0,0,0.07)',
       paddingBlock:0, paddingInline:'16px', height:56,
       display:'flex', alignItems:'center', justifyContent:'space-between',
       direction:'rtl',
@@ -138,8 +139,9 @@ export function BottomTabs({ active }) {
   return (
     <div style={{
       position:'fixed', bottom:0, insetInline:0, zIndex:100,
-      background:'var(--card)',
-      borderBlockStart:'1px solid rgba(0,0,0,0.08)',
+      background:'rgba(255,255,255,0.96)',
+      backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
+      borderBlockStart:'1px solid rgba(0,0,0,0.07)',
       display:'flex', alignItems:'center', justifyContent:'space-around',
       paddingBlock:'8px',
       paddingBlockEnd:'calc(8px + env(safe-area-inset-bottom))',
@@ -150,14 +152,15 @@ export function BottomTabs({ active }) {
         <button key={t.id} onClick={() => router.push(t.path)}
           style={{
             display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-            paddingBlock:'5px', paddingInline:'14px',
+            paddingBlock:'6px', paddingInline:'14px',
             borderRadius:'var(--radius-md)', cursor:'pointer',
-            transition:'all .15s', background:'transparent', border:'none',
+            transition:'all .15s', background: active===t.id ? 'rgba(0,0,0,0.06)' : 'transparent',
+            border:'none',
             color: active===t.id ? '#111111' : '#A1A1AA',
             minWidth:56,
           }}>
-          <span style={{fontSize:'1.25rem',lineHeight:1}}>{t.icon}</span>
-          <span style={{fontSize:'.65rem',fontWeight:700,fontFamily:"'Tajawal',sans-serif"}}>{t.label}</span>
+          <span style={{fontSize:'1.2rem',lineHeight:1}}>{t.icon}</span>
+          <span style={{fontSize:'.6rem',fontWeight: active===t.id ? 800 : 600,fontFamily:"'Tajawal',sans-serif"}}>{t.label}</span>
         </button>
       ))}
     </div>

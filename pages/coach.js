@@ -154,8 +154,11 @@ export default function CoachPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--surface)', color: 'var(--text-primary)', direction: 'rtl', display: 'flex', flexDirection: 'column' }}>
 
+      {/* IMG-PLACEHOLDER: coach-hero · 21:9 · AI coach hero banner */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'21/9',borderRadius:'0 0 24px 24px',flexShrink:0}}/>
+
       {/* Header */}
-      <div style={{ background: 'var(--card)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBlockEnd: '1px solid rgba(0,0,0,0.07)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 50 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '4px 8px', flexShrink: 0 }}>←</button>
         <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>🤖</div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -169,7 +172,7 @@ export default function CoachPage() {
           <div style={{ height: 3, background: 'rgba(0,0,0,0.10)', borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${Math.min(100, (usageCount / DAILY_LIMIT) * 100)}%`, background: remaining < 5 ? '#ef4444' : '#111111', transition: 'width .3s', borderRadius: 10 }} />
           </div>
-          <div style={{ fontSize: '.6rem', color: 'rgba(0,0,0,0.25)', textAlign: 'left', fontFamily: "'IBM Plex Mono',monospace" }}>{usageCount}/{DAILY_LIMIT}</div>
+          <div style={{ fontSize: '.6rem', color: 'rgba(0,0,0,0.25)', textAlign: 'start', fontFamily: "'IBM Plex Mono',monospace" }}>{usageCount}/{DAILY_LIMIT}</div>
         </div>
         {/* Clear chat button */}
         {messages.length > 1 && (

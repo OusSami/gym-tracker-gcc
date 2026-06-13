@@ -459,6 +459,9 @@ export default function Exercises() {
       `}</style>
       <TopNav title="مكتبة التمارين" user={user} back="/" onSignOut={()=>supabase.auth.signOut().then(()=>router.push('/'))}/>
 
+      {/* IMG-PLACEHOLDER: exercises-hero · 16:9 · exercises library hero */}
+      <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:'0 0 24px 24px',marginBottom:0}}/>
+
       <div style={{maxWidth:760,margin:'0 auto',padding:'14px 16px 0'}}>
         {/* Tabs */}
         <div style={{display:'flex',borderBottom:'1px solid rgba(0,0,0,0.08)',marginBottom:14}}>

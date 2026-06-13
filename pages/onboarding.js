@@ -193,6 +193,8 @@ export default function Onboarding() {
           {/* ══ STEP 0: WELCOME ══ */}
           {step === 0 && (
             <div className="fu" style={{ textAlign:'center' }}>
+              {/* IMG-PLACEHOLDER: onboarding-welcome · 4:3 · welcome screen lifestyle photo */}
+              <div className="img-placeholder" style={{width:'100%',aspectRatio:'4/3',borderRadius:20,marginBottom:24}}/>
               <div style={{ fontSize:'3rem', marginBottom:20 }}>🏆</div>
               <div style={{ fontWeight:900, fontSize:'1.8rem', marginBottom:10, lineHeight:1.2 }}>
                 أهلاً في<br/><span style={{ color:G }}>GYM TRACKER GCC</span>

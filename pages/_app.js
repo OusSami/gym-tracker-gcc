@@ -14,11 +14,11 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, info) { console.error('App error:', error, info) }
   render() {
     if (this.state.hasError) return (
-      <div style={{minHeight:'100vh',background:'#09090B',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,textAlign:'center',direction:'rtl'}}>
+      <div style={{minHeight:'100vh',background:'var(--surface)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,textAlign:'center',direction:'rtl'}}>
         <div style={{fontSize:'2.5rem',marginBottom:16}}>⚠️</div>
-        <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.2rem',color:'#ECE3CF',marginBottom:8}}>صار خطأ غير متوقع</div>
-        <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.85rem',color:'#6B5F47',marginBottom:24}}>نعتذر — جرّب تحديث الصفحة.</div>
-        <button onClick={()=>window.location.reload()} style={{background:'#CBA23B',color:'#09090B',border:'none',borderRadius:12,padding:'12px 28px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',cursor:'pointer'}}>
+        <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1.2rem',color:'var(--text-primary)',marginBottom:8}}>صار خطأ غير متوقع</div>
+        <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.85rem',color:'var(--text-secondary)',marginBottom:24}}>نعتذر — جرّب تحديث الصفحة.</div>
+        <button onClick={()=>window.location.reload()} style={{background:'#111111',color:'#FFFFFF',border:'none',borderRadius:9999,padding:'14px 32px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',cursor:'pointer'}}>
           تحديث الصفحة
         </button>
         {process.env.NODE_ENV === 'development' && (

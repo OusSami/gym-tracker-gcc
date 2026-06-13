@@ -148,10 +148,9 @@ export default function ChatWidget() {
         <div style={{
           position: 'fixed',
           bottom: 148,
-          left: 14,
-          right: 14,
+          insetInline: 14,
           width: 'min(340px, calc(100vw - 28px))',
-          marginLeft: 'auto',
+          marginInlineStart: 'auto',
           height: 460,
           background: 'var(--card)',
           borderRadius: 18,
@@ -167,7 +166,7 @@ export default function ChatWidget() {
         }}>
 
           {/* HEADER */}
-          <div style={{ padding: '12px 14px 10px', borderBottom: '1px solid rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
+          <div style={{ padding: '12px 14px 10px', borderBlockEnd: '1px solid rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
             <div style={{ width: 34, height: 34, borderRadius: '50%', background: `rgba(0,0,0,0.05)`, border: `1.5px solid ${ctx.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.95rem', flexShrink: 0 }}>
               {ctx.icon}
             </div>
@@ -202,7 +201,7 @@ export default function ChatWidget() {
                   maxWidth: '82%',
                   background: m.role === 'user' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.03)',
                   border: m.role === 'user' ? '1px solid rgba(0,0,0,0.10)' : '1px solid rgba(0,0,0,0.06)',
-                  borderRight: m.role === 'bot' ? `2px solid ${ctx.color}45` : undefined,
+                  borderInlineStart: m.role === 'bot' ? `2px solid ${ctx.color}45` : undefined,
                   borderRadius: m.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                   padding: '8px 12px',
                 }}>
@@ -214,7 +213,7 @@ export default function ChatWidget() {
             {busy && (
               <div style={{ display: 'flex', flexDirection: 'row-reverse', alignItems: 'flex-end', gap: 6 }}>
                 <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', border: `1px solid ${ctx.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.6rem' }}>{ctx.icon}</div>
-                <div style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.07)', borderRight: `2px solid ${ctx.color}45`, borderRadius: '14px 14px 14px 4px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
+                <div style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.07)', borderInlineStart: `2px solid ${ctx.color}45`, borderRadius: '14px 14px 14px 4px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
                   {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(0,0,0,0.25)', animation: `cw-dot .8s ${i*.15}s ease-in-out infinite` }}/>)}
                 </div>
               </div>
@@ -237,7 +236,7 @@ export default function ChatWidget() {
           )}
 
           {/* INPUT */}
-          <div style={{ padding: '8px 12px 12px', borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
+          <div style={{ padding: '8px 12px 12px', borderBlockStart: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0, background: 'rgba(0,0,0,0.02)' }}>
             <textarea
               ref={inputRef}
               value={input}
@@ -261,12 +260,12 @@ export default function ChatWidget() {
       {/* ── FAB BUTTON ── */}
       <div
         onClick={() => setOpen(v => !v)}
-        style={{ position: 'fixed', bottom: 82, left: 18, zIndex: 9999, width: 48, height: 48, borderRadius: '50%', background: open ? 'rgba(0,0,0,0.08)' : '#111111', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s', border: '1px solid rgba(0,0,0,0.15)', animation: open ? 'none' : 'cw-glow 2.5s ease-in-out infinite' }}
+        style={{ position: 'fixed', bottom: 82, insetInlineEnd: 18, zIndex: 9999, width: 48, height: 48, borderRadius: '50%', background: open ? 'rgba(0,0,0,0.08)' : '#111111', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s', border: '1px solid rgba(0,0,0,0.15)', animation: open ? 'none' : 'cw-glow 2.5s ease-in-out infinite' }}
       >
         {open
           ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           : <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
-        {unread && !open && <div style={{ position: 'absolute', top: 1, right: 1, width: 11, height: 11, borderRadius: '50%', background: '#ef4444', border: '2px solid var(--card)', animation: 'cw-badge 1.5s infinite' }}/>}
+        {unread && !open && <div style={{ position: 'absolute', top: 1, insetInlineEnd: 1, width: 11, height: 11, borderRadius: '50%', background: '#ef4444', border: '2px solid var(--card)', animation: 'cw-badge 1.5s infinite' }}/>}
       </div>
     </>
   )
