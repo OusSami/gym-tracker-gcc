@@ -1125,16 +1125,16 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable row ── */}
         <div style={{display:'flex',gap:10,overflowX:'auto',marginInline:-16,paddingInlineStart:16,paddingInlineEnd:16,paddingBottom:6,scrollbarWidth:'none',WebkitOverflowScrolling:'touch',marginBottom:14}}>
           {[
-            {icon:'🏋️',label:'تمارين هذا الأسبوع',value:d?d.weekSessions:'—',color:'var(--text-primary)'},
-            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:'—',color:'var(--macro-protein)',click:()=>router.push('/weight')},
-            {icon:'📈',label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:'—',color:d?.monthChange<0?'#4ade80':d?.monthChange>0?'#ef4444':'var(--text-primary)'},
-            {icon:'🎯',label:'هدفك الحالي',value:d?.goal||'—',color:'var(--text-primary)',small:true},
+            {icon:'🏋️',label:'تمارين هذا الأسبوع',value:d?d.weekSessions:'—',color:'var(--spiritual-fg)',bg:'var(--accent-faint)',labelColor:'var(--accent)'},
+            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:'—',color:'var(--macro-protein)',bg:'var(--spiritual-bg)',labelColor:'var(--text-secondary)',click:()=>router.push('/weight')},
+            {icon:'📈',label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:'—',color:d?.monthChange<0?'#4ade80':d?.monthChange>0?'#ef4444':'var(--challenge)',bg:'rgba(127,119,221,0.12)',labelColor:'rgba(127,119,221,0.65)'},
+            {icon:'🎯',label:'هدفك الحالي',value:d?.goal||'—',color:'var(--spiritual-fg)',bg:'var(--accent-dim)',labelColor:'var(--text-secondary)',small:true},
           ].map((stat,i)=>(
             <div key={i} onClick={stat.click}
-              style={{flexShrink:0,width:140,background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:20,padding:'16px 14px',boxShadow:'var(--shadow-card)',cursor:stat.click?'pointer':'default'}}>
+              style={{flexShrink:0,width:140,background:stat.bg,border:'1px solid var(--border-subtle)',borderRadius:20,padding:'16px 14px',boxShadow:'var(--shadow-card)',cursor:stat.click?'pointer':'default'}}>
               <div style={{fontSize:'1.2rem',marginBottom:8}}>{stat.icon}</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:stat.small?'.82rem':'1.5rem',color:stat.color,lineHeight:1.2,marginBottom:4}}>{stat.value}</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:'var(--text-secondary)',lineHeight:1.3}}>{stat.label}</div>
+              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.6rem',color:stat.labelColor,lineHeight:1.3}}>{stat.label}</div>
             </div>
           ))}
         </div>
