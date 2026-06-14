@@ -1088,36 +1088,48 @@ function HomeScreen({ user, quote, onStart, router }) {
   return (
     <div style={{padding:'0 0 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
 
-      {/* ── 1. HERO BLOCK — lifestyle image with overlaid greeting ── */}
-      <div style={{position:'relative',marginBottom:0}}>
-        <img src="/home-hero.png" alt="" style={{width:'100%',aspectRatio:'16/9',objectFit:'cover',borderRadius:'0 0 28px 28px',display:'block'}}/>
-        {/* Scrim: var(--surface) at base edge → dark behind text → transparent at top */}
-        <div style={{position:'absolute',bottom:0,insetInline:0,height:'70%',background:'linear-gradient(to top,var(--surface) 0%,rgba(0,0,0,0.62) 16%,rgba(0,0,0,0.38) 45%,transparent 100%)',borderRadius:'0 0 28px 28px',pointerEvents:'none'}}/>
-        {/* Greeting overlaid at bottom-start */}
-        <div style={{position:'absolute',bottom:20,insetInlineStart:20,direction:'rtl'}}>
-          <div style={{color:'rgba(255,255,255,0.80)',fontSize:'.78rem',fontFamily:"'Tajawal',sans-serif",marginBottom:4}}>{greeting}</div>
-          <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'1.9rem',color:'#FFFFFF',lineHeight:1.05}}>
-            {firstName || 'أهلاً 👋'}
-          </div>
-        </div>
+      {/* ── 1. HERO BLOCK — full-bleed with gradient bg + scrim + CTA ── */}
+      {/* IMG-PLACEHOLDER: to use a real photo, add <img> or <Image> as first child with position:absolute,inset:0,objectFit:'cover',width:'100%',height:'100%' and remove the `background` gradient below */}
+      <div style={{
+        position:'relative',
+        minHeight:'45vh',
+        background:'linear-gradient(135deg,#2D1F14 0%,#5C3D2E 50%,#3D2A1F 100%)',
+        display:'flex',
+        flexDirection:'column',
+        overflow:'hidden',
+      }}>
+        {/* Dark scrim overlay */}
+        <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.40)',pointerEvents:'none',zIndex:0}}/>
+
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
-          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)'}}>
+          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2}}>
             <div style={{fontSize:'.95rem',lineHeight:1}}>🔥</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
           </div>
         )}
-      </div>
 
-      {/* ── CTA BUTTON — black pill below hero ── */}
-      <div style={{padding:'14px 16px 0',direction:'rtl'}}>
-        <button onClick={onStart}
-          style={{width:'100%',background:'#111111',color:'#FFFFFF',border:'none',borderRadius:9999,padding:'16px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',cursor:'pointer',transition:'opacity .15s'}}
-          onTouchStart={e=>e.currentTarget.style.opacity='.7'}
-          onTouchEnd={e=>e.currentTarget.style.opacity='1'}>
-          يلا نبدأ 💪
-        </button>
+        {/* Content: greeting → name → spacer → CTA */}
+        <div style={{
+          position:'relative',zIndex:1,
+          flex:1,display:'flex',flexDirection:'column',justifyContent:'space-between',
+          paddingBlockStart:52,paddingBlockEnd:20,paddingInlineStart:20,paddingInlineEnd:20,
+          direction:'rtl',textAlign:'right',
+        }}>
+          <div>
+            <div style={{color:'var(--text-secondary)',fontSize:'.78rem',fontFamily:"'Tajawal',sans-serif",marginBottom:8}}>{greeting}</div>
+            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2.2rem',color:'#FFFFFF',lineHeight:1.05}}>
+              {firstName || 'أهلاً 👋'}
+            </div>
+          </div>
+          <button onClick={onStart}
+            style={{width:'100%',background:'var(--btn-primary-bg)',color:'var(--btn-primary-fg)',border:'none',borderRadius:9999,padding:'16px',fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'1rem',cursor:'pointer',transition:'opacity .15s',marginBlockStart:24}}
+            onTouchStart={e=>e.currentTarget.style.opacity='.7'}
+            onTouchEnd={e=>e.currentTarget.style.opacity='1'}>
+            يلا نبدأ 💪
+          </button>
+        </div>
       </div>
 
       <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
