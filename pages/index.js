@@ -1303,14 +1303,12 @@ function HomeScreen({ user, quote, onStart, router }) {
           </div>
         )}
 
-        {/* ── 8. GYM QUOTE — photo-backed tip card ── */}
-        <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,overflow:'hidden',marginBottom:14,boxShadow:'var(--shadow-card)'}}>
-          {/* IMG-PLACEHOLDER: home-tip · 16:9 · gym lifestyle tip photo */}
-          <div className="img-placeholder" style={{width:'100%',aspectRatio:'16/9',borderRadius:0}}/>
-          <div style={{padding:'16px 18px'}}>
-            <div style={{color:'var(--accent)',fontSize:'.6rem',fontWeight:700,letterSpacing:2,marginBottom:8,fontFamily:"'Tajawal',sans-serif"}}>💬 من الجيم</div>
-            <div style={{color:'var(--text-primary)',fontFamily:"'Tajawal',sans-serif",fontSize:'.9rem',lineHeight:1.75,fontWeight:500}}>"{coach}"</div>
-          </div>
+        {/* ── 8. GYM QUOTE — dark Hala-style conseil card ── */}
+        <div style={{marginInline:16,borderRadius:20,minHeight:160,background:'var(--text-primary)',position:'relative',overflow:'hidden',paddingInline:24,paddingBlock:20,marginBottom:14}}>
+          {/* Decorative circle */}
+          <div style={{position:'absolute',bottom:-20,insetInlineStart:-20,width:80,height:80,borderRadius:40,background:'rgba(255,255,255,0.06)',pointerEvents:'none'}}/>
+          <div style={{fontSize:12,color:'rgba(255,255,255,0.6)',textAlign:'right',fontFamily:"'Tajawal',sans-serif",fontWeight:600,letterSpacing:1}}>💬 من الجيم</div>
+          <div style={{marginBlockStart:12,fontSize:16,fontWeight:600,color:'#FFFFFF',textAlign:'right',lineHeight:1.6,fontFamily:"'Tajawal',sans-serif"}}>«{coach}»</div>
         </div>
 
         {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
