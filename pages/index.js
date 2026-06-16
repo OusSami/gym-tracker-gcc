@@ -1088,16 +1088,17 @@ function HomeScreen({ user, quote, onStart, router }) {
   return (
     <div style={{padding:'0 0 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
 
-      {/* ── 1. HERO BLOCK — full-bleed with gradient bg + scrim + CTA ── */}
-      {/* IMG-PLACEHOLDER: to use a real photo, add <img> or <Image> as first child with position:absolute,inset:0,objectFit:'cover',width:'100%',height:'100%' and remove the `background` gradient below */}
+      {/* ── 1. HERO BLOCK — full-bleed with photo bg + scrim + CTA ── */}
       <div style={{
         position:'relative',
         minHeight:'45vh',
-        background:'linear-gradient(135deg,#2D1F14 0%,#5C3D2E 50%,#3D2A1F 100%)',
+        backgroundColor:'#2D1F14',
         display:'flex',
         flexDirection:'column',
         overflow:'hidden',
       }}>
+        {/* Hero background photo */}
+        <img src="/hero-bg.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top'}}/>
         {/* Dark scrim overlay */}
         <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.40)',pointerEvents:'none',zIndex:0}}/>
 
@@ -1303,12 +1304,16 @@ function HomeScreen({ user, quote, onStart, router }) {
           </div>
         )}
 
-        {/* ── 8. GYM QUOTE — dark Hala-style conseil card ── */}
-        <div style={{marginInline:16,borderRadius:20,minHeight:160,background:'var(--text-primary)',position:'relative',overflow:'hidden',paddingInline:24,paddingBlock:20,marginBottom:14}}>
+        {/* ── 8. GYM QUOTE — photo-backed conseil card ── */}
+        <div style={{marginInline:16,borderRadius:20,minHeight:160,backgroundColor:'var(--text-primary)',position:'relative',overflow:'hidden',paddingInline:24,paddingBlock:20,marginBottom:14}}>
+          {/* Quote card background photo */}
+          <img src="/quote-bg.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center'}}/>
+          {/* Dark scrim over photo */}
+          <div style={{position:'absolute',inset:0,background:'rgba(30,15,5,0.55)',pointerEvents:'none'}}/>
           {/* Decorative circle */}
           <div style={{position:'absolute',bottom:-20,insetInlineStart:-20,width:80,height:80,borderRadius:40,background:'rgba(255,255,255,0.06)',pointerEvents:'none'}}/>
-          <div style={{fontSize:12,color:'rgba(255,255,255,0.6)',textAlign:'right',fontFamily:"'Tajawal',sans-serif",fontWeight:600,letterSpacing:1}}>💬 من الجيم</div>
-          <div style={{marginBlockStart:12,fontSize:16,fontWeight:600,color:'#FFFFFF',textAlign:'right',lineHeight:1.6,fontFamily:"'Tajawal',sans-serif"}}>«{coach}»</div>
+          <div style={{position:'relative',fontSize:12,color:'rgba(255,255,255,0.6)',textAlign:'right',fontFamily:"'Tajawal',sans-serif",fontWeight:600,letterSpacing:1}}>💬 من الجيم</div>
+          <div style={{position:'relative',marginBlockStart:12,fontSize:16,fontWeight:600,color:'#FFFFFF',textAlign:'right',lineHeight:1.6,fontFamily:"'Tajawal',sans-serif"}}>«{coach}»</div>
         </div>
 
         {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
