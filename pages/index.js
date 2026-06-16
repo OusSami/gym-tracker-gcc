@@ -1098,9 +1098,9 @@ function HomeScreen({ user, quote, onStart, router }) {
         overflow:'hidden',
       }}>
         {/* Hero background photo */}
-        <img src="/hero-bg.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top'}}/>
-        {/* Dark scrim overlay */}
-        <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.40)',pointerEvents:'none',zIndex:0}}/>
+        <img src="/hero-bg.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
+        {/* Gradient scrim: light at top (face visible) → dark at bottom (button legible) */}
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(30,15,5,0.25) 0%,rgba(20,10,3,0.55) 60%,rgba(15,8,2,0.75) 100%)',pointerEvents:'none',zIndex:0}}/>
 
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
