@@ -302,6 +302,13 @@ export default function Meals() {
   const [mealsLoading, setMealsLoading] = useState(true)
   const [mealsDate, setMealsDate]       = useState(todayStr)
   const [goals, setGoals]               = useState(null)
+  const [mealPlan, setMealPlan]         = useState(null)
+
+  // ── Add meal modal ──────────────────────────────────────────────────────
+  const [showAddMeal, setShowAddMeal]   = useState(false)
+  const [addMealType, setAddMealType]   = useState('breakfast')
+  const [addMealName, setAddMealName]   = useState('')
+  const [addMealCal, setAddMealCal]     = useState('')
 
   // ── Meals loader ────────────────────────────────────────────────────────
   const loadMeals = useCallback(async (uid, date) => {
@@ -321,6 +328,12 @@ export default function Meals() {
       if (!session?.user) { router.push('/'); return }
       const u = session.user
       setUser(u)
+
+      // Meal plan — fire and forget, non-blocking
+      fetch('/api/packages/meal-plan?userId=' + u.id)
+        .then(r => r.json())
+        .then(d => { if (d?.plan) setMealPlan(d) })
+        .catch(() => {})
 
       // Profile + recipes in parallel
       const [profResult, recipeResult] = await Promise.allSettled([
@@ -367,17 +380,30 @@ export default function Meals() {
   const today      = todayStr()
   const canGoNext  = mealsDate < today
 
-  // ── Recipe detail: full-screen overlay ─────────────────────────────────
-  if (selectedRecipe) {
-    return (
-      <>
-        <style>{STYLES}</style>
-        <div className="meals-container">
-          <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />
-        </div>
-        <BottomTabs active="meals" />
-      </>
-    )
+  // ── Add meal handler ────────────────────────────────────────────────────
+  const handleAddMeal = async () => {
+    if (!addMealName.trim() || !user?.id) return
+    const body = {
+      userId: user.id,
+      meal_type: addMealType,
+      meal_name: addMealName.trim(),
+      total_calories: parseInt(addMealCal) || 0,
+      meal_date: mealsDate,
+      protein_g: 0, carbs_g: 0, fat_g: 0,
+    }
+    try {
+      const r = await fetch('/api/meals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (r.ok) {
+        setShowAddMeal(false)
+        setAddMealName('')
+        setAddMealCal('')
+        loadMeals(user.id, mealsDate)
+      }
+    } catch (_) {}
   }
 
   // ── Main layout ─────────────────────────────────────────────────────────
@@ -417,8 +443,13 @@ export default function Meals() {
         ══════════════════════════════════════════════════════ */}
         {activeTab === 'recipes' && (
           <>
+            {/* Recipe detail — renders in place so tab bar stays visible */}
+            {selectedRecipe && (
+              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />
+            )}
+
             {/* Sub-screen A2: Full browser */}
-            {showAllRecipes && (
+            {!selectedRecipe && showAllRecipes && (
               <div>
                 <div style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -478,7 +509,7 @@ export default function Meals() {
             )}
 
             {/* Sub-screen A1: Main browse */}
-            {!showAllRecipes && (
+            {!selectedRecipe && !showAllRecipes && (
               <div>
                 {/* Page header */}
                 <div style={{ paddingBlock: 16, paddingInline: 16, textAlign: 'right' }}>
@@ -690,6 +721,58 @@ export default function Meals() {
                   </div>
                 </div>
 
+                {/* Meal plan card */}
+                <div style={{
+                  marginInline: 16, marginBlockEnd: 16,
+                  backgroundColor: 'var(--card)', borderRadius: 20,
+                  boxShadow: 'var(--shadow-card)', overflow: 'hidden',
+                }}>
+                  <div style={{
+                    paddingInline: 16, paddingBlock: 12,
+                    borderBottom: '1px solid var(--accent-faint)',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  }}>
+                    <span style={{ fontSize: 13, color: 'var(--accent)', fontFamily: F }}>
+                      {mealPlan?.total_calories ? mealPlan.total_calories + ' سعرة' : ''}
+                    </span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: F }}>
+                      🥗 خطة اليوم المقترحة
+                    </span>
+                  </div>
+
+                  {!mealPlan && (
+                    <div style={{ paddingInline: 16, paddingBlock: 20, textAlign: 'center', color: 'var(--text-secondary)', fontSize: 13, fontFamily: F }}>
+                      جارٍ تحميل الخطة...
+                    </div>
+                  )}
+
+                  {mealPlan?.plan && mealPlan.plan.map((item, i) => (
+                    <div key={i} style={{
+                      paddingInline: 16, paddingBlock: 10,
+                      borderBottom: i < mealPlan.plan.length - 1 ? '1px solid var(--accent-faint)' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}>
+                      <span style={{ fontSize: 13, color: 'var(--accent)', fontFamily: F }}>
+                        {item.actual_calories} سعرة
+                      </span>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{item.meal_time}</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', fontFamily: F }}>{item.food?.name_ar}</div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {mealPlan?.tip && (
+                    <div style={{
+                      paddingInline: 16, paddingBlock: 12,
+                      backgroundColor: 'var(--accent-faint)', borderRadius: '0 0 20px 20px',
+                      fontSize: 12, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F,
+                    }}>
+                      💡 {mealPlan.tip}
+                    </div>
+                  )}
+                </div>
+
                 {/* Meal type sections */}
                 {MEAL_TYPES.map(({ id, label, emoji }) => {
                   const typeMeals = meals.filter(m => m.meal_type === id)
@@ -705,9 +788,21 @@ export default function Meals() {
                         paddingInline: 16, paddingBlock: 12,
                         borderBottom: typeMeals.length ? '1px solid var(--accent-faint)' : 'none',
                       }}>
-                        <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>
-                          {typeTotal > 0 ? typeTotal + ' سعرة' : ''}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>
+                            {typeTotal > 0 ? typeTotal + ' سعرة' : ''}
+                          </span>
+                          <button
+                            onClick={() => { setShowAddMeal(true); setAddMealType(id) }}
+                            style={{
+                              width: 24, height: 24, borderRadius: 12,
+                              backgroundColor: 'var(--accent)', color: '#FFFFFF',
+                              fontSize: 16, border: 'none', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                            +
+                          </button>
+                        </div>
                         <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', fontFamily: F }}>
                           {emoji} {label}
                         </span>
@@ -741,9 +836,90 @@ export default function Meals() {
               </>
             )}
 
+            {/* Add meal modal */}
+            {showAddMeal && (
+              <div
+                onClick={() => setShowAddMeal(false)}
+                style={{
+                  position: 'fixed', inset: 0, zIndex: 100,
+                  backgroundColor: 'rgba(0,0,0,0.5)',
+                  display: 'flex', alignItems: 'flex-end',
+                }}>
+                <div
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    backgroundColor: 'var(--card)', borderRadius: '24px 24px 0 0',
+                    padding: 24, width: '100%', maxWidth: 480, margin: '0 auto',
+                  }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', textAlign: 'right', fontFamily: F, marginBlockEnd: 16 }}>
+                    أضيفي وجبة
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {MEAL_TYPES.map(type => (
+                      <button key={type.id} onClick={() => setAddMealType(type.id)} style={{
+                        paddingInline: 12, paddingBlock: 6, borderRadius: 16,
+                        fontSize: 13, cursor: 'pointer', fontFamily: F, border: 'none',
+                        backgroundColor: addMealType === type.id ? 'var(--accent)' : 'var(--accent-faint)',
+                        color: addMealType === type.id ? '#FFFFFF' : 'var(--text-secondary)',
+                      }}>
+                        {type.emoji} {type.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ marginBlockStart: 16 }}>
+                    <label style={{ fontSize: 13, color: 'var(--text-secondary)', textAlign: 'right', display: 'block', marginBlockEnd: 4, fontFamily: F }}>
+                      اسم الوجبة
+                    </label>
+                    <input
+                      value={addMealName}
+                      onChange={e => setAddMealName(e.target.value)}
+                      style={{
+                        width: '100%', padding: 12, borderRadius: 12,
+                        border: '1px solid var(--accent-soft)',
+                        backgroundColor: 'var(--surface)', textAlign: 'right',
+                        fontSize: 14, color: 'var(--text-primary)', fontFamily: F,
+                        boxSizing: 'border-box', outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBlockStart: 12 }}>
+                    <label style={{ fontSize: 13, color: 'var(--text-secondary)', textAlign: 'right', display: 'block', marginBlockEnd: 4, fontFamily: F }}>
+                      السعرات (تقريباً)
+                    </label>
+                    <input
+                      type="number"
+                      value={addMealCal}
+                      onChange={e => setAddMealCal(e.target.value)}
+                      style={{
+                        width: '100%', padding: 12, borderRadius: 12,
+                        border: '1px solid var(--accent-soft)',
+                        backgroundColor: 'var(--surface)', textAlign: 'right',
+                        fontSize: 14, color: 'var(--text-primary)', fontFamily: F,
+                        boxSizing: 'border-box', outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleAddMeal}
+                    style={{
+                      marginBlockStart: 20, width: '100%', padding: 14,
+                      backgroundColor: 'var(--text-primary)', color: '#FFFFFF',
+                      border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 600,
+                      cursor: 'pointer', fontFamily: F,
+                    }}>
+                    إضافة ✓
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* FAB — only visible on nutrition tab */}
             <button
-              onClick={() => { window.location.href = '/meals/add' }}
+              onClick={() => { setShowAddMeal(true); setAddMealType('breakfast') }}
               style={{
                 position: 'fixed', bottom: 70, insetInlineEnd: 16,
                 width: 52, height: 52, borderRadius: 26,
