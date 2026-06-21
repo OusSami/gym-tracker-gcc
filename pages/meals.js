@@ -23,6 +23,13 @@ const MEAL_TYPES = [
   { id:'snack',     label:'سناك',   icon:'🍎', color:'#f97316' },
 ]
 
+const MEAL_COLORS = {
+  breakfast: { bg: '#FFF3E0', emoji: '☀️' },
+  lunch:     { bg: '#E8F5E9', emoji: '🌤️' },
+  dinner:    { bg: '#EDE7F6', emoji: '🌙' },
+  snack:     { bg: '#FCE4EC', emoji: '🍎' },
+}
+
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 const addDays = (dateStr, n) => {
@@ -97,21 +104,41 @@ const STYLES = `
   input,textarea { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#ECE3CF;padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s; }
   input:focus,textarea:focus { border-color:#CBA23B;background:rgba(203,162,59,0.04); }
   ::placeholder { color:rgba(255,255,255,0.2); }
+  .t3-textarea::placeholder { color: var(--text-secondary); opacity: 0.7; }
 `
 
 // ── Module-level helpers (stable identity — prevents re-mount on parent render) ──
 
-function RecipeImg({ src, height = 130, className = '' }) {
-  if (!src) {
-    return (
-      <div className={className} style={{
-        width: '100%', height, backgroundColor: 'var(--accent-faint)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32,
-      }}>🍽️</div>
-    )
+function RecipeImgFallback({ name, height, className }) {
+  return (
+    <div className={className} style={{
+      width: '100%', height,
+      backgroundColor: 'var(--accent-soft)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      gap: 4,
+    }}>
+      <span style={{ fontSize: 28 }}>🍽️</span>
+      <span style={{
+        fontSize: 11, color: 'var(--text-secondary)',
+        textAlign: 'center', paddingInline: 8,
+        display: '-webkit-box', WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical', overflow: 'hidden',
+      }}>{name}</span>
+    </div>
+  )
+}
+
+function RecipeImg({ src, name = '', height = 130, className = '' }) {
+  const [errored, setErrored] = React.useState(false)
+  if (!src || errored) {
+    return <RecipeImgFallback name={name} height={height} className={className} />
   }
-  return <img src={src} alt="" className={className}
-    style={{ width: '100%', height, objectFit: 'cover', display: 'block' }} />
+  return (
+    <img src={src} alt="" className={className}
+      style={{ width: '100%', height, objectFit: 'cover', display: 'block' }}
+      onError={() => setErrored(true)} />
+  )
 }
 
 function CalorieRingSimple({ totalCal, goalCal }) {
@@ -350,6 +377,7 @@ export default function Meals() {
   const [savingTemplate, setSavingTemplate]     = useState(false)
   const [mealPlan, setMealPlan]                 = useState(null)
   const [mealPlanLoading, setMealPlanLoading]   = useState(false)
+  const [selectedMeal, setSelectedMeal]         = useState(null)
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
   const [t3MealType, setT3MealType]       = useState('breakfast')
@@ -403,7 +431,7 @@ export default function Meals() {
       // Profile + recipes in parallel
       const [profResult, recipeResult] = await Promise.allSettled([
         fetch('/api/profile?userId=' + u.id).then(r => r.json()),
-        supabase.from('recipes').select('*').order('created_at', { ascending: false }),
+        supabase.from('recipes').select('*'),
       ])
 
       if (profResult.status === 'fulfilled' && profResult.value?.profile) {
@@ -412,7 +440,14 @@ export default function Meals() {
       }
       if (recipeResult.status === 'fulfilled') {
         const { data, error } = recipeResult.value
-        if (!error && data) setRecipes(data)
+        if (!error && data) {
+          const arr = [...data]
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]]
+          }
+          setRecipes(arr)
+        }
       }
       setRecipesLoading(false)
 
@@ -774,6 +809,142 @@ export default function Meals() {
       {/* Edit meal modal (Tab 2) */}
       {editMeal && <EditModal meal={editMeal} onSave={updateMeal} onClose={() => setEditMeal(null)} onReanalyze={async (id, data) => { await updateMeal(id, data) }} />}
 
+      {/* Meal detail sheet */}
+      {selectedMeal && (
+        <>
+          {/* Backdrop */}
+          <div onClick={() => setSelectedMeal(null)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }} />
+          {/* Sheet */}
+          <div onClick={e => e.stopPropagation()} style={{
+            position: 'fixed', bottom: 0,
+            insetInlineStart: 0, insetInlineEnd: 0, zIndex: 201,
+            backgroundColor: 'var(--card)',
+            borderRadius: '24px 24px 0 0',
+            maxHeight: '80vh', overflowY: 'auto',
+            paddingBlockEnd: 40,
+            direction: 'rtl',
+          }}>
+            {/* Handle bar */}
+            <div style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: 'var(--accent-soft)', margin: '12px auto' }} />
+            {/* Title row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingInline: 16, paddingBlock: 8 }}>
+              <button onClick={() => setSelectedMeal(null)} style={{ fontSize: 20, border: 'none', background: 'none', color: 'var(--text-secondary)', cursor: 'pointer', lineHeight: 1 }}>×</button>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', fontFamily: F, flex: 1, textAlign: 'right', marginInlineEnd: 8 }}>{selectedMeal.meal_name}</div>
+            </div>
+            {/* Calorie badge */}
+            <div style={{ textAlign: 'center', paddingBlock: 4 }}>
+              <span style={{
+                backgroundColor: 'var(--accent)', color: '#FFFFFF',
+                paddingInline: 20, paddingBlock: 8,
+                borderRadius: 20, fontSize: 16, fontWeight: 700,
+                display: 'inline-block',
+              }}>{selectedMeal.total_calories} سعرة</span>
+            </div>
+            {/* Macro row */}
+            {(selectedMeal.protein_g > 0 || selectedMeal.carbs_g > 0 || selectedMeal.fat_g > 0) && (
+              <div style={{
+                display: 'flex', justifyContent: 'space-around',
+                paddingBlock: 16, marginInline: 16,
+                backgroundColor: 'var(--surface)', borderRadius: 16,
+                marginBlockStart: 12,
+              }}>
+                {[
+                  { value: Math.round(selectedMeal.protein_g || 0), label: 'بروتين', color: '#3B82F6' },
+                  { value: Math.round(selectedMeal.carbs_g || 0),   label: 'كارب',   color: '#F59E0B' },
+                  { value: Math.round(selectedMeal.fat_g || 0),     label: 'دهن',    color: '#8B5CF6' },
+                ].map(({ value, label, color }) => (
+                  <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                    <span style={{ fontSize: 18, fontWeight: 700, color }}>{value}g</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Portion note */}
+            {selectedMeal.portion_note && (
+              <div style={{
+                marginInline: 16, marginBlockStart: 12,
+                padding: 12, backgroundColor: 'var(--accent-faint)',
+                borderRadius: 12, textAlign: 'right',
+                fontSize: 14, color: 'var(--text-primary)', fontFamily: F,
+              }}>📏 {selectedMeal.portion_note}</div>
+            )}
+            {/* Ingredients */}
+            {selectedMeal.ingredients?.length > 0 && (
+              <>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', paddingInline: 16, marginBlockStart: 16, textAlign: 'right', fontFamily: F }}>المكونات</div>
+                {selectedMeal.ingredients.map((ing, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+                    paddingBlock: 8, paddingInline: 16,
+                    borderBottom: '1px solid var(--accent-faint)',
+                  }}>
+                    <span style={{ fontSize: 14, color: 'var(--text-primary)', textAlign: 'right', fontFamily: F }}>
+                      {typeof ing === 'string' ? ing : (ing.name + (ing.portion ? ` — ${ing.portion}` : ''))}
+                    </span>
+                    <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: 'var(--accent)', marginInlineStart: 8, flexShrink: 0 }} />
+                  </div>
+                ))}
+              </>
+            )}
+            {/* Nutrition details */}
+            {[
+              ['fiber_g',         'ألياف',          'g'],
+              ['sugar_g',         'سكر',            'g'],
+              ['saturated_fat_g', 'دهون مشبعة',     'g'],
+              ['cholesterol_mg',  'كوليسترول',      'mg'],
+              ['sodium_mg',       'صوديوم',          'mg'],
+              ['potassium_mg',    'بوتاسيوم',       'mg'],
+            ].some(([k]) => selectedMeal[k] > 0) && (
+              <>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', paddingInline: 16, marginBlockStart: 16, textAlign: 'right', fontFamily: F }}>القيم الغذائية</div>
+                {[
+                  ['fiber_g',         'ألياف',          'g'],
+                  ['sugar_g',         'سكر',            'g'],
+                  ['saturated_fat_g', 'دهون مشبعة',     'g'],
+                  ['cholesterol_mg',  'كوليسترول',      'mg'],
+                  ['sodium_mg',       'صوديوم',          'mg'],
+                  ['potassium_mg',    'بوتاسيوم',       'mg'],
+                ].filter(([k]) => selectedMeal[k] > 0).map(([k, label, unit]) => (
+                  <div key={k} style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    paddingBlock: 8, paddingInline: 16,
+                    borderBottom: '1px solid var(--accent-faint)',
+                  }}>
+                    <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontFamily: F }}>{Math.round((selectedMeal[k] || 0) * 10) / 10}{unit}</span>
+                    <span style={{ fontSize: 14, color: 'var(--text-primary)', fontFamily: F }}>{label}</span>
+                  </div>
+                ))}
+              </>
+            )}
+            {/* Health score */}
+            {selectedMeal.health_score > 0 && (
+              <div style={{
+                marginInline: 16, marginBlockStart: 12,
+                padding: 12, backgroundColor: 'var(--card)',
+                borderRadius: 12, borderInlineStart: '3px solid var(--accent)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent)', fontFamily: F }}>{selectedMeal.health_score} / 10</span>
+                <span style={{ fontSize: 14, color: 'var(--text-primary)', fontFamily: F }}>نقاط الصحة 🌟</span>
+              </div>
+            )}
+            {/* Delete button */}
+            <button onClick={async () => { await deleteMeal(selectedMeal.id, 'meal'); setSelectedMeal(null) }} style={{
+              marginInline: 16, marginBlockStart: 16,
+              width: 'calc(100% - 32px)', padding: 12,
+              backgroundColor: '#FEF2F2', color: '#EF4444',
+              border: '1px solid #FECACA', borderRadius: 12,
+              fontSize: 14, fontWeight: 600, cursor: 'pointer',
+              fontFamily: F, display: 'block',
+            }}>🗑️ حذف الوجبة</button>
+          </div>
+        </>
+      )}
+
       <div className="meals-container">
 
         {/* ── 3-Tab bar ───────────────────────────────────────── */}
@@ -849,7 +1020,7 @@ export default function Meals() {
                     <div key={recipe.id} className="recipe-card-hover"
                       onClick={() => setSelectedRecipe(recipe)}
                       style={{ borderRadius: 16, overflow: 'hidden', backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-                      <RecipeImg src={recipe.image_url} height={130} className="recipe-card-img" />
+                      <RecipeImg src={recipe.image_url} name={recipe.name} height={130} className="recipe-card-img" />
                       <div style={{ paddingInline: 10, paddingBlock: 8 }}>
                         <div style={{
                           fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
@@ -917,14 +1088,7 @@ export default function Meals() {
                               width: 150, minWidth: 150, borderRadius: 16, overflow: 'hidden',
                               backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)', flexShrink: 0,
                             }}>
-                            {recipe.image_url
-                              ? <img src={recipe.image_url} alt="" className="recipe-card-img"
-                                  style={{ width: 150, height: 110, objectFit: 'cover', display: 'block' }} />
-                              : <div className="recipe-card-img" style={{
-                                  width: 150, height: 110, backgroundColor: 'var(--accent-faint)',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
-                                }}>🍽️</div>
-                            }
+                            <RecipeImg src={recipe.image_url} name={recipe.name} height={110} className="recipe-card-img" />
                             <div style={{ paddingInline: 10, paddingBlock: 8 }}>
                               <div style={{
                                 fontSize: 12, fontWeight: 600, color: 'var(--text-primary)',
@@ -982,7 +1146,7 @@ export default function Meals() {
                         <div key={recipe.id} className="recipe-card-hover"
                           onClick={() => setSelectedRecipe(recipe)}
                           style={{ borderRadius: 16, overflow: 'hidden', backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-                          <RecipeImg src={recipe.image_url} height={130} className="recipe-card-img" />
+                          <RecipeImg src={recipe.image_url} name={recipe.name} height={130} className="recipe-card-img" />
                           <div style={{ paddingInline: 10, paddingBlock: 8 }}>
                             <div style={{
                               fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
@@ -1131,22 +1295,36 @@ export default function Meals() {
                             {mls.length===0
                               ? <div style={{color:'rgba(255,255,255,0.2)',fontSize:'.8rem',padding:'6px 0'}}>ما سجّلت شي بعد — يلا ابدأ!</div>
                               : mls.map(m=>(
-                                <div key={m.id} style={{borderBottom:'1px solid rgba(255,255,255,0.04)',paddingBottom:10,marginBottom:10}}>
-                                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:4}}>
-                                    <div style={{flex:1}}>
-                                      <div style={{fontWeight:600,fontSize:'.88rem'}}>{m.meal_name||'Meal'}</div>
-                                      {m.portion_note&&<div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.25)',marginTop:1}}>{m.portion_note}</div>}
-                                    </div>
-                                    <div style={{display:'flex',alignItems:'center',gap:6}}>
-                                      <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,color:'#CBA23B',fontSize:'.95rem'}}>{m.total_calories}</span>
-                                      <button onClick={()=>setEditMeal(m)} style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:6,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontSize:'.7rem',padding:'3px 7px',fontFamily:"'DM Sans','Tajawal',sans-serif"}}>🔄</button>
-                                      <button onClick={()=>deleteMeal(m.id,'meal')} style={{background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:6,color:'#f87171',cursor:'pointer',fontSize:'.7rem',padding:'3px 7px'}}>✕</button>
-                                    </div>
+                                <div key={m.id} onClick={() => setSelectedMeal(m)} style={{
+                                  display:'flex', alignItems:'center', gap:12,
+                                  paddingInline:0, paddingBlock:10,
+                                  borderBottom:'1px solid var(--accent-faint)',
+                                  cursor:'pointer',
+                                }}>
+                                  {/* Avatar */}
+                                  <div style={{
+                                    width:48, height:48, borderRadius:12, flexShrink:0,
+                                    backgroundColor: MEAL_COLORS[m.meal_type]?.bg || '#F5F5F5',
+                                    display:'flex', alignItems:'center', justifyContent:'center',
+                                    fontSize:22,
+                                  }}>
+                                    {MEAL_COLORS[m.meal_type]?.emoji || '🍽️'}
                                   </div>
-                                  <div style={{display:'flex',gap:8,fontSize:'.7rem',flexWrap:'wrap'}}>
-                                    {[['ب',m.protein_g,'#3b82f6'],['ك',m.carbs_g,'#f97316'],['د',m.fat_g,'#a855f7'],['أ',m.fiber_g,'#22c55e']].map(([l,v,c])=>v>0&&(
-                                      <span key={l} style={{color:c,fontWeight:700}}>{l} {Math.round(v||0)}g</span>
-                                    ))}
+                                  {/* Info */}
+                                  <div style={{flex:1, textAlign:'right'}}>
+                                    <div style={{fontSize:14, fontWeight:600, color:'var(--text-primary)'}}>{m.meal_name||'Meal'}</div>
+                                    <div style={{fontSize:12, color:'var(--text-secondary)', marginBlockStart:2, display:'flex', gap:8, justifyContent:'flex-end'}}>
+                                      {m.protein_g > 0 && <span style={{color:'#3B82F6'}}>بروتين {Math.round(m.protein_g)}g</span>}
+                                      {m.carbs_g > 0 && <span style={{color:'#F59E0B'}}>كارب {Math.round(m.carbs_g)}g</span>}
+                                      {m.fat_g > 0 && <span style={{color:'#8B5CF6'}}>دهن {Math.round(m.fat_g)}g</span>}
+                                    </div>
+                                    {m.portion_note && <div style={{fontSize:11, color:'var(--text-secondary)', textAlign:'right', marginBlockStart:2}}>{m.portion_note}</div>}
+                                  </div>
+                                  {/* Calories + arrow */}
+                                  <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:2, flexShrink:0}}>
+                                    <span style={{fontSize:15, fontWeight:700, color:'var(--accent)'}}>{m.total_calories}</span>
+                                    <span style={{fontSize:10, color:'var(--text-secondary)'}}>سعرة</span>
+                                    <span style={{fontSize:12, color:'var(--text-secondary)'}}>←</span>
                                   </div>
                                 </div>
                               ))
@@ -1568,43 +1746,53 @@ export default function Meals() {
               <div>
                 {/* Page header */}
                 <div style={{ paddingBlock: 16, paddingInline: 16, textAlign: 'right' }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#ECE3CF', marginBottom: 4 }}>تحليل الوجبة 🔍</div>
-                  <div style={{ fontSize: 14, color: 'rgba(236,227,207,0.5)' }}>صوّري وجبتك أو اكتبي مكوناتها</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4, fontFamily: F }}>تحليل الوجبة 🔍</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-secondary)', fontFamily: F }}>صوّري وجبتك أو اكتبي مكوناتها</div>
                 </div>
 
                 <div style={{ padding: '0 16px' }}>
                   {/* Image upload area */}
-                  <div
-                    onClick={() => { t3FileRef.current.removeAttribute('capture'); t3FileRef.current.click() }}
-                    style={{ border: `2px dashed ${t3ImgPreview ? 'rgba(255,255,255,0.1)' : 'rgba(203,162,59,0.18)'}`, borderRadius: 16, overflow: 'hidden', marginBottom: 10, cursor: 'pointer', minHeight: t3ImgPreview ? 0 : 140, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)' }}>
-                    {t3ImgPreview
-                      ? <div style={{ position: 'relative', width: '100%' }}>
-                          <img src={t3ImgPreview} alt="" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
-                          <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(0,0,0,.75)', borderRadius: 6, padding: '3px 10px', fontSize: '.68rem', color: 'rgba(255,255,255,.5)' }}>اضغطي لتغيير الصورة</div>
-                        </div>
-                      : <div style={{ textAlign: 'center', padding: '28px' }}>
-                          <div style={{ fontSize: '3rem', marginBottom: 8 }}>📸</div>
-                          <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '.88rem', fontWeight: 600 }}>صوّري وجبتك</div>
-                          <div style={{ color: 'rgba(255,255,255,0.18)', fontSize: '.72rem', marginTop: 4 }}>أو اختاري صورة من المعرض</div>
-                        </div>}
-                  </div>
+                  {t3ImgPreview ? (
+                    <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', marginBottom: 12, cursor: 'pointer' }}
+                      onClick={() => { t3FileRef.current.removeAttribute('capture'); t3FileRef.current.click() }}>
+                      <img src={t3ImgPreview} alt="" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
+                      <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(0,0,0,.75)', borderRadius: 6, padding: '3px 10px', fontSize: '.68rem', color: 'rgba(255,255,255,.6)' }}>اضغطي لتغيير الصورة</div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => { t3FileRef.current.removeAttribute('capture'); t3FileRef.current.click() }}
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '2px dashed var(--accent-soft)',
+                        borderRadius: 16, padding: 32,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 12, cursor: 'pointer', minHeight: 180,
+                        marginBottom: 12,
+                      }}>
+                      <span style={{ fontSize: 48 }}>📸</span>
+                      <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: F }}>صوّري وجبتك</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>أو اختاري صورة من المعرض</span>
+                    </div>
+                  )}
                   <input ref={t3FileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => t3LoadImg(e.target.files[0])} />
 
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                    <button
-                      onClick={() => { t3FileRef.current.removeAttribute('capture'); t3FileRef.current.click() }}
-                      style={{ flex: 1, padding: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontFamily: F, fontSize: '.82rem', fontWeight: 600 }}>
-                      🖼 المعرض
-                    </button>
+                  {/* Camera / Gallery buttons */}
+                  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBlockStart: t3ImgPreview ? 0 : 4, marginBottom: 16 }}>
                     <button
                       onClick={() => { t3FileRef.current.setAttribute('capture', 'environment'); t3FileRef.current.click() }}
-                      style={{ flex: 1, padding: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontFamily: F, fontSize: '.82rem', fontWeight: 600 }}>
+                      style={{ paddingInline: 20, paddingBlock: 10, borderRadius: 20, fontSize: 14, fontWeight: 500, cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'var(--text-primary)', color: '#FFFFFF', fontFamily: F }}>
                       📷 الكاميرا
+                    </button>
+                    <button
+                      onClick={() => { t3FileRef.current.removeAttribute('capture'); t3FileRef.current.click() }}
+                      style={{ paddingInline: 20, paddingBlock: 10, borderRadius: 20, fontSize: 14, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'var(--card)', color: 'var(--text-primary)', border: '1px solid var(--accent-soft)', fontFamily: F }}>
+                      🖼 المعرض
                     </button>
                     {t3ImgPreview && (
                       <button
                         onClick={() => { setT3ImgB64(null); setT3ImgPreview(null) }}
-                        style={{ padding: '10px 13px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, color: '#f87171', cursor: 'pointer' }}>
+                        style={{ paddingInline: 14, paddingBlock: 10, borderRadius: 20, fontSize: 14, cursor: 'pointer', border: '1px solid #FECACA', backgroundColor: '#FEF2F2', color: '#EF4444', fontFamily: F }}>
                         ✕
                       </button>
                     )}
@@ -1612,27 +1800,37 @@ export default function Meals() {
 
                   {/* Divider */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '.7rem', fontWeight: 700, whiteSpace: 'nowrap' }}>أو صفي الوجبة بكلامك</span>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
+                    <div style={{ flex: 1, height: 1, background: 'var(--accent-faint)' }} />
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '.7rem', fontWeight: 700, whiteSpace: 'nowrap', fontFamily: F }}>أو صفي الوجبة بكلامك</span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--accent-faint)' }} />
                   </div>
 
                   {/* Text input */}
                   <textarea
+                    className="t3-textarea"
                     value={t3TextInput}
                     onChange={e => setT3TextInput(e.target.value)}
                     placeholder="أو اكتبي مكونات الوجبة مثل: أرز بسمتي ١٠٠ج، دجاج مشوي ١٥٠ج..."
                     rows={4}
-                    style={{ marginBottom: 12, resize: 'none', lineHeight: 1.7 }}
+                    style={{
+                      marginBottom: 12, resize: 'vertical', lineHeight: 1.7,
+                      backgroundColor: 'var(--card)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--accent-soft)',
+                      borderRadius: 12, padding: 14, width: '100%',
+                      fontSize: 14, textAlign: 'right',
+                      minHeight: 100,
+                      fontFamily: F,
+                    }}
                   />
 
                   {t3ImgB64 && t3TextInput && (
-                    <div style={{ color: '#CBA23B', fontSize: '.72rem', marginBottom: 10, fontWeight: 600 }}>✓ سيتم دمج الصورة والوصف لتحليل أدق</div>
+                    <div style={{ color: 'var(--accent)', fontSize: '.72rem', marginBottom: 10, fontWeight: 600, fontFamily: F }}>✓ سيتم دمج الصورة والوصف لتحليل أدق</div>
                   )}
 
                   {/* Error */}
                   {t3Err && (
-                    <div style={{ color: '#fca5a5', fontSize: '.8rem', marginBottom: 10, padding: '10px 14px', background: 'rgba(239,68,68,.08)', borderRadius: 10, border: '1px solid rgba(239,68,68,.2)' }}>
+                    <div style={{ color: '#fca5a5', fontSize: '.8rem', marginBottom: 10, padding: '10px 14px', background: 'rgba(239,68,68,.08)', borderRadius: 10, border: '1px solid rgba(239,68,68,.2)', fontFamily: F }}>
                       {t3Err}
                     </div>
                   )}
@@ -1640,13 +1838,21 @@ export default function Meals() {
                   {/* Analyze button */}
                   {t3Analyzing
                     ? <div style={{ textAlign: 'center', padding: '28px' }}>
-                        <div style={{ width: 44, height: 44, border: '3px solid rgba(203,162,59,0.2)', borderTopColor: '#CBA23B', borderRadius: '50%', animation: 'spin .8s linear infinite', margin: '0 auto 14px' }} />
-                        <div style={{ color: '#CBA23B', fontWeight: 700, fontFamily: "'Space Grotesk','Tajawal',sans-serif", letterSpacing: 1 }}>جارٍ التحليل...</div>
+                        <div style={{ width: 44, height: 44, border: '3px solid rgba(203,162,59,0.2)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin .8s linear infinite', margin: '0 auto 14px' }} />
+                        <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontFamily: F }}>جارٍ التحليل...</div>
                       </div>
                     : <button
                         onClick={t3Analyze}
                         disabled={t3Analyzing || (!t3ImgB64 && !t3TextInput.trim())}
-                        style={{ width: '100%', padding: '16px', background: (!t3ImgB64 && !t3TextInput.trim()) ? 'rgba(255,255,255,0.05)' : '#CBA23B', border: 'none', borderRadius: 14, fontFamily: "'Space Grotesk','Tajawal',sans-serif", fontWeight: 800, fontSize: '1rem', color: (!t3ImgB64 && !t3TextInput.trim()) ? 'rgba(255,255,255,0.2)' : '#0C0B0D', cursor: (!t3ImgB64 && !t3TextInput.trim()) ? 'not-allowed' : 'pointer', transition: 'all .2s' }}>
+                        style={{
+                          marginBlockStart: 16, width: '100%', padding: 14,
+                          backgroundColor: (!t3ImgB64 && !t3TextInput.trim()) ? 'var(--accent-soft)' : 'var(--text-primary)',
+                          color: '#FFFFFF',
+                          border: 'none', borderRadius: 16, fontSize: 15,
+                          fontWeight: 700, cursor: (!t3ImgB64 && !t3TextInput.trim()) ? 'not-allowed' : 'pointer',
+                          fontFamily: F, opacity: (!t3ImgB64 && !t3TextInput.trim()) ? 0.5 : 1,
+                          transition: 'all .2s',
+                        }}>
                         تحليل 🔍
                       </button>
                   }
