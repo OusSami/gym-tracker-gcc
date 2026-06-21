@@ -14,6 +14,7 @@ const recipes = raw.recipes.map(r => ({ ...r }))   // shallow clone each record
 
 let stats = {
   cookTimeNulled:    0,
+  namesStripped:     0,   // trailing suffix removed
   imagePathFixed:    0,   // case-normalized (still exists)
   imageLocalNulled:  0,   // file not found on disk
   namesDeduped:      0,
@@ -35,7 +36,22 @@ for (const r of recipes) {
   r.servings = sv || null
 }
 
-// ── 2. Normalize image_local extension case + existence check ────────────────
+// ── 2. Strip trailing suffixes from recipe names ─────────────────────────────
+// Patterns added by the scraper that aren't part of the real dish name.
+// Order matters: longest match first.
+// بالفيديو is only stripped when it trails the name, not mid-name.
+for (const r of recipes) {
+  const before = r.name
+  r.name = r.name
+    .replace(/[\s-]*(خطوة بخطوة بالصور|خطوة بخطوة|بالصور)\s*$/g, '')
+    .trim()
+  r.name = r.name
+    .replace(/[\s-]*بالفيديو\s*$/g, '')
+    .trim()
+  if (r.name !== before) stats.namesStripped++
+}
+
+// ── 3. Normalize image_local extension case + existence check ────────────────
 for (const r of recipes) {
   if (!r.image_local) continue
 
@@ -59,7 +75,8 @@ for (const r of recipes) {
   }
 }
 
-// ── 3. Deduplicate names ─────────────────────────────────────────────────────
+// ── 4. Deduplicate names ─────────────────────────────────────────────────────
+// Runs after stripping so post-strip collisions are caught here.
 const nameCounts = {}
 for (const r of recipes) {
   const n = r.name
@@ -72,7 +89,7 @@ for (const r of recipes) {
   }
 }
 
-// ── 4. Write output ──────────────────────────────────────────────────────────
+// ── 5. Write output ──────────────────────────────────────────────────────────
 const output = {
   ...raw,
   cleaned_at: new Date().toISOString(),
@@ -81,12 +98,13 @@ const output = {
 }
 fs.writeFileSync(OUTPUT, JSON.stringify(output, null, 2), 'utf8')
 
-// ── 5. Summary ───────────────────────────────────────────────────────────────
+// ── 6. Summary ───────────────────────────────────────────────────────────────
 console.log('\n✅ Cleaning complete')
 console.log(`   Output:               ${OUTPUT}`)
 console.log(`   Total recipes:        ${recipes.length}`)
 console.log(`   cook_time nulled:     ${stats.cookTimeNulled}`)
+console.log(`   names stripped:       ${stats.namesStripped}  (trailing suffix removed)`)
 console.log(`   image_local fixed:    ${stats.imagePathFixed}  (case-normalized, file exists)`)
 console.log(`   image_local nulled:   ${stats.imageLocalNulled}  (file missing on disk)`)
-console.log(`   names deduplicated:   ${stats.namesDeduped}`)
+console.log(`   names deduplicated:   ${stats.namesDeduped}  (post-strip collisions)`)
 console.log()
