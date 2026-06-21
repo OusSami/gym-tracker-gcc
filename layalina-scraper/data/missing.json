@@ -1,0 +1,219 @@
+{
+  "generated_at": "2026-06-21T07:43:48.575Z",
+  "summary": {
+    "total": 141,
+    "complete": 117,
+    "missing_ingredients": 17,
+    "missing_steps": 24,
+    "missing_both": 17
+  },
+  "missing_ingredients": [
+    {
+      "name": "سلطة التونة بالزيتون والمعكرونة",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%B2%D9%8A%D8%AA%D9%88%D9%86-%D9%88%D8%A7%D9%84%D9%85%D8%B9%D9%83%D8%B1%D9%88%D9%86%D8%A9-0.html",
+      "steps": 0
+    },
+    {
+      "name": "ما هي أسهل وصفة سلطة سريعة للغداء؟ إليكِ سلطة المكرونة بالتونة",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D9%85%D9%83%D8%B1%D9%88%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-%D8%A7%D9%84%D8%B4%D9%87%D9%8A%D8%A9-278276.html",
+      "steps": 0
+    },
+    {
+      "name": "جيب التاجر بالتونة",
+      "url": "https://yummy.layalina.com/%D8%AC%D9%8A%D8%A8-%D8%A7%D9%84%D8%AA%D8%A7%D8%AC%D8%B1-%D8%A8%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-358993.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة عمل السوشي بشكل صحي",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D8%B3%D9%88%D8%B4%D9%8A-%D8%A8%D8%B4%D9%83%D9%84-%D8%B5%D8%AD%D9%8A-363257.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة عمل السوشي في المنزل",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D8%B3%D9%88%D8%B4%D9%8A-%D9%81%D9%8A-%D8%A7%D9%84%D9%85%D9%86%D8%B2%D9%84-362931.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة تحضير سلطة الكينوا بالدجاج خطوة بخطوة: وصفة صحية وسهلة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-%D8%A8%D8%A7%D9%84%D8%AF%D8%AC%D8%A7%D8%AC-281782.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة تحضير الكينوا المقرمشة مع الدجاج والزعتر",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-%D8%A7%D9%84%D9%85%D9%82%D8%B1%D9%85%D8%B4%D8%A9-%D9%85%D8%B9-%D8%A7%D9%84%D8%AF%D8%AC%D8%A7%D8%AC-%D9%88%D8%A7%D9%84%D8%B2%D8%B9%D8%AA%D8%B1.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة تحضير شوربة الكوسا بالشوفان الشهية",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D8%B4%D9%88%D8%B1%D8%A8%D8%A9-%D8%A7%D9%84%D9%83%D9%88%D8%B3%D8%A7-%D8%A8%D8%A7%D9%84%D8%B4%D9%88%D9%81%D8%A7%D9%86-224931.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة عمل كوكيز الشوفان بالشوكولاته",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D9%83%D9%88%D9%83%D9%8A%D8%B2-%D8%A7%D9%84%D8%B4%D9%88%D9%81%D8%A7%D9%86-%D8%A8%D8%A7%D9%84%D8%B4%D9%88%D9%83%D9%88%D9%84%D8%A7-0.html",
+      "steps": 0
+    },
+    {
+      "name": "سلطة ناتشوز سهله",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%86%D8%A7%D8%AA%D8%B4%D9%88%D8%B2-%D8%B3%D9%87%D9%84%D9%87-195821.html",
+      "steps": 0
+    },
+    {
+      "name": "سلطة الخضار مع الكينوا: دليلكِ لتحضير سوبر فود بالمنزل",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AE%D8%B6%D8%A7%D8%B1-%D9%85%D8%B9-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-171590.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة عمل سلطة فواكه بالكريمة الشهية والمنعشة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%81%D9%88%D8%A7%D9%83%D9%87-%D8%A8%D8%A7%D9%84%D9%83%D8%B1%D9%8A%D9%85%D9%87-287544.html",
+      "steps": 0
+    },
+    {
+      "name": "سلطة الأفوكادو والخس: طبق صحي ولذيذ يناسب كل الأوقات",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%A3%D9%81%D9%88%D9%83%D8%A7%D8%AF%D9%88-%D9%88%D8%A7%D9%84%D8%AE%D8%B3-%D9%88%D8%B5%D9%81%D8%A9-%D9%85%D9%86%D8%B9%D8%B4%D8%A9-%D9%88%D8%B5%D8%AD%D9%8A%D8%A9-%D8%A8%D9%85%D9%83%D9%88%D9%86%D8%A7%D8%AA-%D8%A8%D8%B3%D9%8A%D8%B7%D8%A9-745391.html",
+      "steps": 0
+    },
+    {
+      "name": "ما هي طريقة تحضير سلطة الذرة والخيار؟ اكتشفي الآن",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%B0%D8%B1%D8%A9-%D9%88%D8%A7%D9%84%D8%AE%D9%8A%D8%A7%D8%B1-%D9%88%D8%B5%D9%81%D8%A9-%D8%A8%D8%B3%D9%8A%D8%B7%D8%A9-%D9%84%D9%85%D8%AD%D8%A8%D9%8A-%D8%A7%D9%84%D8%A3%D9%83%D9%84%D8%A7%D8%AA-%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%A9-745927.html",
+      "steps": 0
+    },
+    {
+      "name": "حضري سلطة الباذنجان المشوي الصحية",
+      "url": "https://yummy.layalina.com/%D8%AD%D8%B6%D8%B1%D9%8A-%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86-%D8%A7%D9%84%D9%85%D8%B4%D9%88%D9%8A-%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%A9.html",
+      "steps": 0
+    },
+    {
+      "name": "هل ترغبين بطبق جانبي شهي؟ اكتشفي وصفة سلطة فتوش الباذنجان",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%81%D8%AA%D9%88%D8%B4-%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86-%D8%A7%D9%84%D8%B4%D9%87%D9%8A%D9%91%D8%A9-281611.html",
+      "steps": 0
+    },
+    {
+      "name": "طريقة عمل اليغمش – وصفة تقليدية سهلة ولذيذة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D9%8A%D8%BA%D9%85%D8%B4-199316.html",
+      "steps": 0
+    }
+  ],
+  "missing_steps": [
+    {
+      "name": "سلطة التونة بالزيتون والمعكرونة",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%B2%D9%8A%D8%AA%D9%88%D9%86-%D9%88%D8%A7%D9%84%D9%85%D8%B9%D9%83%D8%B1%D9%88%D9%86%D8%A9-0.html",
+      "ingredients": 0
+    },
+    {
+      "name": "ما هي أسهل وصفة سلطة سريعة للغداء؟ إليكِ سلطة المكرونة بالتونة",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D9%85%D9%83%D8%B1%D9%88%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-%D8%A7%D9%84%D8%B4%D9%87%D9%8A%D8%A9-278276.html",
+      "ingredients": 0
+    },
+    {
+      "name": "جيب التاجر بالتونة",
+      "url": "https://yummy.layalina.com/%D8%AC%D9%8A%D8%A8-%D8%A7%D9%84%D8%AA%D8%A7%D8%AC%D8%B1-%D8%A8%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-358993.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة عمل السوشي بشكل صحي",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D8%B3%D9%88%D8%B4%D9%8A-%D8%A8%D8%B4%D9%83%D9%84-%D8%B5%D8%AD%D9%8A-363257.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة عمل السوشي في المنزل",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D8%B3%D9%88%D8%B4%D9%8A-%D9%81%D9%8A-%D8%A7%D9%84%D9%85%D9%86%D8%B2%D9%84-362931.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة تحضير سلطة الكينوا بالدجاج خطوة بخطوة: وصفة صحية وسهلة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-%D8%A8%D8%A7%D9%84%D8%AF%D8%AC%D8%A7%D8%AC-281782.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة تحضير الكينوا المقرمشة مع الدجاج والزعتر",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-%D8%A7%D9%84%D9%85%D9%82%D8%B1%D9%85%D8%B4%D8%A9-%D9%85%D8%B9-%D8%A7%D9%84%D8%AF%D8%AC%D8%A7%D8%AC-%D9%88%D8%A7%D9%84%D8%B2%D8%B9%D8%AA%D8%B1.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة تحضير شوربة الكوسا بالشوفان الشهية",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%AA%D8%AD%D8%B6%D9%8A%D8%B1-%D8%B4%D9%88%D8%B1%D8%A8%D8%A9-%D8%A7%D9%84%D9%83%D9%88%D8%B3%D8%A7-%D8%A8%D8%A7%D9%84%D8%B4%D9%88%D9%81%D8%A7%D9%86-224931.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة عمل كوكيز الشوفان بالشوكولاته",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D9%83%D9%88%D9%83%D9%8A%D8%B2-%D8%A7%D9%84%D8%B4%D9%88%D9%81%D8%A7%D9%86-%D8%A8%D8%A7%D9%84%D8%B4%D9%88%D9%83%D9%88%D9%84%D8%A7-0.html",
+      "ingredients": 0
+    },
+    {
+      "name": "سلطة السلمون والأفوكادو",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%B3%D9%84%D9%85%D9%88%D9%86-383446.html",
+      "ingredients": 10
+    },
+    {
+      "name": "سلطة ناتشوز سهله",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%86%D8%A7%D8%AA%D8%B4%D9%88%D8%B2-%D8%B3%D9%87%D9%84%D9%87-195821.html",
+      "ingredients": 0
+    },
+    {
+      "name": "سلطة الخضار مع الكينوا: دليلكِ لتحضير سوبر فود بالمنزل",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AE%D8%B6%D8%A7%D8%B1-%D9%85%D8%B9-%D8%A7%D9%84%D9%83%D9%8A%D9%86%D9%88%D8%A7-171590.html",
+      "ingredients": 0
+    },
+    {
+      "name": "طريقة عمل سلطة فواكه بالكريمة الشهية والمنعشة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%81%D9%88%D8%A7%D9%83%D9%87-%D8%A8%D8%A7%D9%84%D9%83%D8%B1%D9%8A%D9%85%D9%87-287544.html",
+      "ingredients": 0
+    },
+    {
+      "name": "سلطة الأفوكادو والخس: طبق صحي ولذيذ يناسب كل الأوقات",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%A3%D9%81%D9%88%D9%83%D8%A7%D8%AF%D9%88-%D9%88%D8%A7%D9%84%D8%AE%D8%B3-%D9%88%D8%B5%D9%81%D8%A9-%D9%85%D9%86%D8%B9%D8%B4%D8%A9-%D9%88%D8%B5%D8%AD%D9%8A%D8%A9-%D8%A8%D9%85%D9%83%D9%88%D9%86%D8%A7%D8%AA-%D8%A8%D8%B3%D9%8A%D8%B7%D8%A9-745391.html",
+      "ingredients": 0
+    },
+    {
+      "name": "ما هي طريقة تحضير سلطة الذرة والخيار؟ اكتشفي الآن",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%B0%D8%B1%D8%A9-%D9%88%D8%A7%D9%84%D8%AE%D9%8A%D8%A7%D8%B1-%D9%88%D8%B5%D9%81%D8%A9-%D8%A8%D8%B3%D9%8A%D8%B7%D8%A9-%D9%84%D9%85%D8%AD%D8%A8%D9%8A-%D8%A7%D9%84%D8%A3%D9%83%D9%84%D8%A7%D8%AA-%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%A9-745927.html",
+      "ingredients": 0
+    },
+    {
+      "name": "حضري سلطة الباذنجان المشوي الصحية",
+      "url": "https://yummy.layalina.com/%D8%AD%D8%B6%D8%B1%D9%8A-%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86-%D8%A7%D9%84%D9%85%D8%B4%D9%88%D9%8A-%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%A9.html",
+      "ingredients": 0
+    },
+    {
+      "name": "هل ترغبين بطبق جانبي شهي؟ اكتشفي وصفة سلطة فتوش الباذنجان",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D9%81%D8%AA%D9%88%D8%B4-%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86-%D8%A7%D9%84%D8%B4%D9%87%D9%8A%D9%91%D8%A9-281611.html",
+      "ingredients": 0
+    },
+    {
+      "name": "ساندوتش التونة",
+      "url": "https://yummy.layalina.com/%D8%B3%D8%A7%D9%86%D8%AF%D9%88%D8%AA%D8%B4-%D8%A7%D9%84%D8%AA%D9%88%D9%86%D8%A9-397489.html",
+      "ingredients": 12
+    },
+    {
+      "name": "سلطة الزبادي بالخيار",
+      "url": "https://yummy.layalina.com/%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%B2%D8%A8%D8%A7%D8%AF%D9%8A-%D8%A8%D8%A7%D9%84%D8%AE%D9%8A%D8%A7%D8%B1-430621.html",
+      "ingredients": 10
+    },
+    {
+      "name": "طريقة عمل اليغمش – وصفة تقليدية سهلة ولذيذة | يمي",
+      "url": "https://yummy.layalina.com/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D9%8A%D8%BA%D9%85%D8%B4-199316.html",
+      "ingredients": 0
+    },
+    {
+      "name": "كيف يحضر مقلقل لحم الحاشي",
+      "url": "https://yummy.layalina.com/%D9%85%D9%82%D9%84%D9%82%D9%84-%D9%84%D8%AD%D9%85-%D8%A7%D9%84%D8%AD%D8%A7%D8%B4%D9%8A-367678.html",
+      "ingredients": 15
+    },
+    {
+      "name": "شاكرية باللحم",
+      "url": "https://yummy.layalina.com/%D8%B4%D8%A7%D9%83%D8%B1%D9%8A%D8%A9-%D8%A8%D8%A7%D9%84%D9%84%D8%AD%D9%85-397378.html",
+      "ingredients": 11
+    },
+    {
+      "name": "تشيلي اللحم",
+      "url": "https://yummy.layalina.com/%D8%AA%D8%B4%D9%8A%D9%84%D9%8A-%D8%A7%D9%84%D9%84%D8%AD%D9%85-384357.html",
+      "ingredients": 13
+    },
+    {
+      "name": "ما هي طريقة الكمونية باللحم",
+      "url": "https://yummy.layalina.com/%D8%A7%D9%84%D9%83%D9%85%D9%88%D9%86%D9%8A%D8%A9-%D8%A8%D8%A7%D9%84%D9%84%D8%AD%D9%85-383594.html",
+      "ingredients": 7
+    }
+  ]
+}
