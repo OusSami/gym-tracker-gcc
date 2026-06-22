@@ -20,6 +20,21 @@ const CATEGORIES = [
   { label: 'مشروبات',        match: ['عصير','شاي','قهوة','مشروب','كوكتيل','سموذي'] },
 ]
 
+const VISUAL_CATEGORIES = [
+  { label: 'أطباق رئيسية',  image: '/categories/cat-main-dish.webp',   filter: 'أرز ومجبوس',   emoji: '🍚', bg: '#FFF3E0' },
+  { label: 'فطور',          image: '/categories/cat-breakfast.webp',    filter: 'فطور',          emoji: '🌅', bg: '#FFF8E1' },
+  { label: 'حلويات',        image: '/categories/cat-dessert.webp',      filter: 'حلويات',        emoji: '🍯', bg: '#FCE4EC' },
+  { label: 'شوربة',         image: '/categories/cat-soup.webp',         filter: 'شوربة',         emoji: '🥣', bg: '#E8F5E9' },
+  { label: 'سلطة',          image: '/categories/cat-salad.webp',        filter: 'سلطة',          emoji: '🥗', bg: '#F1F8E9' },
+  { label: 'مشويات',        image: '/categories/cat-grills.webp',       filter: 'لحم',           emoji: '🍖', bg: '#FBE9E7' },
+  { label: 'مأكولات بحرية', image: '/categories/cat-seafood.webp',      filter: 'سمك',           emoji: '🐟', bg: '#E3F2FD' },
+  { label: 'أطباق خليجية', image: '/categories/cat-gulf.webp',          filter: 'أطباق خليجية', emoji: '🫕', bg: '#FFF8E1' },
+  { label: 'مشروبات',       image: '/categories/cat-drinks.webp',       filter: 'مشروبات',       emoji: '☕', bg: '#E8EAF6' },
+  { label: 'صحي وخفيف',     image: '/categories/cat-healthy.webp',      filter: 'سلطة',          emoji: '🥬', bg: '#F1F8E9' },
+  { label: 'سريع التحضير',  image: '/categories/cat-quick.webp',        filter: 'مقبلات',        emoji: '⚡', bg: '#FFF9C4' },
+  { label: 'مقبلات',        image: '/categories/cat-appetizers.webp',   filter: 'مقبلات',        emoji: '🫙', bg: '#EDE7F6' },
+]
+
 // ── Meal types (Tab 2 AI analyzer — icon + color from original) ───────────
 const MEAL_TYPES = [
   { id:'breakfast', label:'الفطور', icon:'☀️', color:'#eab308' },
@@ -152,6 +167,23 @@ function RecipeImgFallback({ name, height, className }) {
         WebkitBoxOrient: 'vertical', overflow: 'hidden',
       }}>{name}</span>
     </div>
+  )
+}
+
+function CategoryCardImg({ src, bg, emoji }) {
+  const [errored, setErrored] = React.useState(false)
+  if (!src || errored) {
+    return (
+      <div style={{
+        position: 'absolute', inset: 0, backgroundColor: bg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
+      }}>{emoji}</div>
+    )
+  }
+  return (
+    <img src={src} alt=""
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      onError={() => setErrored(true)} />
   )
 }
 
@@ -1145,6 +1177,50 @@ export default function Meals() {
                           </div>
                         ))
                     }
+                  </div>
+                </div>
+
+                {/* "تصفح حسب الفئة" visual category cards */}
+                <div>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    paddingInline: 16, marginBlockStart: 20, marginBlockEnd: 12,
+                  }}>
+                    <div />
+                    <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', fontFamily: F }}>
+                      تصفح حسب الفئة
+                    </span>
+                  </div>
+                  <div className="stat-scroll" style={{ display: 'flex', overflowX: 'auto', gap: 12, paddingInline: 16, paddingBlockEnd: 12 }}>
+                    {VISUAL_CATEGORIES.map((cat, idx) => {
+                      const isActive = activeCategory === cat.filter
+                      const fallbackBgs = ['#FBE9E7','#E8F5E9','#FFF3E0','#E3F2FD','#F3E5F5','#FCE4EC','#E8EAF6','#FFF8E1','#E0F7FA','#F1F8E9','#FFF9C4','#EDE7F6']
+                      const fallbackEmojis = ['🍚','🌅','🍯','🥣','🥗','🍖','🐟','🫕','☕','🥬','⚡','🫙']
+                      return (
+                        <div key={cat.label}
+                          onClick={() => setActiveCategory(isActive ? 'الكل' : cat.filter)}
+                          style={{
+                            position: 'relative', width: 130, minWidth: 130, height: 160,
+                            borderRadius: 20, overflow: 'hidden', cursor: 'pointer', flexShrink: 0,
+                            outline: isActive ? '3px solid var(--accent)' : 'none',
+                            outlineOffset: isActive ? '2px' : '0',
+                          }}>
+                          <CategoryCardImg src={cat.image} bg={fallbackBgs[idx % fallbackBgs.length]} emoji={fallbackEmojis[idx % fallbackEmojis.length]} />
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.7) 100%)',
+                          }} />
+                          <span style={{
+                            position: 'absolute', bottom: 12,
+                            insetInlineEnd: 0, insetInlineStart: 0,
+                            textAlign: 'center', fontSize: 13, fontWeight: 700,
+                            color: '#FFFFFF', paddingInline: 8,
+                            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                            fontFamily: F,
+                          }}>{cat.label}</span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
 
