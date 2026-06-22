@@ -6,13 +6,18 @@ import { calcNutrientGoals, fmt } from '../lib/nutrition'
 
 // ── Recipe categories (Tab 1) ─────────────────────────────────────────────
 const CATEGORIES = [
-  { label: 'الكل',    match: null },
-  { label: 'رئيسي',  match: ['كبسة','مجبوس','برياني','دجاج','لحم','سمك','أرز','مندي','هريسة','ملوخية','مقلوبة'] },
-  { label: 'حلوى',   match: ['حلوى','كيك','تمر','لقيمات','بسبوسة','كنافة','مهلبية','عصيدة','حلو'] },
-  { label: 'شوربة',  match: ['شوربة','حساء'] },
-  { label: 'سلطة',   match: ['سلطة','تبولة'] },
-  { label: 'فطور',   match: ['فطور','بيض','خبز','فول','فلافل','عجة'] },
-  { label: 'مشويات', match: ['مشوي','مشاوي','كباب','شيش','تكا'] },
+  { label: 'الكل',           match: null },
+  { label: 'أرز ومجبوس',    match: ['أرز','مجبوس','كبسة','برياني','مندي','رز','بخاري','مقلوبة','زربيان','قبولي','جريش','هريسة','باستا','معكرونة','مكرونة'] },
+  { label: 'دجاج',           match: ['دجاج','دجاجة','فراخ','فرخة','تشيكن'] },
+  { label: 'لحم',            match: ['لحم','لحمة','كباب','كفتة','شيش','مشاوي','ضلع','برغر','ستيك'] },
+  { label: 'سمك',            match: ['سمك','ربيان','جمبري','قريدس','حبار','هامور','ميرو','فيليه','تونة'] },
+  { label: 'حلويات',         match: ['حلوى','حلا','كيك','تمر','لقيمات','بسبوسة','كنافة','مهلبية','بقلاوة','سحلب','كوكيز','براونيز','تشيز','وافل','دونات'] },
+  { label: 'شوربة',          match: ['شوربة','حساء','مرق'] },
+  { label: 'سلطة',           match: ['سلطة','تبولة','فتوش'] },
+  { label: 'فطور',           match: ['فطور','فول','فلافل','بيض','عجة','شكشوكة','أومليت'] },
+  { label: 'أطباق خليجية',  match: ['غيمش','هريس','بليلة','هنيني','قوزي','مضبي','عصيد','سليق','حنيذ','مراصيع','مطازيز'] },
+  { label: 'مقبلات',         match: ['مقبلات','دقوس','بابا غنوج','حمص','متبل','محمرة'] },
+  { label: 'مشروبات',        match: ['عصير','شاي','قهوة','مشروب','كوكتيل','سموذي'] },
 ]
 
 // ── Meal types (Tab 2 AI analyzer — icon + color from original) ───────────
@@ -822,7 +827,16 @@ export default function Meals() {
   const filtered = browsePool.filter(r => {
     const matchesCat = activeCategory === 'الكل'
       ? true
-      : CATEGORIES.find(c => c.label === activeCategory)?.match?.some(kw => r.name?.includes(kw))
+      : (() => {
+          // Primary: DB category field (exact label match)
+          if (r.category) {
+            const cat = CATEGORIES.find(c => c.label === activeCategory)
+            if (cat?.label === r.category) return true
+          }
+          // Fallback: keyword match on name
+          const cat = CATEGORIES.find(c => c.label === activeCategory)
+          return cat?.match?.some(kw => r.name?.includes(kw)) ?? false
+        })()
     const matchesSearch = !search.trim() || r.name?.includes(search.trim())
     return matchesCat && matchesSearch
   })
