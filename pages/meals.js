@@ -30,6 +30,27 @@ const MEAL_COLORS = {
   snack:     { bg: '#FCE4EC', emoji: '🍎' },
 }
 
+const FOOD_VISUALS = [
+  { keywords:['أرز','برياني','مجبوس','كبسة','رز'],    emoji:'🍚', bg:'#FFF3E0' },
+  { keywords:['دجاج','فراخ','دجاجة'],                 emoji:'🍗', bg:'#FBE9E7' },
+  { keywords:['لحم','مندي','هريسة'],                  emoji:'🥩', bg:'#FCE4EC' },
+  { keywords:['سمك','ربيان','جمبري'],                 emoji:'🐟', bg:'#E3F2FD' },
+  { keywords:['شوربة','حساء'],                        emoji:'🥣', bg:'#E8F5E9' },
+  { keywords:['سلطة','خضار','خضروات'],                emoji:'🥗', bg:'#F1F8E9' },
+  { keywords:['حلوى','كيك','تمر','لقيمات','حلو'],    emoji:'🍯', bg:'#FFFDE7' },
+  { keywords:['بيض','فطور','فول','فلافل'],            emoji:'🥚', bg:'#FFF9C4' },
+  { keywords:['فاكهة','تفاح','موز','برتقال'],         emoji:'🍎', bg:'#FCE4EC' },
+  { keywords:['ماء','عصير','شاي','قهوة'],             emoji:'🥤', bg:'#E8EAF6' },
+]
+
+function getFoodVisual(name) {
+  if (!name) return { emoji:'🍽️', bg:'#F7E9DF' }
+  for (const v of FOOD_VISUALS) {
+    if (v.keywords.some(k => name.includes(k))) return v
+  }
+  return { emoji:'🍽️', bg:'#F7E9DF' }
+}
+
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 const addDays = (dateStr, n) => {
@@ -792,7 +813,13 @@ export default function Meals() {
   const pct = (val, goal) => goal > 0 ? Math.round((val / goal) * 100) : 0
 
   // ── Derived (Tab 1) ──────────────────────────────────────────────────────
-  const filtered = recipes.filter(r => {
+  // Strip always shows first 8 of the shuffled array
+  const stripRecipes = recipes.slice(0, 8)
+
+  // Browse pool excludes the strip items so grid/A2 always differ from the strip
+  const browsePool = recipes.slice(8)
+
+  const filtered = browsePool.filter(r => {
     const matchesCat = activeCategory === 'الكل'
       ? true
       : CATEGORIES.find(c => c.label === activeCategory)?.match?.some(kw => r.name?.includes(kw))
@@ -1081,7 +1108,7 @@ export default function Meals() {
                             borderRadius: 16, backgroundColor: 'var(--accent-faint)',
                           }} />
                         ))
-                      : recipes.slice(0, 8).map(recipe => (
+                      : stripRecipes.map(recipe => (
                           <div key={recipe.id} className="recipe-card-hover"
                             onClick={() => setSelectedRecipe(recipe)}
                             style={{
