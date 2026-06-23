@@ -335,32 +335,38 @@ function RecipeDetail({ recipe, onBack }) {
           backgroundColor: 'var(--card)', borderRadius: 16,
           padding: 16, boxShadow: 'var(--shadow-card)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBlockEnd: 14 }}>
+          {/* Toggle */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBlockEnd: 16 }}>
             <div style={{
-              display: 'flex', borderRadius: 20,
-              backgroundColor: 'var(--surface-inset)', padding: 3, gap: 2,
+              display: 'flex', borderRadius: 12,
+              backgroundColor: 'var(--surface-inset)', padding: 4, gap: 4,
+              width: 'fit-content',
             }}>
               {[{ label: 'حصة كاملة', val: false }, { label: '100g', val: true }].map(({ label, val }) => (
                 <button key={label} onClick={() => setPer100g(val)} style={{
-                  paddingInline: 12, paddingBlock: 5, borderRadius: 16,
-                  fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
-                  fontFamily: F,
+                  paddingInline: 20, paddingBlock: 8, borderRadius: 10,
+                  fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer',
+                  fontFamily: F, transition: 'all 0.2s',
                   backgroundColor: per100g === val ? 'var(--text-primary)' : 'transparent',
                   color: per100g === val ? '#FFFFFF' : 'var(--text-secondary)',
-                  transition: 'background-color .15s, color .15s',
+                  boxShadow: per100g === val ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
                 }}>
                   {label}
                 </button>
               ))}
             </div>
-            <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent)', fontFamily: F }}>
-              {per100g ? (recipe.cal_per_100g ?? recipe.calories) : recipe.calories} سعرة
-            </span>
           </div>
-          <div style={{
-            display: 'flex', justifyContent: 'space-around',
-            paddingBlockStart: 12, borderTop: '1px solid var(--accent-faint)',
-          }}>
+          {/* Calorie count */}
+          <div style={{ textAlign: 'center', marginBlockEnd: 16 }}>
+            <span style={{ fontSize: 36, fontWeight: 900, color: 'var(--accent)', lineHeight: 1, fontFamily: F }}>
+              {per100g ? (recipe.cal_per_100g ?? recipe.calories) : recipe.calories}
+            </span>
+            <span style={{ fontSize: 14, color: 'var(--text-secondary)', display: 'block', marginBlockStart: 4, fontFamily: F }}>سعرة</span>
+          </div>
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid var(--accent-faint)', marginBlockEnd: 14 }} />
+          {/* Macro row */}
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
             {[
               { value: per100g ? recipe.protein_per_100g : recipe.protein_g, label: 'بروتين', color: '#3B82F6' },
               { value: per100g ? recipe.carbs_per_100g   : recipe.carbs_g,   label: 'كارب',   color: '#F59E0B' },
