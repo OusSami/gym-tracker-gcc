@@ -287,6 +287,7 @@ function SearchAndChips({ search, onSearch, activeCategory, onCategory, showChip
 
 function RecipeDetail({ recipe, onBack }) {
   const [detailTab, setDetailTab] = useState('ingredients')
+  const [per100g, setPer100g] = useState(false)
   return (
     <div style={{ direction: 'rtl', backgroundColor: 'var(--surface)', minHeight: '100vh' }}>
       <div style={{ paddingInline: 16, paddingBlock: 12, textAlign: 'right' }}>
@@ -334,20 +335,41 @@ function RecipeDetail({ recipe, onBack }) {
           backgroundColor: 'var(--card)', borderRadius: 16,
           padding: 16, boxShadow: 'var(--shadow-card)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBlockEnd: 12 }}>
-            <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', fontFamily: F }}>{recipe.calories} سعرة</span>
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>القيم الغذائية / حصة</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBlockEnd: 14 }}>
+            <div style={{
+              display: 'flex', borderRadius: 20,
+              backgroundColor: 'var(--surface-inset)', padding: 3, gap: 2,
+            }}>
+              {[{ label: 'حصة كاملة', val: false }, { label: '100g', val: true }].map(({ label, val }) => (
+                <button key={label} onClick={() => setPer100g(val)} style={{
+                  paddingInline: 12, paddingBlock: 5, borderRadius: 16,
+                  fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
+                  fontFamily: F,
+                  backgroundColor: per100g === val ? 'var(--text-primary)' : 'transparent',
+                  color: per100g === val ? '#FFFFFF' : 'var(--text-secondary)',
+                  transition: 'background-color .15s, color .15s',
+                }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent)', fontFamily: F }}>
+              {per100g ? (recipe.cal_per_100g ?? recipe.calories) : recipe.calories} سعرة
+            </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <div style={{
+            display: 'flex', justifyContent: 'space-around',
+            paddingBlockStart: 12, borderTop: '1px solid var(--accent-faint)',
+          }}>
             {[
-              { value: recipe.protein_g, label: 'بروتين', color: '#3B82F6' },
-              { value: recipe.carbs_g,   label: 'كارب',   color: '#F59E0B' },
-              { value: recipe.fat_g,     label: 'دهن',    color: '#8B5CF6' },
+              { value: per100g ? recipe.protein_per_100g : recipe.protein_g, label: 'بروتين', color: '#3B82F6' },
+              { value: per100g ? recipe.carbs_per_100g   : recipe.carbs_g,   label: 'كارب',   color: '#F59E0B' },
+              { value: per100g ? recipe.fat_per_100g     : recipe.fat_g,     label: 'دهن',    color: '#8B5CF6' },
               ...(recipe.fiber_g > 0 ? [{ value: recipe.fiber_g, label: 'ألياف', color: '#22C55E' }] : []),
             ].map(({ value, label, color }) => (
-              <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color, fontFamily: F }}>{value}g</span>
-                <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color, margin: '0 auto' }} />
+              <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 17, fontWeight: 700, color, fontFamily: F }}>{value}g</span>
+                <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
                 <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
               </div>
             ))}
