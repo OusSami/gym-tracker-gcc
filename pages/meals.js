@@ -328,6 +328,32 @@ function RecipeDetail({ recipe, onBack }) {
           {recipe.servings  && <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>👥 {recipe.servings}</span>}
         </div>
       )}
+      {recipe.calories > 0 && (
+        <div style={{
+          marginInline: 16, marginBlockStart: 12, marginBlockEnd: 4,
+          backgroundColor: 'var(--card)', borderRadius: 16,
+          padding: 16, boxShadow: 'var(--shadow-card)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBlockEnd: 12 }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', fontFamily: F }}>{recipe.calories} سعرة</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>القيم الغذائية / حصة</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            {[
+              { value: recipe.protein_g, label: 'بروتين', color: '#3B82F6' },
+              { value: recipe.carbs_g,   label: 'كارب',   color: '#F59E0B' },
+              { value: recipe.fat_g,     label: 'دهن',    color: '#8B5CF6' },
+              ...(recipe.fiber_g > 0 ? [{ value: recipe.fiber_g, label: 'ألياف', color: '#22C55E' }] : []),
+            ].map(({ value, label, color }) => (
+              <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color, fontFamily: F }}>{value}g</span>
+                <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color, margin: '0 auto' }} />
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--accent-faint)', marginInline: 16, marginBlockStart: 8 }}>
         {[{ key: 'ingredients', label: 'المكونات' }, { key: 'steps', label: 'طريقة التحضير' }].map(({ key, label }) => (
           <button key={key} onClick={() => setDetailTab(key)} style={{
@@ -1107,6 +1133,11 @@ export default function Meals() {
                             🕐 {recipe.cook_time}
                           </div>
                         )}
+                        {recipe.calories > 0 && (
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
+                            🔥 {recipe.calories} سعرة
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1175,6 +1206,11 @@ export default function Meals() {
                                 <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F, marginBlockStart: 2 }}>
                                   🕐 {recipe.cook_time}
                                 </div>
+                              )}
+                              {recipe.calories > 0 && (
+                                <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
+                                  🔥 {recipe.calories} سعرة
+                                </span>
                               )}
                             </div>
                           </div>
@@ -1277,6 +1313,11 @@ export default function Meals() {
                               <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F, marginBlockStart: 2 }}>
                                 🕐 {recipe.cook_time}
                               </div>
+                            )}
+                            {recipe.calories > 0 && (
+                              <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
+                                🔥 {recipe.calories} سعرة
+                              </span>
                             )}
                           </div>
                         </div>
