@@ -329,59 +329,69 @@ function RecipeDetail({ recipe, onBack }) {
           {recipe.servings  && <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>👥 {recipe.servings}</span>}
         </div>
       )}
-      {recipe.calories > 0 && (
-        <div style={{
-          marginInline: 16, marginBlockStart: 12, marginBlockEnd: 4,
-          backgroundColor: 'var(--card)', borderRadius: 16,
-          padding: 16, boxShadow: 'var(--shadow-card)',
-        }}>
-          {/* Toggle */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBlockEnd: 16 }}>
-            <div style={{
-              display: 'flex', borderRadius: 12,
-              backgroundColor: 'var(--surface-inset)', padding: 4, gap: 4,
-              width: 'fit-content',
-            }}>
+      {recipe.calories > 0 && (() => {
+        const vals = per100g
+          ? { p: recipe.protein_per_100g, c: recipe.carbs_per_100g, f: recipe.fat_per_100g, fi: recipe.fiber_g }
+          : { p: recipe.protein_g,        c: recipe.carbs_g,        f: recipe.fat_g,        fi: recipe.fiber_g }
+        const displayCal = per100g ? (recipe.cal_per_100g || '-') : (recipe.calories || '-')
+        const hasFiber = recipe.fiber_g > 0
+        const macros = [
+          { key: 'p',  label: 'بروتين', color: '#3B82F6', val: vals.p,  goal: 50 },
+          { key: 'c',  label: 'كارب',   color: '#F59E0B', val: vals.c,  goal: 70 },
+          { key: 'f',  label: 'دهن',    color: '#8B5CF6', val: vals.f,  goal: 35 },
+          ...(hasFiber ? [{ key: 'fi', label: 'ألياف', color: '#22C55E', val: vals.fi, goal: 10 }] : []),
+        ]
+        return (
+          <div style={{
+            marginInline: 16, marginBlockStart: 12, marginBlockEnd: 4,
+            backgroundColor: 'var(--card)', borderRadius: 20,
+            overflow: 'hidden', boxShadow: 'var(--shadow-card)',
+          }}>
+            {/* Section 1 — Toggle */}
+            <div style={{ display: 'flex', width: '100%' }}>
               {[{ label: 'حصة كاملة', val: false }, { label: '100g', val: true }].map(({ label, val }) => (
                 <button key={label} onClick={() => setPer100g(val)} style={{
-                  paddingInline: 20, paddingBlock: 8, borderRadius: 10,
-                  fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer',
-                  fontFamily: F, transition: 'all 0.2s',
-                  backgroundColor: per100g === val ? 'var(--text-primary)' : 'transparent',
+                  flex: 1, paddingBlock: 14, fontSize: 15, fontWeight: 700,
+                  border: 'none', cursor: 'pointer', fontFamily: F, transition: 'all 0.2s',
+                  backgroundColor: per100g === val ? 'var(--text-primary)' : 'var(--surface-inset)',
                   color: per100g === val ? '#FFFFFF' : 'var(--text-secondary)',
-                  boxShadow: per100g === val ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
                 }}>
                   {label}
                 </button>
               ))}
             </div>
+            {/* Section 2 — Calorie display */}
+            <div style={{ paddingBlock: 20, textAlign: 'center', borderBottom: '1px solid var(--accent-faint)' }}>
+              <span style={{ fontSize: 48, fontWeight: 800, color: 'var(--accent)', lineHeight: 1, display: 'block', fontFamily: F }}>
+                {displayCal}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)', marginBlockStart: 6, display: 'block', fontFamily: F }}>
+                سعرة حرارية
+              </span>
+            </div>
+            {/* Section 3 — Macro grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: hasFiber ? 'repeat(4,1fr)' : 'repeat(3,1fr)' }}>
+              {macros.map(({ key, label, color, val, goal }, idx) => (
+                <div key={key} style={{
+                  paddingBlock: 16, paddingInline: 8, textAlign: 'center',
+                  borderInlineEnd: idx < macros.length - 1 ? '1px solid var(--accent-faint)' : 'none',
+                }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color, fontFamily: F, display: 'block' }}>
+                    {val ?? '-'}g
+                  </span>
+                  <div style={{ marginBlock: '8px auto', width: '60%', height: 4, borderRadius: 2, backgroundColor: 'var(--accent-faint)', marginInline: 'auto' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 2, backgroundColor: color,
+                      width: val != null ? Math.min(val / goal * 100, 100) + '%' : '0%',
+                    }} />
+                  </div>
+                  <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          {/* Calorie count */}
-          <div style={{ textAlign: 'center', marginBlockEnd: 16 }}>
-            <span style={{ fontSize: 36, fontWeight: 900, color: 'var(--accent)', lineHeight: 1, fontFamily: F }}>
-              {per100g ? (recipe.cal_per_100g ?? recipe.calories) : recipe.calories}
-            </span>
-            <span style={{ fontSize: 14, color: 'var(--text-secondary)', display: 'block', marginBlockStart: 4, fontFamily: F }}>سعرة</span>
-          </div>
-          {/* Divider */}
-          <div style={{ borderTop: '1px solid var(--accent-faint)', marginBlockEnd: 14 }} />
-          {/* Macro row */}
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            {[
-              { value: per100g ? recipe.protein_per_100g : recipe.protein_g, label: 'بروتين', color: '#3B82F6' },
-              { value: per100g ? recipe.carbs_per_100g   : recipe.carbs_g,   label: 'كارب',   color: '#F59E0B' },
-              { value: per100g ? recipe.fat_per_100g     : recipe.fat_g,     label: 'دهن',    color: '#8B5CF6' },
-              ...(recipe.fiber_g > 0 ? [{ value: recipe.fiber_g, label: 'ألياف', color: '#22C55E' }] : []),
-            ].map(({ value, label, color }) => (
-              <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 17, fontWeight: 700, color, fontFamily: F }}>{value}g</span>
-                <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color }} />
-                <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )
+      })()}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--accent-faint)', marginInline: 16, marginBlockStart: 8 }}>
         {[{ key: 'ingredients', label: 'المكونات' }, { key: 'steps', label: 'طريقة التحضير' }].map(({ key, label }) => (
           <button key={key} onClick={() => setDetailTab(key)} style={{
