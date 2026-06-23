@@ -187,14 +187,20 @@ function CategoryCardImg({ src, bg, emoji }) {
   )
 }
 
-function RecipeImg({ src, name = '', height = 130, className = '' }) {
+function RecipeImg({ src, name = '' }) {
   const [errored, setErrored] = React.useState(false)
   if (!src || errored) {
-    return <RecipeImgFallback name={name} height={height} className={className} />
+    return (
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundColor: 'var(--accent-soft)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
+      }}>🍽️</div>
+    )
   }
   return (
-    <img src={src} alt="" className={className}
-      style={{ width: '100%', height, objectFit: 'cover', display: 'block' }}
+    <img src={src} alt=""
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
       onError={() => setErrored(true)} />
   )
 }
@@ -1158,24 +1164,50 @@ export default function Meals() {
                   {filtered.map(recipe => (
                     <div key={recipe.id} className="recipe-card-hover"
                       onClick={() => setSelectedRecipe(recipe)}
-                      style={{ borderRadius: 16, overflow: 'hidden', backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-                      <RecipeImg src={recipe.image_url} name={recipe.name} height={130} className="recipe-card-img" />
-                      <div style={{ paddingInline: 10, paddingBlock: 8 }}>
+                      style={{
+                        position: 'relative', borderRadius: 16, overflow: 'hidden',
+                        aspectRatio: '3/4', cursor: 'pointer', boxShadow: 'var(--shadow-card)',
+                      }}>
+                      <RecipeImg src={recipe.image_url} name={recipe.name} />
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
+                      }} />
+                      {recipe.calories > 0 && (
                         <div style={{
-                          fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
-                          textAlign: 'right', fontFamily: F,
+                          position: 'absolute', top: 10, insetInlineStart: 10,
+                          backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+                          borderRadius: 20, paddingInline: 10, paddingBlock: 4,
+                          fontSize: 11, fontWeight: 600, color: '#FFFFFF',
+                          display: 'flex', alignItems: 'center', gap: 4, fontFamily: F,
+                        }}>
+                          🔥 {recipe.calories}
+                        </div>
+                      )}
+                      <div style={{
+                        position: 'absolute', bottom: 0,
+                        insetInlineStart: 0, insetInlineEnd: 0, padding: 12,
+                      }}>
+                        <p style={{
+                          fontSize: 14, fontWeight: 700, color: '#FFFFFF', textAlign: 'right',
+                          margin: 0, marginBlockEnd: 6, fontFamily: F,
                           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                        }}>{recipe.name}</div>
-                        {recipe.cook_time && (
-                          <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F, marginBlockStart: 2 }}>
-                            🕐 {recipe.cook_time}
-                          </div>
-                        )}
-                        {recipe.calories > 0 && (
-                          <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
-                            🔥 {recipe.calories} سعرة
-                          </span>
-                        )}
+                          textShadow: '0 1px 4px rgba(0,0,0,0.4)', lineHeight: 1.4,
+                        }}>{recipe.name}</p>
+                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                          {recipe.cook_time && (
+                            <span style={{
+                              backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 20,
+                              paddingInline: 8, paddingBlock: 3, fontSize: 11, color: '#FFFFFF', fontWeight: 500, fontFamily: F,
+                            }}>🕐 {recipe.cook_time}</span>
+                          )}
+                          {recipe.category && (
+                            <span style={{
+                              backgroundColor: 'var(--accent)', borderRadius: 20,
+                              paddingInline: 8, paddingBlock: 3, fontSize: 11, color: '#FFFFFF', fontWeight: 600, fontFamily: F,
+                            }}>{recipe.category}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1222,7 +1254,7 @@ export default function Meals() {
                     {recipesLoading
                       ? Array.from({ length: 4 }).map((_, i) => (
                           <div key={i} className="skeleton" style={{
-                            width: 150, minWidth: 150, height: 180, flexShrink: 0,
+                            width: 170, minWidth: 170, height: 220, flexShrink: 0,
                             borderRadius: 16, backgroundColor: 'var(--accent-faint)',
                           }} />
                         ))
@@ -1230,26 +1262,44 @@ export default function Meals() {
                           <div key={recipe.id} className="recipe-card-hover"
                             onClick={() => setSelectedRecipe(recipe)}
                             style={{
-                              width: 150, minWidth: 150, borderRadius: 16, overflow: 'hidden',
-                              backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)', flexShrink: 0,
+                              position: 'relative', width: 170, minWidth: 170, height: 220,
+                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer', flexShrink: 0,
+                              boxShadow: 'var(--shadow-card)',
                             }}>
-                            <RecipeImg src={recipe.image_url} name={recipe.name} height={110} className="recipe-card-img" />
-                            <div style={{ paddingInline: 10, paddingBlock: 8 }}>
+                            <RecipeImg src={recipe.image_url} name={recipe.name} />
+                            <div style={{
+                              position: 'absolute', inset: 0,
+                              background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
+                            }} />
+                            {recipe.calories > 0 && (
                               <div style={{
-                                fontSize: 12, fontWeight: 600, color: 'var(--text-primary)',
-                                textAlign: 'right', fontFamily: F,
+                                position: 'absolute', top: 10, insetInlineStart: 10,
+                                backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+                                borderRadius: 20, paddingInline: 10, paddingBlock: 4,
+                                fontSize: 11, fontWeight: 600, color: '#FFFFFF',
+                                display: 'flex', alignItems: 'center', gap: 4, fontFamily: F,
+                              }}>
+                                🔥 {recipe.calories}
+                              </div>
+                            )}
+                            <div style={{
+                              position: 'absolute', bottom: 0,
+                              insetInlineStart: 0, insetInlineEnd: 0, padding: 12,
+                            }}>
+                              <p style={{
+                                fontSize: 14, fontWeight: 700, color: '#FFFFFF', textAlign: 'right',
+                                margin: 0, marginBlockEnd: 6, fontFamily: F,
                                 display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                              }}>{recipe.name}</div>
-                              {recipe.cook_time && (
-                                <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F, marginBlockStart: 2 }}>
-                                  🕐 {recipe.cook_time}
-                                </div>
-                              )}
-                              {recipe.calories > 0 && (
-                                <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
-                                  🔥 {recipe.calories} سعرة
-                                </span>
-                              )}
+                                textShadow: '0 1px 4px rgba(0,0,0,0.4)', lineHeight: 1.4,
+                              }}>{recipe.name}</p>
+                              <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                                {recipe.cook_time && (
+                                  <span style={{
+                                    backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 20,
+                                    paddingInline: 8, paddingBlock: 3, fontSize: 11, color: '#FFFFFF', fontWeight: 500, fontFamily: F,
+                                  }}>🕐 {recipe.cook_time}</span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))
@@ -1322,7 +1372,7 @@ export default function Meals() {
                     <div className="recipe-grid" style={{ paddingInline: 16 }}>
                       {Array.from({ length: 6 }).map((_, i) => (
                         <div key={i} className="skeleton"
-                          style={{ borderRadius: 16, backgroundColor: 'var(--accent-faint)', height: 190 }} />
+                          style={{ borderRadius: 16, backgroundColor: 'var(--accent-faint)', aspectRatio: '3/4' }} />
                       ))}
                     </div>
                   )}
@@ -1339,24 +1389,50 @@ export default function Meals() {
                       {filtered.slice(0, 6).map(recipe => (
                         <div key={recipe.id} className="recipe-card-hover"
                           onClick={() => setSelectedRecipe(recipe)}
-                          style={{ borderRadius: 16, overflow: 'hidden', backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-                          <RecipeImg src={recipe.image_url} name={recipe.name} height={130} className="recipe-card-img" />
-                          <div style={{ paddingInline: 10, paddingBlock: 8 }}>
+                          style={{
+                            position: 'relative', borderRadius: 16, overflow: 'hidden',
+                            aspectRatio: '3/4', cursor: 'pointer', boxShadow: 'var(--shadow-card)',
+                          }}>
+                          <RecipeImg src={recipe.image_url} name={recipe.name} />
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
+                          }} />
+                          {recipe.calories > 0 && (
                             <div style={{
-                              fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
-                              textAlign: 'right', fontFamily: F,
+                              position: 'absolute', top: 10, insetInlineStart: 10,
+                              backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+                              borderRadius: 20, paddingInline: 10, paddingBlock: 4,
+                              fontSize: 11, fontWeight: 600, color: '#FFFFFF',
+                              display: 'flex', alignItems: 'center', gap: 4, fontFamily: F,
+                            }}>
+                              🔥 {recipe.calories}
+                            </div>
+                          )}
+                          <div style={{
+                            position: 'absolute', bottom: 0,
+                            insetInlineStart: 0, insetInlineEnd: 0, padding: 12,
+                          }}>
+                            <p style={{
+                              fontSize: 14, fontWeight: 700, color: '#FFFFFF', textAlign: 'right',
+                              margin: 0, marginBlockEnd: 6, fontFamily: F,
                               display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                            }}>{recipe.name}</div>
-                            {recipe.cook_time && (
-                              <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', fontFamily: F, marginBlockStart: 2 }}>
-                                🕐 {recipe.cook_time}
-                              </div>
-                            )}
-                            {recipe.calories > 0 && (
-                              <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'right', display: 'block' }}>
-                                🔥 {recipe.calories} سعرة
-                              </span>
-                            )}
+                              textShadow: '0 1px 4px rgba(0,0,0,0.4)', lineHeight: 1.4,
+                            }}>{recipe.name}</p>
+                            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                              {recipe.cook_time && (
+                                <span style={{
+                                  backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 20,
+                                  paddingInline: 8, paddingBlock: 3, fontSize: 11, color: '#FFFFFF', fontWeight: 500, fontFamily: F,
+                                }}>🕐 {recipe.cook_time}</span>
+                              )}
+                              {recipe.category && (
+                                <span style={{
+                                  backgroundColor: 'var(--accent)', borderRadius: 20,
+                                  paddingInline: 8, paddingBlock: 3, fontSize: 11, color: '#FFFFFF', fontWeight: 600, fontFamily: F,
+                                }}>{recipe.category}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
