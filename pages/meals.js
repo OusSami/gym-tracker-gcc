@@ -240,7 +240,7 @@ function MacroBar({ label, value, goal, color }) {
   )
 }
 
-function SearchAndChips({ search, onSearch, activeCategory, onCategory }) {
+function SearchAndChips({ search, onSearch, activeCategory, onCategory, showChips = true }) {
   return (
     <>
       <div style={{ marginInline: 16, marginBlockEnd: 12 }}>
@@ -262,23 +262,25 @@ function SearchAndChips({ search, onSearch, activeCategory, onCategory }) {
           <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, flexShrink: 0 }}>🔍</span>
         </div>
       </div>
-      <div className="chips-scroll" style={{ display: 'flex', overflowX: 'auto', gap: 8, paddingInline: 16, paddingBlockEnd: 12 }}>
-        {CATEGORIES.map(cat => {
-          const isActive = activeCategory === cat.label
-          return (
-            <button key={cat.label} onClick={() => onCategory(cat.label)} style={{
-              paddingInline: 14, paddingBlock: 7, borderRadius: 20,
-              fontSize: 13, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
-              fontFamily: F, flexShrink: 0,
-              backgroundColor: isActive ? 'var(--text-primary)' : 'var(--card)',
-              color: isActive ? '#FFFFFF' : 'var(--text-secondary)',
-              border: isActive ? 'none' : '1px solid var(--accent-soft)',
-            }}>
-              {cat.label}
-            </button>
-          )
-        })}
-      </div>
+      {showChips && (
+        <div className="chips-scroll" style={{ display: 'flex', overflowX: 'auto', gap: 8, paddingInline: 16, paddingBlockEnd: 12 }}>
+          {CATEGORIES.map(cat => {
+            const isActive = activeCategory === cat.label
+            return (
+              <button key={cat.label} onClick={() => onCategory(cat.label)} style={{
+                paddingInline: 14, paddingBlock: 7, borderRadius: 20,
+                fontSize: 13, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
+                fontFamily: F, flexShrink: 0,
+                backgroundColor: isActive ? 'var(--text-primary)' : 'var(--card)',
+                color: isActive ? '#FFFFFF' : 'var(--text-secondary)',
+                border: isActive ? 'none' : '1px solid var(--accent-soft)',
+              }}>
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </>
   )
 }
@@ -1129,6 +1131,7 @@ export default function Meals() {
                 <SearchAndChips
                   search={search} onSearch={setSearch}
                   activeCategory={activeCategory} onCategory={setActiveCategory}
+                  showChips={false}
                 />
 
                 {/* "وصفات جديدة" horizontal strip */}
