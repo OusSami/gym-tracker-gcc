@@ -81,12 +81,16 @@ function getFoodVisual(name) {
   if (n.includes('موز') || n.includes('تفاح') ||
       n.includes('فاكهة') || n.includes('أفوكادو'))
     return { emoji:'🍎', bg:'#FCE4EC' }
+  if (n.includes('شوفان') || n.includes('أوتس'))
+    return { emoji:'🥣', bg:'#FFF9C4' }
+  if (n.includes('جريش'))
+    return { emoji:'🌾', bg:'#FFF3E0' }
   if (n.includes('عصير') || n.includes('شاي') ||
       n.includes('قهوة') || n.includes('ماء') ||
       n.includes('حليب') || n.includes('لبن'))
     return { emoji:'🥤', bg:'#E8EAF6' }
   if (n.includes('خبز') || n.includes('توست') ||
-      n.includes('نافوش') || n.includes('شوفان'))
+      n.includes('نافوش'))
     return { emoji:'🍞', bg:'#FFF8E1' }
   if (n.includes('جبن') || n.includes('لبنة'))
     return { emoji:'🧀', bg:'#FFFDE7' }
@@ -1686,14 +1690,17 @@ export default function Meals() {
                   {weekPlan.length > 0 && weekStart && (
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
                       <button onClick={()=>loadWeekPlan(new Date(weekStart.getTime() - 7*86400000))}
-                        style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 14px',color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
+                        style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-soft)',borderRadius:10,padding:'8px 14px',color:'var(--text-primary)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
                         ← الأسبوع السابق
                       </button>
-                      <div style={{fontFamily:F,fontWeight:800,fontSize:'.9rem',color:'rgba(255,255,255,0.8)',textAlign:'center'}}>
-                        خطة الأسبوع
+                      <div style={{textAlign:'center'}}>
+                        <div style={{fontFamily:F,fontWeight:700,fontSize:'.9rem',color:'var(--text-primary)'}}>خطة الأسبوع</div>
+                        <div style={{fontFamily:F,fontSize:11,color:'var(--text-secondary)',marginTop:2}}>
+                          {weekStart.toLocaleDateString('ar-SA',{day:'numeric',month:'short'})} – {new Date(weekStart.getTime()+6*86400000).toLocaleDateString('ar-SA',{day:'numeric',month:'short'})}
+                        </div>
                       </div>
                       <button onClick={()=>loadWeekPlan(new Date(weekStart.getTime() + 7*86400000))}
-                        style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 14px',color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
+                        style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-soft)',borderRadius:10,padding:'8px 14px',color:'var(--text-primary)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
                         الأسبوع التالي ←
                       </button>
                     </div>
@@ -1701,14 +1708,16 @@ export default function Meals() {
 
                   {/* Calorie goal card */}
                   {weekPlan.length > 0 && (
-                    <div style={{background:'rgba(203,162,59,0.07)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:16,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <div style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-soft)',borderRadius:16,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                       <div>
-                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(203,162,59,0.5)',marginBottom:4}}>هدف السعرات اليومي</div>
-                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.6rem',color:'#CBA23B',lineHeight:1}}>{weekPlan[0]?.totalCal}</div>
-                        <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>سعرة / يوم</div>
+                        <div style={{fontSize:13,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>هدف السعرات اليومي</div>
+                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:28,color:'var(--accent)',lineHeight:1}}>
+                          {weekPlan[0]?.totalCal}
+                          <span style={{fontSize:13,fontWeight:400,color:'var(--text-secondary)',fontFamily:F,marginRight:6}}>سعرة</span>
+                        </div>
                       </div>
                       <button onClick={()=>loadWeekPlan()}
-                        style={{background:'rgba(203,162,59,0.12)',border:'1px solid rgba(203,162,59,0.3)',borderRadius:10,padding:'9px 14px',color:'#CBA23B',cursor:'pointer',fontFamily:F,fontSize:'.78rem',fontWeight:700}}>
+                        style={{backgroundColor:'var(--text-primary)',border:'none',borderRadius:10,padding:'9px 14px',color:'#FFFFFF',cursor:'pointer',fontFamily:F,fontSize:'.78rem',fontWeight:700}}>
                         إعادة توليد
                       </button>
                     </div>
@@ -1742,20 +1751,20 @@ export default function Meals() {
                     <div key={idx} style={{marginBottom:8}}>
                       {/* Day header row */}
                       <button onClick={()=>setExpandedDay(expandedDay===idx?null:idx)}
-                        style={{width:'100%',background:day.isToday?'rgba(203,162,59,0.10)':'rgba(255,255,255,0.03)',border:'1px solid ' + (day.isToday?'rgba(203,162,59,0.3)':'rgba(255,255,255,0.07)'),borderRadius:expandedDay===idx?'14px 14px 0 0':'14px',padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',textAlign:'right'}}>
+                        style={{width:'100%',backgroundColor:'var(--card)',border:day.isToday?'2px solid var(--accent)':'1px solid var(--accent-faint)',borderRadius:expandedDay===idx?'14px 14px 0 0':'14px',padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',textAlign:'right'}}>
                         <div style={{display:'flex',alignItems:'center',gap:10}}>
-                          {day.isToday && <span style={{background:'#CBA23B',color:'#0C0B0D',borderRadius:6,padding:'2px 8px',fontSize:'.62rem',fontWeight:800,fontFamily:F}}>اليوم</span>}
-                          <span style={{fontFamily:F,fontWeight:700,fontSize:'.88rem',color:day.isToday?'#CBA23B':'rgba(255,255,255,0.8)'}}>{day.dateStr}</span>
+                          {day.isToday && <span style={{backgroundColor:'var(--accent)',color:'#FFFFFF',borderRadius:6,padding:'2px 8px',fontSize:'.62rem',fontWeight:800,fontFamily:F}}>اليوم</span>}
+                          <span style={{fontFamily:F,fontWeight:600,fontSize:15,color:'var(--text-primary)'}}>{day.dateStr}</span>
                         </div>
                         <div style={{display:'flex',alignItems:'center',gap:10}}>
-                          <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.82rem',color:'#CBA23B'}}>{day.totalCal} سعرة</span>
-                          <span style={{color:'rgba(255,255,255,0.3)',fontSize:'.75rem'}}>{expandedDay===idx?'▲':'▼'}</span>
+                          <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,color:'var(--accent)'}}>{day.totalCal} سعرة</span>
+                          <span style={{color:'var(--text-secondary)',fontSize:'.75rem'}}>{expandedDay===idx?'▲':'▼'}</span>
                         </div>
                       </button>
 
                       {/* Expanded meal list */}
                       {expandedDay===idx && (
-                        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderTop:'none',borderRadius:'0 0 14px 14px',overflow:'hidden'}}>
+                        <div style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-faint)',borderTop:'none',borderRadius:'0 0 14px 14px',overflow:'hidden'}}>
                           {day.plan.map((meal, mi) => {
                             const fv = getFoodVisual(meal.food?.name_ar)
                             return (
@@ -1766,26 +1775,30 @@ export default function Meals() {
                                 </div>
                                 {/* food info */}
                                 <div style={{flex:1,minWidth:0,textAlign:'right'}}>
-                                  <div style={{fontSize:11,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
-                                  <div style={{fontSize:14,fontWeight:600,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
+                                  <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
+                                  <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
                                   <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>{meal.food?.portion_desc}</div>
                                   <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
-                                    {[['B',meal.protein_g,'#3b82f6'],['C',meal.carbs_g,'#f97316'],['F',meal.fat_g,'#a855f7']].map(([l,v,c])=>(
-                                      <span key={l} style={{background:c+'18',border:'1px solid '+c+'30',color:c,borderRadius:6,padding:'2px 6px',fontSize:'.62rem',fontWeight:700,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
+                                    {[
+                                      ['B',meal.protein_g,'#EFF6FF','#1D4ED8'],
+                                      ['C',meal.carbs_g,'#FFFBEB','#92400E'],
+                                      ['F',meal.fat_g,'#F5F3FF','#5B21B6'],
+                                    ].map(([l,v,bg,tc])=>(
+                                      <span key={l} style={{backgroundColor:bg,color:tc,borderRadius:6,padding:'2px 6px',fontSize:11,fontWeight:600,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
                                     ))}
                                   </div>
                                 </div>
                                 {/* calories (RTL: last in DOM = visual left) */}
                                 <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:60}}>
-                                  <span style={{fontSize:15,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
+                                  <span style={{fontSize:16,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
                                   <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
                                 </div>
                               </div>
                             )
                           })}
                           {day.tip && (
-                            <div style={{padding:'10px 16px',background:'rgba(203,162,59,0.04)',borderTop:'1px solid rgba(203,162,59,0.1)'}}>
-                              <div style={{fontSize:'.73rem',color:'rgba(203,162,59,0.6)',lineHeight:1.55,fontFamily:F}}>💡 {day.tip}</div>
+                            <div style={{padding:'10px 16px',backgroundColor:'var(--surface-inset)',borderTop:'1px solid var(--accent-faint)'}}>
+                              <div style={{fontSize:12,color:'var(--text-secondary)',lineHeight:1.55,fontFamily:F}}>💡 {day.tip}</div>
                             </div>
                           )}
                         </div>
