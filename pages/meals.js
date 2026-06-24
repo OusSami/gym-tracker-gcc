@@ -51,16 +51,16 @@ const MEAL_COLORS = {
 }
 
 const FOOD_VISUALS = [
-  { keywords:['أرز','برياني','مجبوس','كبسة','رز'],    emoji:'🍚', bg:'#FFF3E0' },
-  { keywords:['دجاج','فراخ','دجاجة'],                 emoji:'🍗', bg:'#FBE9E7' },
-  { keywords:['لحم','مندي','هريسة'],                  emoji:'🥩', bg:'#FCE4EC' },
-  { keywords:['سمك','ربيان','جمبري'],                 emoji:'🐟', bg:'#E3F2FD' },
-  { keywords:['شوربة','حساء'],                        emoji:'🥣', bg:'#E8F5E9' },
-  { keywords:['سلطة','خضار','خضروات'],                emoji:'🥗', bg:'#F1F8E9' },
-  { keywords:['حلوى','كيك','تمر','لقيمات','حلو'],    emoji:'🍯', bg:'#FFFDE7' },
-  { keywords:['بيض','فطور','فول','فلافل'],            emoji:'🥚', bg:'#FFF9C4' },
-  { keywords:['فاكهة','تفاح','موز','برتقال'],         emoji:'🍎', bg:'#FCE4EC' },
-  { keywords:['ماء','عصير','شاي','قهوة'],             emoji:'🥤', bg:'#E8EAF6' },
+  { keywords:['أرز','برياني','مجبوس','كبسة','رز','بخاري','مقلوبة','زربيان','قبولي'], emoji:'🍚', bg:'#FFF3E0' },
+  { keywords:['دجاج','فراخ','دجاجة'], emoji:'🍗', bg:'#FBE9E7' },
+  { keywords:['لحم','مندي','هريسة','كباب','كفتة'], emoji:'🥩', bg:'#FCE4EC' },
+  { keywords:['سمك','ربيان','جمبري','قريدس','تونة'], emoji:'🐟', bg:'#E3F2FD' },
+  { keywords:['شوربة','حساء'], emoji:'🥣', bg:'#E8F5E9' },
+  { keywords:['سلطة','خضار','تبولة'], emoji:'🥗', bg:'#F1F8E9' },
+  { keywords:['حلوى','كيك','تمر','لقيمات','بسبوسة','كنافة'], emoji:'🍯', bg:'#FFFDE7' },
+  { keywords:['بيض','فطور','فول','فلافل','عجة'], emoji:'🥚', bg:'#FFF9C4' },
+  { keywords:['فاكهة','تفاح','موز','برتقال'], emoji:'🍎', bg:'#FCE4EC' },
+  { keywords:['ماء','عصير','شاي','قهوة'], emoji:'🥤', bg:'#E8EAF6' },
 ]
 
 function getFoodVisual(name) {
@@ -507,6 +507,10 @@ export default function Meals() {
   const [savingTemplate, setSavingTemplate]     = useState(false)
   const [mealPlan, setMealPlan]                 = useState(null)
   const [mealPlanLoading, setMealPlanLoading]   = useState(false)
+  const [weekPlan, setWeekPlan]                 = useState([])
+  const [weekLoading, setWeekLoading]           = useState(true)
+  const [expandedDay, setExpandedDay]           = useState(null)
+  const [weekStart, setWeekStart]               = useState(null)
   const [selectedMeal, setSelectedMeal]         = useState(null)
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
@@ -608,6 +612,9 @@ export default function Meals() {
 
   // ── Re-fetch meals when viewDate changes (Tab 2) ─────────────────────────
   useEffect(() => { if (user) loadDay(user.id, viewDate) }, [viewDate, user])
+
+  // ── Load week plan once user is available ────────────────────────────────
+  useEffect(() => { if (user?.id && weekPlan.length === 0) loadWeekPlan() }, [user?.id])
 
   // ── Tab 2: all functions from original e4f2f06 ───────────────────────────
 
@@ -944,6 +951,53 @@ export default function Meals() {
     const matchesSearch = !search.trim() || r.name?.includes(search.trim())
     return matchesCat && matchesSearch
   })
+
+  // ── Week plan helpers ────────────────────────────────────────────────────
+  function getWeekDays(fromDate) {
+    const start = new Date(fromDate)
+    const day = start.getDay()
+    const diff = start.getDate() - day + (day === 0 ? -6 : 1)
+    start.setDate(diff)
+    const days = []
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start)
+      d.setDate(start.getDate() + i)
+      days.push(d)
+    }
+    return days
+  }
+
+  async function loadWeekPlan(fromDate) {
+    if (!user?.id) return
+    setWeekLoading(true)
+    const today = new Date()
+    const days = getWeekDays(fromDate || today)
+    setWeekStart(days[0])
+    try {
+      const res = await fetch('/api/packages/meal-plan?userId=' + user.id)
+      const data = await res.json()
+      if (data?.plan) {
+        const built = days.map((date, i) => {
+          const rotated = [
+            ...data.plan.slice(i % data.plan.length),
+            ...data.plan.slice(0, i % data.plan.length)
+          ]
+          return {
+            date,
+            dateStr: date.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }),
+            isToday: date.toDateString() === today.toDateString(),
+            totalCal: data.total_calories,
+            plan: rotated,
+            tip: data.tip
+          }
+        })
+        setWeekPlan(built)
+        const todayIdx = built.findIndex(d => d.isToday)
+        if (todayIdx >= 0) setExpandedDay(todayIdx)
+      }
+    } catch(e) { console.error(e) }
+    setWeekLoading(false)
+  }
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -1469,56 +1523,115 @@ export default function Meals() {
 
             <div style={{maxWidth:520,margin:'0 auto',padding:'0 16px'}}>
 
-              {/* ── MEAL PLAN ── */}
+              {/* ── WEEK PLAN ── */}
               {tab==='plan' && (
                 <div style={{paddingTop:14,paddingBottom:100}}>
-                  {mealPlanLoading ? (
-                    <div style={{textAlign:'center',padding:'60px 0',color:'rgba(255,255,255,0.35)'}}>
-                      <div style={{width:28,height:28,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite',margin:'0 auto 14px'}}/>
-                      <div style={{fontSize:'.85rem'}}>جاري تحميل خطة الوجبات...</div>
-                    </div>
-                  ) : mealPlan ? (<>
-                    <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.15)',borderRadius:16,padding:'14px 16px',marginBottom:12}}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                        <div style={{fontWeight:700,fontSize:'.85rem'}}>هدف السعرات</div>
-                        <div style={{fontWeight:900,color:'#CBA23B',fontFamily:'monospace'}}>{mealPlan.total_calories} سعرة</div>
+
+                  {/* Week navigation header */}
+                  {weekPlan.length > 0 && weekStart && (
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                      <button onClick={()=>loadWeekPlan(new Date(weekStart.getTime() - 7*86400000))}
+                        style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 14px',color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
+                        ← الأسبوع السابق
+                      </button>
+                      <div style={{fontFamily:F,fontWeight:800,fontSize:'.9rem',color:'rgba(255,255,255,0.8)',textAlign:'center'}}>
+                        خطة الأسبوع
                       </div>
-                      <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:10,overflow:'hidden',marginBottom:10}}>
-                        <div style={{height:'100%',width:'100%',background:'linear-gradient(90deg,#CBA23B,#e8c55a)',borderRadius:10}}/>
-                      </div>
-                      <div style={{display:'flex',gap:12,fontSize:'.72rem'}}>
-                        {[['بروتين',mealPlan.total_protein+'g','#3b82f6'],['كارب','—g','#f97316'],['دهون','—g','#22c55e']].map(([l,v,c])=>(
-                          <div key={l} style={{display:'flex',gap:4}}><span style={{color:c,fontWeight:700,fontFamily:'monospace'}}>{v}</span><span style={{color:'rgba(255,255,255,0.35)'}}>{l}</span></div>
-                        ))}
-                      </div>
-                      {mealPlan.tip&&<div style={{marginTop:10,fontSize:'.76rem',color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>💡 {mealPlan.tip}</div>}
-                    </div>
-                    {(mealPlan.plan||[]).map((meal,i)=>(
-                      <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:16,padding:'14px 16px',marginBottom:9}}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                          <div style={{fontWeight:700,fontSize:'.78rem',color:'#CBA23B'}}>{meal.meal_time}</div>
-                          <div style={{fontFamily:'monospace',fontWeight:700,color:'#CBA23B',fontSize:'.78rem'}}>{meal.actual_calories} سعرة</div>
-                        </div>
-                        <div style={{fontWeight:800,fontSize:'.9rem',marginBottom:3}}>{meal.food?.name_ar}</div>
-                        <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.4)',marginBottom:8}}>{meal.food?.portion_desc}</div>
-                        <div style={{display:'flex',gap:10,fontSize:'.68rem'}}>
-                          {[['B',meal.protein_g+'g','#3b82f6'],['C',meal.carbs_g+'g','#f97316'],['F',meal.fat_g+'g','#22c55e']].map(([l,v,c])=>(
-                            <div key={l} style={{display:'flex',gap:3}}><span style={{color:c,fontFamily:'monospace',fontWeight:700}}>{v}</span><span style={{color:'rgba(255,255,255,0.3)'}}>{l==='B'?'بروتين':l==='C'?'كارب':'دهون'}</span></div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                    <button onClick={()=>{setTab('add');resetAdd()}}
-                      style={{width:'100%',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',color:'#22c55e',borderRadius:12,padding:'13px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',cursor:'pointer',marginTop:4}}>
-                      🍽️ سجّل ما أكلته اليوم ←
-                    </button>
-                  </>) : (
-                    <div style={{textAlign:'center',padding:'60px 0',color:'rgba(255,255,255,0.35)'}}>
-                      <div style={{fontSize:'2.5rem',marginBottom:12}}>🍽️</div>
-                      <div style={{marginBottom:8}}>لا توجد خطة وجبات بعد</div>
-                      <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.25)'}}>ابدأ برنامجك لتفعيل خطة التغذية</div>
+                      <button onClick={()=>loadWeekPlan(new Date(weekStart.getTime() + 7*86400000))}
+                        style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 14px',color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:F,fontSize:'.82rem',fontWeight:600}}>
+                        الأسبوع التالي ←
+                      </button>
                     </div>
                   )}
+
+                  {/* Calorie goal card */}
+                  {weekPlan.length > 0 && (
+                    <div style={{background:'rgba(203,162,59,0.07)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:16,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                      <div>
+                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(203,162,59,0.5)',marginBottom:4}}>هدف السعرات اليومي</div>
+                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.6rem',color:'#CBA23B',lineHeight:1}}>{weekPlan[0]?.totalCal}</div>
+                        <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>سعرة / يوم</div>
+                      </div>
+                      <button onClick={()=>loadWeekPlan()}
+                        style={{background:'rgba(203,162,59,0.12)',border:'1px solid rgba(203,162,59,0.3)',borderRadius:10,padding:'9px 14px',color:'#CBA23B',cursor:'pointer',fontFamily:F,fontSize:'.78rem',fontWeight:700}}>
+                        إعادة توليد
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Loading skeletons */}
+                  {weekLoading && (
+                    <div>
+                      {[...Array(7)].map((_,i) => (
+                        <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:'14px 16px',marginBottom:8}}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            <div style={{width:100,height:14,background:'rgba(255,255,255,0.06)',borderRadius:6}}/>
+                            <div style={{width:60,height:14,background:'rgba(255,255,255,0.04)',borderRadius:6}}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Empty state */}
+                  {!weekLoading && weekPlan.length === 0 && (
+                    <div style={{textAlign:'center',padding:'60px 0',color:'rgba(255,255,255,0.35)'}}>
+                      <div style={{fontSize:'2.5rem',marginBottom:12}}>🍽️</div>
+                      <div style={{marginBottom:8,fontFamily:F}}>لا توجد خطة وجبات بعد</div>
+                      <div style={{fontSize:'.78rem',color:'rgba(255,255,255,0.25)',fontFamily:F}}>ابدأ برنامجك لتفعيل خطة التغذية</div>
+                    </div>
+                  )}
+
+                  {/* Week day cards */}
+                  {!weekLoading && weekPlan.map((day, idx) => (
+                    <div key={idx} style={{marginBottom:8}}>
+                      {/* Day header row */}
+                      <button onClick={()=>setExpandedDay(expandedDay===idx?null:idx)}
+                        style={{width:'100%',background:day.isToday?'rgba(203,162,59,0.10)':'rgba(255,255,255,0.03)',border:'1px solid ' + (day.isToday?'rgba(203,162,59,0.3)':'rgba(255,255,255,0.07)'),borderRadius:expandedDay===idx?'14px 14px 0 0':'14px',padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',textAlign:'right'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          {day.isToday && <span style={{background:'#CBA23B',color:'#0C0B0D',borderRadius:6,padding:'2px 8px',fontSize:'.62rem',fontWeight:800,fontFamily:F}}>اليوم</span>}
+                          <span style={{fontFamily:F,fontWeight:700,fontSize:'.88rem',color:day.isToday?'#CBA23B':'rgba(255,255,255,0.8)'}}>{day.dateStr}</span>
+                        </div>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.82rem',color:'#CBA23B'}}>{day.totalCal} سعرة</span>
+                          <span style={{color:'rgba(255,255,255,0.3)',fontSize:'.75rem'}}>{expandedDay===idx?'▲':'▼'}</span>
+                        </div>
+                      </button>
+
+                      {/* Expanded meal list */}
+                      {expandedDay===idx && (
+                        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderTop:'none',borderRadius:'0 0 14px 14px',overflow:'hidden'}}>
+                          {day.plan.map((meal, mi) => {
+                            const fv = getFoodVisual(meal.food?.name_ar)
+                            return (
+                              <div key={mi} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderBottom:mi<day.plan.length-1?'1px solid rgba(255,255,255,0.04)':'none'}}>
+                                {/* Food emoji badge */}
+                                <div style={{width:40,height:40,borderRadius:12,background:fv.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',flexShrink:0}}>
+                                  {fv.emoji}
+                                </div>
+                                <div style={{flex:1,minWidth:0}}>
+                                  <div style={{fontFamily:F,fontWeight:700,fontSize:'.85rem',color:'rgba(255,255,255,0.9)',marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
+                                  <div style={{fontFamily:F,fontSize:'.7rem',color:'rgba(255,255,255,0.35)',marginBottom:4}}>{meal.meal_time} · {meal.food?.portion_desc}</div>
+                                  <div style={{display:'flex',gap:8}}>
+                                    {[['B',meal.protein_g,'#3b82f6'],['C',meal.carbs_g,'#f97316'],['F',meal.fat_g,'#a855f7']].map(([l,v,c])=>(
+                                      <span key={l} style={{background:c+'18',border:'1px solid '+c+'30',color:c,borderRadius:6,padding:'2px 6px',fontSize:'.62rem',fontWeight:700,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'.9rem',color:'#CBA23B',flexShrink:0}}>{meal.actual_calories}<span style={{fontSize:'.58rem',opacity:.6,marginRight:2}}>kcal</span></div>
+                              </div>
+                            )
+                          })}
+                          {day.tip && (
+                            <div style={{padding:'10px 16px',background:'rgba(203,162,59,0.04)',borderTop:'1px solid rgba(203,162,59,0.1)'}}>
+                              <div style={{fontSize:'.73rem',color:'rgba(203,162,59,0.6)',lineHeight:1.55,fontFamily:F}}>💡 {day.tip}</div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
                 </div>
               )}
 
