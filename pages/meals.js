@@ -584,7 +584,6 @@ export default function Meals() {
   const [water, setWater]                       = useState([])
   const [loading, setLoading]                   = useState(true)
   const [tab, setTab]                           = useState('plan')   // internal sub-tab
-  const [addStep, setAddStep]                   = useState('type')
   const [mealType, setMealType]                 = useState(null)
   const [imgB64, setImgB64]                     = useState(null)
   const [imgMime, setImgMime]                   = useState('image/jpeg')
@@ -613,6 +612,7 @@ export default function Meals() {
   const [addMealType, setAddMealType]             = useState('breakfast')
   const [addMealName, setAddMealName]             = useState('')
   const [addMealCal, setAddMealCal]               = useState('')
+  const [showAddMeal, setShowAddMeal]             = useState(false)
   const [barcode, setBarcode]                   = useState('')
   const [barcodeLoading, setBarcodeLoading]     = useState(false)
   const [savingTemplate, setSavingTemplate]     = useState(false)
@@ -776,7 +776,7 @@ export default function Meals() {
       setAnalyzing(false); return
     }
     if (!r.ok || data.error) { setErr(data.error || 'التحليل فشل'); setAnalyzing(false); return }
-    setResult(data); setAddStep('result')
+    setResult(data)
     setAnalyzing(false)
   }
 
@@ -786,7 +786,7 @@ export default function Meals() {
     try {
       const r = await fetch('/api/barcode', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ barcode: barcode.trim() }) })
       const data = await r.json()
-      if (data.found) { setResult(data); setAddStep('result') }
+      if (data.found) { setResult(data) }
       else setErr(data.error || 'ما لقيناه في قاعدة البيانات — جرب اكتب الاسم يدوياً.')
     } catch (e) { setErr('Barcode lookup failed: ' + e.message) }
     setBarcodeLoading(false)
@@ -822,7 +822,7 @@ export default function Meals() {
         body: JSON.stringify({ imageBase64: b64, imageMime: 'image/jpeg' })
       })
       const data = await r.json()
-      if (data.found) { setResult(data); setAddStep('result') }
+      if (data.found) { setResult(data) }
       else setErr(data.error || 'No barcode/QR found. Try better lighting, or type the number above.')
     } catch (e) { setErr('Scan error: ' + e.message) }
     setBarcodeLoading(false)
@@ -838,7 +838,7 @@ export default function Meals() {
   }
 
   const useCustomMeal = (meal) => {
-    setResult({ ...meal }); setAddStep('result')
+    setResult({ ...meal })
     fetch('/api/custom-meals', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: meal.id }) }).catch(() => {})
     setShowCustom(false)
   }
@@ -959,7 +959,7 @@ export default function Meals() {
   }
 
   const resetAdd = () => {
-    setAddStep('type'); setMealType(null); setImgB64(null); setImgPreview(null)
+    setMealType(null); setImgB64(null); setImgPreview(null)
     setTextInput(''); setResult(null); setErr(''); setShowRecentMeals(false)
     setAddMealName(''); setAddMealCal('')
   }
@@ -984,7 +984,7 @@ export default function Meals() {
       if (r.ok) {
         await loadDay(user.id, viewDate)
         setAddMealName(''); setAddMealCal('')
-        setTab('daily')
+        setShowAddMeal(false)
       } else {
         setErr(d.error || 'تعذر الحفظ')
       }
@@ -1202,6 +1202,68 @@ export default function Meals() {
 
       {/* Edit meal modal (Tab 2) */}
       {editMeal && <EditModal meal={editMeal} onSave={updateMeal} onClose={() => setEditMeal(null)} onReanalyze={async (id, data) => { await updateMeal(id, data) }} />}
+
+      {/* Add meal modal */}
+      {showAddMeal && (
+        <>
+          <div onClick={()=>{setShowAddMeal(false);setErr('')}} style={{position:'fixed',inset:0,zIndex:300,backgroundColor:'rgba(0,0,0,0.55)'}}/>
+          <div onClick={e=>e.stopPropagation()} style={{position:'fixed',bottom:0,insetInlineStart:0,insetInlineEnd:0,zIndex:301,backgroundColor:'var(--card)',borderRadius:'24px 24px 0 0',maxHeight:'85vh',overflowY:'auto',paddingBlockEnd:48,direction:'rtl'}}>
+            <div style={{width:40,height:4,borderRadius:2,backgroundColor:'var(--accent-soft)',margin:'12px auto'}}/>
+            <div style={{padding:'0 20px 20px'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
+                <button onClick={()=>{setShowAddMeal(false);setErr('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.3rem',lineHeight:1}}>×</button>
+                <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)'}}>+ سجّل وجبة جديدة</div>
+              </div>
+              {/* Meal type pills */}
+              <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
+                {MEAL_TYPES.map(mt=>(
+                  <button key={mt.id} onClick={()=>setAddMealType(mt.id)}
+                    style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?mt.color:'rgba(255,255,255,0.1)'}`,background:addMealType===mt.id?`${mt.color}20`:'transparent',color:addMealType===mt.id?mt.color:'rgba(255,255,255,0.45)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
+                    {mt.icon} {mt.label}
+                  </button>
+                ))}
+              </div>
+              {/* Meal name */}
+              <input type="text" placeholder="اسم الوجبة (مثال: كبسة دجاج)" value={addMealName} onChange={e=>setAddMealName(e.target.value)}
+                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--surface)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
+              {/* Calories */}
+              <input type="number" placeholder="السعرات الحرارية" value={addMealCal} onChange={e=>setAddMealCal(e.target.value)}
+                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--surface)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
+              {/* Quick calorie pills */}
+              <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:18}}>
+                {['150','250','350','450','550','650','750'].map(cal=>(
+                  <button key={cal} onClick={()=>setAddMealCal(cal)}
+                    style={{padding:'5px 12px',borderRadius:20,border:'1px solid rgba(255,255,255,0.08)',background:addMealCal===cal?'rgba(203,162,59,0.18)':'rgba(255,255,255,0.04)',color:addMealCal===cal?'#CBA23B':'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'Space Grotesk',monospace",fontWeight:700,fontSize:'.75rem',transition:'all .12s'}}>
+                    {cal}
+                  </button>
+                ))}
+              </div>
+              {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
+              <button onClick={handleAddMeal} disabled={!addMealName.trim()||saving}
+                style={{width:'100%',padding:'15px',background:addMealName.trim()?'#CBA23B':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#0C0B0D':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
+                {saving?'جاري الحفظ...':'حفظ الوجبة'}
+              </button>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+                <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
+                <span style={{color:'rgba(255,255,255,0.25)',fontSize:'.72rem',fontWeight:700,whiteSpace:'nowrap'}}>أو حللي صورة الوجبة</span>
+                <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
+              </div>
+              <button onClick={()=>{setShowAddMeal(false);setActiveTab('analyze')}}
+                style={{width:'100%',padding:'13px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:12,color:'#CBA23B',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.88rem',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+                📸 تحليل الوجبة بالذكاء الاصطناعي
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* FAB — add meal (nutrition tab only) */}
+      {activeTab === 'nutrition' && !showAddMeal && (
+        <button onClick={()=>setShowAddMeal(true)}
+          style={{position:'fixed',bottom:'calc(72px + env(safe-area-inset-bottom))',insetInlineEnd:20,zIndex:150,width:52,height:52,borderRadius:'50%',background:'#CBA23B',border:'none',color:'#0C0B0D',fontSize:'1.6rem',fontWeight:700,cursor:'pointer',boxShadow:'0 4px 18px rgba(203,162,59,0.35)',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
+          +
+        </button>
+      )}
 
       {/* Meal detail sheet */}
       {selectedMeal && (
@@ -1841,7 +1903,6 @@ export default function Meals() {
             <div style={{display:'flex',borderBottom:'1px solid var(--accent-faint)',padding:'0 16px',overflowX:'auto',backgroundColor:'var(--surface)'}}>
               <button className={`ptab${tab==='plan'?' on':''}`} onClick={()=>setTab('plan')}>🍽️ خطة اليوم</button>
               <button className={`ptab${tab==='daily'?' on':''}`} onClick={()=>setTab('daily')}>أكلك اليوم</button>
-              <button className={`ptab${tab==='add'?' on':''}`} onClick={()=>{setTab('add');resetAdd()}}>+ سجّل وجبة</button>
               <button className={`ptab${tab==='nutrients'?' on':''}`} onClick={()=>setTab('nutrients')}>📊 مغذياتي</button>
               <button className={`ptab${tab==='report'?' on':''}`} onClick={()=>setTab('report')}>التقرير</button>
             </div>
@@ -2013,7 +2074,7 @@ export default function Meals() {
                           </div>
                           <div style={{display:'flex',alignItems:'center',gap:8}}>
                             {mCal>0&&<span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,color:mt.color,fontSize:'.85rem'}}>{mCal} kcal</span>}
-                            <button onClick={e=>{e.stopPropagation();setMealType(mt.id);setAddStep('capture');setTab('add')}}
+                            <button onClick={e=>{e.stopPropagation();setAddMealType(mt.id);setShowAddMeal(true)}}
                               style={{backgroundColor:MEAL_BTN_COLORS[mt.id]?.bg,border:'none',color:MEAL_BTN_COLORS[mt.id]?.tc,borderRadius:7,padding:'4px 9px',cursor:'pointer',fontSize:'.7rem',fontWeight:700,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>+ سجّل وجبة</button>
                             <span style={{color:'var(--text-secondary)',fontSize:'.8rem',transition:'transform .2s',transform:open?'rotate(180deg)':'none'}}>▼</span>
                           </div>
@@ -2083,56 +2144,9 @@ export default function Meals() {
                     <div style={{textAlign:'center',padding:'30px 0'}}>
                       <div style={{fontSize:'2.5rem',marginBottom:8}}>🍽️</div>
                       <div style={{fontWeight:600,marginBottom:4,fontSize:14,color:'var(--text-secondary)',fontFamily:F}}>ما سجّلت شي بعد — يلا ابدأ!</div>
-                      <button onClick={()=>{setTab('add');resetAdd()}} style={{backgroundColor:'var(--text-primary)',border:'none',borderRadius:12,padding:'12px 22px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',color:'#FFFFFF',cursor:'pointer',marginTop:10}}>سجّل أول وجبة</button>
+                      <button onClick={()=>setShowAddMeal(true)} style={{backgroundColor:'var(--text-primary)',border:'none',borderRadius:12,padding:'12px 22px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',color:'#FFFFFF',cursor:'pointer',marginTop:10}}>سجّل أول وجبة</button>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* ── ADD ── */}
-              {tab==='add' && (
-                <div style={{paddingTop:16,paddingBottom:32}}>
-                  <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:14,textAlign:'right'}}>+ سجّل وجبة جديدة</div>
-                  {/* Meal type pills */}
-                  <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
-                    {MEAL_TYPES.map(mt=>(
-                      <button key={mt.id} onClick={()=>setAddMealType(mt.id)}
-                        style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?mt.color:'rgba(255,255,255,0.1)'}`,background:addMealType===mt.id?`${mt.color}20`:'transparent',color:addMealType===mt.id?mt.color:'rgba(255,255,255,0.45)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
-                        {mt.icon} {mt.label}
-                      </button>
-                    ))}
-                  </div>
-                  {/* Meal name */}
-                  <input type="text" placeholder="اسم الوجبة (مثال: كبسة دجاج)" value={addMealName} onChange={e=>setAddMealName(e.target.value)}
-                    style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--card)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
-                  {/* Calories */}
-                  <input type="number" placeholder="السعرات الحرارية" value={addMealCal} onChange={e=>setAddMealCal(e.target.value)}
-                    style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--card)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
-                  {/* Quick calorie pills */}
-                  <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:18}}>
-                    {['150','250','350','450','550','650','750'].map(cal=>(
-                      <button key={cal} onClick={()=>setAddMealCal(cal)}
-                        style={{padding:'5px 12px',borderRadius:20,border:'1px solid rgba(255,255,255,0.08)',background:addMealCal===cal?'rgba(203,162,59,0.18)':'rgba(255,255,255,0.04)',color:addMealCal===cal?'#CBA23B':'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'Space Grotesk',monospace",fontWeight:700,fontSize:'.75rem',transition:'all .12s'}}>
-                        {cal}
-                      </button>
-                    ))}
-                  </div>
-                  {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
-                  <button onClick={handleAddMeal} disabled={!addMealName.trim()||saving}
-                    style={{width:'100%',padding:'15px',background:addMealName.trim()?'#CBA23B':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#0C0B0D':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
-                    {saving?'جاري الحفظ...':'حفظ الوجبة'}
-                  </button>
-                  {/* Divider */}
-                  <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
-                    <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
-                    <span style={{color:'rgba(255,255,255,0.25)',fontSize:'.72rem',fontWeight:700,whiteSpace:'nowrap'}}>أو حللي صورة الوجبة</span>
-                    <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
-                  </div>
-                  {/* Shortcut to AI analyzer */}
-                  <button onClick={()=>setActiveTab('analyze')}
-                    style={{width:'100%',padding:'13px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:12,color:'#CBA23B',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.88rem',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-                    📸 تحليل الوجبة بالذكاء الاصطناعي
-                  </button>
                 </div>
               )}
 
