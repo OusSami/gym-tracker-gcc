@@ -291,7 +291,7 @@ function SearchAndChips({ search, onSearch, activeCategory, onCategory, showChip
   )
 }
 
-function RecipeDetail({ recipe, onBack }) {
+function RecipeDetail({ recipe, onBack, favorites, toggleFavorite }) {
   const [detailTab, setDetailTab] = useState('ingredients')
   const [per100g, setPer100g] = useState(false)
   return (
@@ -319,7 +319,14 @@ function RecipeDetail({ recipe, onBack }) {
         </div>
       </div>
       <div style={{ backgroundColor: 'var(--card)', paddingBlock: 14, paddingInline: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-        {[{ icon: '❤️', label: 'المفضلة' }, { icon: '📅', label: 'جدولة' }, { icon: '🔗', label: 'مشاركة' }].map(({ icon, label }) => (
+        <button onClick={() => toggleFavorite && toggleFavorite(recipe.id)} style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            border: 'none', background: 'none', cursor: 'pointer',
+          }}>
+            <span style={{ fontSize: 22 }}>{favorites?.has(recipe.id) ? '❤️' : '🤍'}</span>
+            <span style={{ fontSize: 11, color: favorites?.has(recipe.id) ? '#EF4444' : 'var(--text-secondary)', fontFamily: F }}>المفضلة</span>
+          </button>
+          {[{ icon: '📅', label: 'جدولة' }, { icon: '🔗', label: 'مشاركة' }].map(({ icon, label }) => (
           <button key={label} onClick={() => {}} style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
             border: 'none', background: 'none', cursor: 'pointer',
@@ -511,6 +518,7 @@ export default function Meals() {
   const [weekLoading, setWeekLoading]           = useState(true)
   const [expandedDay, setExpandedDay]           = useState(null)
   const [weekStart, setWeekStart]               = useState(null)
+  const [favorites, setFavorites]               = useState(new Set())
   const [selectedMeal, setSelectedMeal]         = useState(null)
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
@@ -615,6 +623,9 @@ export default function Meals() {
 
   // ── Load week plan once user is available ────────────────────────────────
   useEffect(() => { if (user?.id && weekPlan.length === 0) loadWeekPlan() }, [user?.id])
+
+  // ── Load favorites once user is available ───────────────────────────────
+  useEffect(() => { if (user?.id) loadFavorites() }, [user?.id])
 
   // ── Tab 2: all functions from original e4f2f06 ───────────────────────────
 
@@ -952,6 +963,38 @@ export default function Meals() {
     return matchesCat && matchesSearch
   })
 
+  const favoriteRecipes = recipes.filter(r => favorites.has(r.id))
+
+  // ── Recipe favorites ─────────────────────────────────────────────────────
+  async function loadFavorites() {
+    if (!user?.id) return
+    const { data } = await supabase
+      .from('recipe_favorites')
+      .select('recipe_id')
+      .eq('user_id', user.id)
+    if (data) setFavorites(new Set(data.map(f => f.recipe_id)))
+  }
+
+  async function toggleFavorite(recipeId) {
+    if (!user?.id) return
+    const isFav = favorites.has(recipeId)
+    const newFavs = new Set(favorites)
+    if (isFav) newFavs.delete(recipeId)
+    else newFavs.add(recipeId)
+    setFavorites(newFavs)
+    if (isFav) {
+      await supabase
+        .from('recipe_favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('recipe_id', recipeId)
+    } else {
+      await supabase
+        .from('recipe_favorites')
+        .insert({ user_id: user.id, recipe_id: recipeId })
+    }
+  }
+
   // ── Week plan helpers ────────────────────────────────────────────────────
   function getWeekDays(fromDate) {
     const start = new Date(fromDate)
@@ -1181,7 +1224,7 @@ export default function Meals() {
           <>
             {/* Recipe detail — renders in place so tab bar stays visible */}
             {selectedRecipe && (
-              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />
+              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} favorites={favorites} toggleFavorite={toggleFavorite} />
             )}
 
             {/* Sub-screen A2: Full browser */}
@@ -1223,6 +1266,19 @@ export default function Meals() {
                         aspectRatio: '3/4', cursor: 'pointer', boxShadow: 'var(--shadow-card)',
                       }}>
                       <RecipeImg src={recipe.image_url} name={recipe.name} />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id) }}
+                        style={{
+                          position:'absolute', top:10, insetInlineEnd:10, zIndex:10,
+                          width:34, height:34, borderRadius:17,
+                          backgroundColor:'rgba(0,0,0,0.4)',
+                          border:'none', cursor:'pointer',
+                          display:'flex', alignItems:'center',
+                          justifyContent:'center', fontSize:16,
+                        }}
+                      >
+                        {favorites.has(recipe.id) ? '❤️' : '🤍'}
+                      </button>
                       <div style={{
                         position: 'absolute', inset: 0,
                         background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
@@ -1321,6 +1377,19 @@ export default function Meals() {
                               boxShadow: 'var(--shadow-card)',
                             }}>
                             <RecipeImg src={recipe.image_url} name={recipe.name} />
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id) }}
+                              style={{
+                                position:'absolute', top:10, insetInlineEnd:10, zIndex:10,
+                                width:34, height:34, borderRadius:17,
+                                backgroundColor:'rgba(0,0,0,0.4)',
+                                border:'none', cursor:'pointer',
+                                display:'flex', alignItems:'center',
+                                justifyContent:'center', fontSize:16,
+                              }}
+                            >
+                              {favorites.has(recipe.id) ? '❤️' : '🤍'}
+                            </button>
                             <div style={{
                               position: 'absolute', inset: 0,
                               background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
@@ -1360,6 +1429,57 @@ export default function Meals() {
                     }
                   </div>
                 </div>
+
+                {/* ── Favorites section ── */}
+                {favoriteRecipes.length > 0 && (
+                  <div style={{ marginBlockEnd: 8 }}>
+                    <div style={{
+                      display:'flex', justifyContent:'space-between', alignItems:'center',
+                      paddingInline:16, marginBlockStart:16, marginBlockEnd:10,
+                    }}>
+                      <span style={{ fontSize:13, color:'var(--text-secondary)', fontFamily:F }}>{favoriteRecipes.length} وصفة</span>
+                      <span style={{ fontSize:18, fontWeight:700, color:'var(--text-primary)', fontFamily:F }}>❤️ المفضلة</span>
+                    </div>
+                    <div className="stat-scroll" style={{ display:'flex', overflowX:'auto', gap:12, paddingInline:16, paddingBlockEnd:8 }}>
+                      {favoriteRecipes.map(recipe => (
+                        <div key={recipe.id} className="recipe-card-hover"
+                          onClick={() => setSelectedRecipe(recipe)}
+                          style={{
+                            position:'relative', width:170, minWidth:170, height:220,
+                            borderRadius:16, overflow:'hidden', cursor:'pointer', flexShrink:0,
+                            boxShadow:'var(--shadow-card)',
+                          }}>
+                          <RecipeImg src={recipe.image_url} name={recipe.name} />
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id) }}
+                            style={{
+                              position:'absolute', top:10, insetInlineEnd:10, zIndex:10,
+                              width:34, height:34, borderRadius:17,
+                              backgroundColor:'rgba(0,0,0,0.4)',
+                              border:'none', cursor:'pointer',
+                              display:'flex', alignItems:'center',
+                              justifyContent:'center', fontSize:16,
+                            }}
+                          >
+                            ❤️
+                          </button>
+                          <div style={{
+                            position:'absolute', inset:0,
+                            background:'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
+                          }} />
+                          <div style={{ position:'absolute', bottom:0, insetInlineStart:0, insetInlineEnd:0, padding:12 }}>
+                            <p style={{
+                              fontSize:14, fontWeight:700, color:'#FFFFFF', textAlign:'right',
+                              margin:0, fontFamily:F,
+                              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
+                              textShadow:'0 1px 4px rgba(0,0,0,0.4)', lineHeight:1.4,
+                            }}>{recipe.name}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* "تصفح حسب الفئة" visual category cards */}
                 <div>
@@ -1448,6 +1568,19 @@ export default function Meals() {
                             aspectRatio: '3/4', cursor: 'pointer', boxShadow: 'var(--shadow-card)',
                           }}>
                           <RecipeImg src={recipe.image_url} name={recipe.name} />
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id) }}
+                            style={{
+                              position:'absolute', top:10, insetInlineEnd:10, zIndex:10,
+                              width:34, height:34, borderRadius:17,
+                              backgroundColor:'rgba(0,0,0,0.4)',
+                              border:'none', cursor:'pointer',
+                              display:'flex', alignItems:'center',
+                              justifyContent:'center', fontSize:16,
+                            }}
+                          >
+                            {favorites.has(recipe.id) ? '❤️' : '🤍'}
+                          </button>
                           <div style={{
                             position: 'absolute', inset: 0,
                             background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
