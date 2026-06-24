@@ -50,6 +50,13 @@ const MEAL_COLORS = {
   snack:     { bg: '#FCE4EC', emoji: '🍎' },
 }
 
+const MEAL_BTN_COLORS = {
+  breakfast: { bg:'#FFF3E0', tc:'#E65100' },
+  lunch:     { bg:'#E8F5E9', tc:'#2E7D32' },
+  dinner:    { bg:'#EDE7F6', tc:'#4527A0' },
+  snack:     { bg:'#FCE4EC', tc:'#880E4F' },
+}
+
 function getFoodVisual(name) {
   if (!name) return { emoji:'🍽️', bg:'#F7E9DF' }
   const n = name
@@ -164,9 +171,9 @@ const STYLES = `
   .recipe-card-hover:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,120,90,0.18); }
   @keyframes spin { to { transform: rotate(360deg); } }
   * { box-sizing: border-box; }
-  .ptab { background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.3);font-family:'DM Sans','Tajawal',sans-serif;font-size:.82rem;font-weight:600;padding:10px 10px;cursor:pointer;transition:all .2s;white-space:nowrap; }
-  .ptab.on { color:#CBA23B;border-bottom-color:#CBA23B; }
-  .mrow { display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+  .ptab { background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-secondary);font-family:'DM Sans','Tajawal',sans-serif;font-size:.82rem;font-weight:600;padding:10px 10px;cursor:pointer;transition:all .2s;white-space:nowrap; }
+  .ptab.on { color:var(--text-primary);border-bottom-color:var(--accent); }
+  .mrow { display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--accent-faint); }
   .mrow:last-child { border-bottom:none; }
   input,textarea { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#ECE3CF;padding:11px 14px;font-family:'DM Sans','Tajawal',sans-serif;font-size:.9rem;border-radius:10px;outline:none;width:100%;transition:all .2s; }
   input:focus,textarea:focus { border-color:#CBA23B;background:rgba(203,162,59,0.04); }
@@ -1663,16 +1670,16 @@ export default function Meals() {
         {activeTab === 'nutrition' && (
           <>
             {/* Date nav */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',background:'rgba(255,255,255,0.02)',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
-              <button onClick={prevDay} style={{background:'none',border:'none',color:'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>‹</button>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 16px',backgroundColor:'var(--surface)',borderBottom:'1px solid var(--accent-faint)'}}>
+              <button onClick={prevDay} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>‹</button>
               <div style={{textAlign:'center'}}>
-                <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem'}}>{isToday?'اليوم 📅':new Date(viewDate+'T12:00:00').toLocaleDateString('ar-SA',{weekday:'long',month:'long',day:'numeric'})}</div>
+                <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.95rem',color:'var(--text-primary)'}}>{isToday?'اليوم 📅':new Date(viewDate+'T12:00:00').toLocaleDateString('ar-SA',{weekday:'long',month:'long',day:'numeric'})}</div>
               </div>
-              <button onClick={nextDay} disabled={isToday} style={{background:'none',border:'none',color:isToday?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.4)',cursor:isToday?'default':'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>›</button>
+              <button onClick={nextDay} disabled={isToday} style={{background:'none',border:'none',color:isToday?'var(--accent-faint)':'var(--text-secondary)',cursor:isToday?'default':'pointer',fontSize:'1.3rem',padding:'4px 8px'}}>›</button>
             </div>
 
             {/* Internal sub-tab bar */}
-            <div style={{display:'flex',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'0 16px',overflowX:'auto'}}>
+            <div style={{display:'flex',borderBottom:'1px solid var(--accent-faint)',padding:'0 16px',overflowX:'auto',backgroundColor:'var(--surface)'}}>
               <button className={`ptab${tab==='plan'?' on':''}`} onClick={()=>setTab('plan')}>🍽️ خطة اليوم</button>
               <button className={`ptab${tab==='daily'?' on':''}`} onClick={()=>setTab('daily')}>أكلك اليوم</button>
               <button className={`ptab${tab==='add'?' on':''}`} onClick={()=>{setTab('add');resetAdd()}}>+ سجّل وجبة</button>
@@ -1814,20 +1821,20 @@ export default function Meals() {
                 <div style={{paddingTop:14}}>
                   <CalorieRing calories={totals.calories||0} goal={G.calories} protein={totals.protein_g||0} carbs={totals.carbs_g||0} fat={totals.fat_g||0} G={G}/>
                   {/* Water */}
-                  <div style={{background:'rgba(6,182,212,0.06)',border:'1px solid rgba(6,182,212,0.18)',borderRadius:14,padding:'13px 16px',marginBottom:12}}>
+                  <div style={{backgroundColor:'#E0F7FA',border:'1px solid #B2EBF2',borderRadius:14,padding:'13px 16px',marginBottom:12}}>
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
                       <div>
-                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(6,182,212,0.6)',marginBottom:2}}>الماء</div>
-                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.3rem',color:'#06b6d4'}}>{totalWater}ml <span style={{fontSize:'.7rem',fontWeight:600,opacity:.6}}>/ {G.water_ml||2500}ml</span></div>
+                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'#0097A7',marginBottom:2}}>الماء</div>
+                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'1.3rem',color:'#00838F'}}>{totalWater}ml <span style={{fontSize:'.7rem',fontWeight:600,color:'#0097A7'}}>/ {G.water_ml||2500}ml</span></div>
                       </div>
                       <div style={{flex:1,margin:'0 12px'}}>
-                        <div style={{height:6,background:'rgba(6,182,212,0.1)',borderRadius:3,overflow:'hidden'}}><div style={{height:'100%',width:`${pct(totalWater,G.water_ml||2500)}%`,background:'#06b6d4',borderRadius:3,transition:'width .5s'}}/></div>
-                        <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.2)',marginTop:3,textAlign:'right'}}>{pct(totalWater,G.water_ml||2500)}%</div>
+                        <div style={{height:6,backgroundColor:'#B2EBF2',borderRadius:3,overflow:'hidden'}}><div style={{height:'100%',width:`${pct(totalWater,G.water_ml||2500)}%`,backgroundColor:'#00838F',borderRadius:3,transition:'width .5s'}}/></div>
+                        <div style={{fontSize:'.62rem',color:'#0097A7',marginTop:3,textAlign:'right'}}>{pct(totalWater,G.water_ml||2500)}%</div>
                       </div>
                     </div>
                     <div style={{display:'flex',gap:6}}>
                       {[150,250,330,500].map(ml=>(
-                        <button key={ml} onClick={()=>logWater(ml)} style={{flex:1,padding:'7px 4px',background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.2)',borderRadius:9,color:'#06b6d4',cursor:'pointer',fontSize:'.72rem',fontWeight:700,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>+{ml}ml</button>
+                        <button key={ml} onClick={()=>logWater(ml)} style={{flex:1,padding:'7px 4px',backgroundColor:'#B2EBF2',border:'none',borderRadius:9,color:'#006064',cursor:'pointer',fontSize:'.72rem',fontWeight:700,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>+{ml}ml</button>
                       ))}
                     </div>
                     {water.length>0&&<div style={{marginTop:7,display:'flex',gap:5,flexWrap:'wrap'}}>{water.map(w=><span key={w.id} onClick={()=>deleteMeal(w.id,'water')} style={{background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.12)',color:'rgba(6,182,212,0.7)',padding:'3px 8px',borderRadius:20,fontSize:'.65rem',cursor:'pointer'}}>💧{w.amount_ml}ml ✕</span>)}</div>}
@@ -1838,24 +1845,24 @@ export default function Meals() {
                     const mCal = mls.reduce((a,m)=>a+(m.total_calories||0),0)
                     const open = expandMeal===mt.id
                     return (
-                      <div key={mt.id} style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,marginBottom:8,overflow:'hidden'}}>
+                      <div key={mt.id} style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-faint)',borderRadius:14,marginBottom:8,overflow:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',cursor:'pointer'}} onClick={()=>setExpandMeal(open?null:mt.id)}>
                           <div style={{display:'flex',alignItems:'center',gap:8}}>
                             <span style={{fontSize:'1.2rem'}}>{mt.icon}</span>
-                            <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem'}}>{mt.label}</span>
+                            <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:600,fontSize:'.88rem',color:'var(--text-primary)'}}>{mt.label}</span>
                             {mls.length>0&&<span style={{background:`${mt.color}20`,color:mt.color,padding:'2px 7px',borderRadius:20,fontSize:'.62rem',fontWeight:700}}>{mls.length}</span>}
                           </div>
                           <div style={{display:'flex',alignItems:'center',gap:8}}>
                             {mCal>0&&<span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,color:mt.color,fontSize:'.85rem'}}>{mCal} kcal</span>}
                             <button onClick={e=>{e.stopPropagation();setMealType(mt.id);setAddStep('capture');setTab('add')}}
-                              style={{background:`${mt.color}18`,border:`1px solid ${mt.color}33`,color:mt.color,borderRadius:7,padding:'4px 9px',cursor:'pointer',fontSize:'.7rem',fontWeight:700,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>+ سجّل وجبة</button>
-                            <span style={{color:'rgba(255,255,255,0.3)',fontSize:'.8rem',transition:'transform .2s',transform:open?'rotate(180deg)':'none'}}>▼</span>
+                              style={{backgroundColor:MEAL_BTN_COLORS[mt.id]?.bg,border:'none',color:MEAL_BTN_COLORS[mt.id]?.tc,borderRadius:7,padding:'4px 9px',cursor:'pointer',fontSize:'.7rem',fontWeight:700,fontFamily:"'DM Sans','Tajawal',sans-serif"}}>+ سجّل وجبة</button>
+                            <span style={{color:'var(--text-secondary)',fontSize:'.8rem',transition:'transform .2s',transform:open?'rotate(180deg)':'none'}}>▼</span>
                           </div>
                         </div>
                         {open && (
-                          <div style={{borderTop:'1px solid rgba(255,255,255,0.05)',padding:'10px 14px'}}>
+                          <div style={{borderTop:'1px solid var(--accent-faint)',padding:'10px 14px'}}>
                             {mls.length===0
-                              ? <div style={{color:'rgba(255,255,255,0.2)',fontSize:'.8rem',padding:'6px 0'}}>ما سجّلت شي بعد — يلا ابدأ!</div>
+                              ? <div style={{color:'var(--text-secondary)',fontSize:'.8rem',padding:'6px 0'}}>ما سجّلت شي بعد — يلا ابدأ!</div>
                               : mls.map(m=>(
                                 <div key={m.id} onClick={() => setSelectedMeal(m)} style={{
                                   display:'flex', alignItems:'center', gap:12,
@@ -1897,10 +1904,10 @@ export default function Meals() {
                     )
                   })}
                   {meals.length===0&&(
-                    <div style={{textAlign:'center',padding:'30px 0',color:'rgba(255,255,255,0.2)'}}>
+                    <div style={{textAlign:'center',padding:'30px 0'}}>
                       <div style={{fontSize:'2.5rem',marginBottom:8}}>🍽️</div>
-                      <div style={{fontWeight:600,marginBottom:4}}>ما سجّلت شي بعد — يلا ابدأ!</div>
-                      <button onClick={()=>{setTab('add');resetAdd()}} style={{background:'#CBA23B',border:'none',borderRadius:12,padding:'12px 22px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',color:'#0C0B0D',cursor:'pointer',marginTop:10}}>سجّل أول وجبة</button>
+                      <div style={{fontWeight:600,marginBottom:4,fontSize:14,color:'var(--text-secondary)',fontFamily:F}}>ما سجّلت شي بعد — يلا ابدأ!</div>
+                      <button onClick={()=>{setTab('add');resetAdd()}} style={{backgroundColor:'var(--text-primary)',border:'none',borderRadius:12,padding:'12px 22px',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.9rem',color:'#FFFFFF',cursor:'pointer',marginTop:10}}>سجّل أول وجبة</button>
                     </div>
                   )}
                 </div>
@@ -2476,46 +2483,46 @@ function CalorieRing({ calories, goal, protein, carbs, fat, G }) {
   const over = calories > goal
   const r = 42, circ = 2*Math.PI*r
   return (
-    <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:18,padding:'16px',marginBottom:12}}>
+    <div style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-soft)',borderRadius:18,padding:'16px',marginBottom:12}}>
       <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:14}}>
         <div style={{flexShrink:0}}>
           <svg width={100} height={100} viewBox="0 0 100 100">
-            <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={9}/>
-            <circle cx={50} cy={50} r={r} fill="none" stroke={over?'#ef4444':'#CBA23B'} strokeWidth={9}
+            <circle cx={50} cy={50} r={r} fill="none" stroke="var(--accent-faint)" strokeWidth={9}/>
+            <circle cx={50} cy={50} r={r} fill="none" stroke={over?'#ef4444':'var(--accent)'} strokeWidth={9}
               strokeDasharray={`${pct*circ} ${circ}`} strokeLinecap="round"
               transform="rotate(-90 50 50)" style={{transition:'stroke-dasharray .6s'}}/>
-            <text x={50} y={46} textAnchor="middle" fill={over?'#ef4444':'#CBA23B'} fontSize={15} fontFamily="'Space Grotesk','Tajawal',sans-serif" fontWeight={800}>{Math.round(calories)}</text>
-            <text x={50} y={60} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize={9} fontFamily="'DM Sans','Tajawal',sans-serif">سعرة</text>
+            <text x={50} y={46} textAnchor="middle" fill={over?'#ef4444':'var(--accent)'} fontSize={15} fontFamily="'Space Grotesk','Tajawal',sans-serif" fontWeight={800}>{Math.round(calories)}</text>
+            <text x={50} y={60} textAnchor="middle" fill="var(--text-secondary)" fontSize={9} fontFamily="'DM Sans','Tajawal',sans-serif">سعرة</text>
           </svg>
         </div>
         <div style={{flex:1}}>
-          <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:6}}>هدفك اليومي: {goal} سعرة</div>
+          <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:6}}>هدفك اليومي: {goal} سعرة</div>
           <div style={{fontSize:'.8rem',marginBottom:10,fontWeight:600}}>
             {goal-calories>0
-              ? <span style={{color:'#4ade80'}}>{goal-calories} سعرة باقيين لك</span>
-              : <span style={{color:'#ef4444'}}>{calories-goal} سعرة زادت</span>}
+              ? <span style={{color:'#22C55E'}}>{goal-calories} سعرة باقيين لك</span>
+              : <span style={{color:'#EF4444'}}>{calories-goal} سعرة زادت</span>}
           </div>
           {[['بروتين',protein,G.protein_g,'#3b82f6'],['كارب',carbs,G.carbs_g,'#f97316'],['دهن',fat,G.fat_g,'#a855f7']].map(([l,v,g,c])=>(
             <div key={l} style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
-              <span style={{fontSize:'.65rem',fontWeight:800,color:c,minWidth:10}}>{l}</span>
-              <div style={{flex:1,height:5,background:'rgba(203,162,59,0.10)',borderRadius:3,overflow:'hidden'}}>
-                <div style={{height:'100%',width:`${Math.min(100,g>0?(v/g)*100:0)}%`,background:c,borderRadius:3,transition:'width .5s'}}/>
+              <span style={{fontSize:'.65rem',fontWeight:700,color:'var(--text-primary)',minWidth:30,fontFamily:F}}>{l}</span>
+              <div style={{flex:1,height:5,backgroundColor:'var(--accent-faint)',borderRadius:3,overflow:'hidden'}}>
+                <div style={{height:'100%',width:`${Math.min(100,g>0?(v/g)*100:0)}%`,backgroundColor:c,borderRadius:3,transition:'width .5s'}}/>
               </div>
-              <span style={{fontSize:'.65rem',color:'rgba(255,255,255,0.35)',minWidth:52,textAlign:'right'}}>{Math.round(v||0)}g / {g}g</span>
+              <span style={{fontSize:'.65rem',color:'var(--text-secondary)',minWidth:52,textAlign:'right',fontFamily:F}}>{Math.round(v||0)}g / {g}g</span>
             </div>
           ))}
         </div>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,paddingTop:12,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,paddingTop:12,borderTop:'1px solid var(--accent-faint)'}}>
         {[['البروتين',protein,'g','#3b82f6'],['الكارب',carbs,'g','#f97316'],['الدهن',fat,'g','#a855f7']].map(([l,v,u,c])=>(
           <div key={l} style={{textAlign:'center'}}>
             <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:c,lineHeight:1}}>{Math.round(v||0)}<span style={{fontSize:'.58rem',opacity:.6,marginLeft:1}}>{u}</span></div>
-            <div style={{fontSize:'.56rem',color:'rgba(255,255,255,0.28)',letterSpacing:1,marginTop:3,fontWeight:700}}>{l.toUpperCase()}</div>
+            <div style={{fontSize:'.56rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:3,fontWeight:700}}>{l.toUpperCase()}</div>
           </div>
         ))}
         <div style={{textAlign:'center'}}>
-          <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'#CBA23B',lineHeight:1}}>{Math.round(pct*100)}<span style={{fontSize:'.58rem',opacity:.6}}>%</span></div>
-          <div style={{fontSize:'.56rem',color:'rgba(255,255,255,0.28)',letterSpacing:1,marginTop:3,fontWeight:700}}>من الهدف</div>
+          <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:'var(--accent)',lineHeight:1}}>{Math.round(pct*100)}<span style={{fontSize:'.58rem',opacity:.6}}>%</span></div>
+          <div style={{fontSize:'.56rem',color:'var(--text-secondary)',letterSpacing:1,marginTop:3,fontWeight:700}}>من الهدف</div>
         </div>
       </div>
     </div>
