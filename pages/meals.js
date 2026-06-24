@@ -132,6 +132,34 @@ function findRecipeImage(mealName, recipes) {
   return null
 }
 
+function searchRecipes(recipes, query) {
+  if (!query || query.trim() === '') return recipes
+  const q = query.trim()
+  const terms = q.split(/\s+/).filter(t => t.length > 1)
+  return recipes
+    .map(recipe => {
+      let score = 0
+      if (recipe.name === q) score += 100
+      if (recipe.name?.startsWith(q)) score += 50
+      if (recipe.name?.includes(q)) score += 40
+      terms.forEach(term => {
+        if (recipe.name?.includes(term)) score += 20
+      })
+      terms.forEach(term => {
+        if (recipe.category?.includes(term)) score += 10
+      })
+      if (recipe.ingredients?.length) {
+        terms.forEach(term => {
+          if (recipe.ingredients.some(ing => ing.includes(term))) score += 15
+        })
+      }
+      return { recipe, score }
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(({ recipe }) => recipe)
+}
+
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 const addDays = (dateStr, n) => {
@@ -310,23 +338,35 @@ function MacroBar({ label, value, goal, color }) {
 function SearchAndChips({ search, onSearch, activeCategory, onCategory, showChips = true }) {
   return (
     <>
-      <div style={{ marginInline: 16, marginBlockEnd: 12 }}>
+      <div style={{ marginInline: 16, marginBlockEnd: 12, position: 'relative' }}>
         <div style={{
           backgroundColor: '#1A1A1A', borderRadius: 30,
           paddingInline: 16, paddingBlock: 12,
           display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8,
         }}>
+          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, flexShrink: 0 }}>🔍</span>
           <input
             value={search}
             onChange={e => onSearch(e.target.value)}
-            placeholder="ابحثي عن وصفة"
+            placeholder="ابحثي عن وصفة أو مكوّن..."
             style={{
               flex: 1, color: '#FFFFFF', backgroundColor: 'transparent',
               border: 'none', outline: 'none', textAlign: 'right',
               fontSize: 14, fontFamily: F,
             }}
           />
-          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, flexShrink: 0 }}>🔍</span>
+          {search.length > 0 && (
+            <button
+              onClick={() => onSearch('')}
+              style={{
+                background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 50,
+                width: 22, height: 22, color: '#FFFFFF', fontSize: 14,
+                cursor: 'pointer', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                paddingBottom: 1,
+              }}
+            >×</button>
+          )}
         </div>
       </div>
       {showChips && (
@@ -1029,22 +1069,17 @@ export default function Meals() {
   // Browse pool excludes the strip items so grid/A2 always differ from the strip
   const browsePool = recipes.slice(8)
 
-  const filtered = browsePool.filter(r => {
-    const matchesCat = activeCategory === 'الكل'
-      ? true
-      : (() => {
-          // Primary: DB category field (exact label match)
-          if (r.category) {
-            const cat = CATEGORIES.find(c => c.label === activeCategory)
-            if (cat?.label === r.category) return true
-          }
-          // Fallback: keyword match on name
+  const filtered = (() => {
+    const catFiltered = activeCategory === 'الكل'
+      ? browsePool
+      : browsePool.filter(r => {
+          if (r.category === activeCategory) return true
           const cat = CATEGORIES.find(c => c.label === activeCategory)
           return cat?.match?.some(kw => r.name?.includes(kw)) ?? false
-        })()
-    const matchesSearch = !search.trim() || r.name?.includes(search.trim())
-    return matchesCat && matchesSearch
-  })
+        })
+    if (!search || search.trim() === '') return catFiltered
+    return searchRecipes(catFiltered, search)
+  })()
 
   const favoriteRecipes = recipes.filter(r => favorites.has(r.id))
 
@@ -1330,7 +1365,7 @@ export default function Meals() {
                   borderBottom: '1px solid var(--accent-faint)',
                 }}>
                   <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontFamily: F }}>
-                    {filtered.length} وصفة
+                    {search ? `${filtered.length} نتيجة لـ "${search}"` : `${filtered.length} وصفة`}
                   </span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: F }}>
                     كل الوصفات
@@ -1416,8 +1451,23 @@ export default function Meals() {
                   ))}
                   {!recipesLoading && filtered.length === 0 && (
                     <div style={{ gridColumn: '1/-1', textAlign: 'center', paddingBlock: 40, color: 'var(--text-secondary)', fontFamily: F }}>
-                      <div style={{ fontSize: 40 }}>🔍</div>
-                      <div style={{ fontSize: 16, marginBlockStart: 8 }}>لا توجد وصفات مطابقة</div>
+                      <div style={{ fontSize: 40, marginBlockEnd: 12 }}>🔍</div>
+                      <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: 8 }}>
+                        {search ? `لا توجد نتائج لـ "${search}"` : 'لا توجد وصفات مطابقة'}
+                      </div>
+                      <div style={{ fontSize: 13 }}>
+                        {search ? 'جربي البحث باسم المكوّن مثل "دجاج" أو "أرز"' : 'جربي فئة مختلفة'}
+                      </div>
+                      {search && (
+                        <button
+                          onClick={() => setSearch('')}
+                          style={{
+                            marginBlockStart: 16, paddingInline: 20, paddingBlock: 10,
+                            backgroundColor: 'var(--text-primary)', color: '#FFFFFF',
+                            border: 'none', borderRadius: 20, fontSize: 13, cursor: 'pointer', fontFamily: F,
+                          }}
+                        >مسح البحث</button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1646,8 +1696,23 @@ export default function Meals() {
 
                   {!recipesLoading && filtered.length === 0 && (
                     <div style={{ textAlign: 'center', paddingBlock: 40, color: 'var(--text-secondary)', fontFamily: F }}>
-                      <div style={{ fontSize: 40 }}>🔍</div>
-                      <div style={{ fontSize: 16, marginBlockStart: 8 }}>لا توجد وصفات مطابقة</div>
+                      <div style={{ fontSize: 40, marginBlockEnd: 12 }}>🔍</div>
+                      <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: 8 }}>
+                        {search ? `لا توجد نتائج لـ "${search}"` : 'لا توجد وصفات مطابقة'}
+                      </div>
+                      <div style={{ fontSize: 13 }}>
+                        {search ? 'جربي البحث باسم المكوّن مثل "دجاج" أو "أرز"' : 'جربي فئة مختلفة'}
+                      </div>
+                      {search && (
+                        <button
+                          onClick={() => setSearch('')}
+                          style={{
+                            marginBlockStart: 16, paddingInline: 20, paddingBlock: 10,
+                            backgroundColor: 'var(--text-primary)', color: '#FFFFFF',
+                            border: 'none', borderRadius: 20, fontSize: 13, cursor: 'pointer', fontFamily: F,
+                          }}
+                        >مسح البحث</button>
+                      )}
                     </div>
                   )}
 
