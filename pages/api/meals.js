@@ -54,6 +54,7 @@ export default async function handler(req, res) {
       ingredients: fields.ingredients || null,
       vitamins: fields.vitamins || [],
       allergens: fields.allergens || [],
+      image_url: fields.image_url || null,
     }).select().single()
     if (error) return res.status(500).json({ error: error.message })
     return res.status(200).json({ meal: data })
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
     const allowed = ['meal_name','total_calories','protein_g','carbs_g','fat_g','fiber_g',
       'sugar_g','saturated_fat_g','polyunsaturated_fat_g','monounsaturated_fat_g',
       'trans_fat_g','cholesterol_mg','sodium_mg','potassium_mg',
-      'vitamin_a_mcg','vitamin_c_mg','calcium_mg','iron_mg','portion_note']
+      'vitamin_a_mcg','vitamin_c_mg','calcium_mg','iron_mg','portion_note','image_url']
     const updates = {}
     allowed.forEach(k => { if (fields[k] !== undefined) updates[k] = fields[k] })
     const { data, error } = await sb.from('meals').update(updates).eq('id', id).eq('user_id', userId).select().single()

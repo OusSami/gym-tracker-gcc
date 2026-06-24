@@ -104,6 +104,34 @@ function getFoodVisual(name) {
   return { emoji:'🍽️', bg:'#F7E9DF' }
 }
 
+function findRecipeImage(mealName, recipes) {
+  if (!mealName || !recipes?.length) return null
+  const name = mealName.trim()
+
+  const exact = recipes.find(r =>
+    r.name === name ||
+    r.name?.includes(name) ||
+    name.includes(r.name)
+  )
+  if (exact?.image_url) return exact.image_url
+
+  const words = name.split(/\s+/).filter(w => w.length > 2)
+  let bestMatch = null
+  let bestScore = 0
+
+  for (const recipe of recipes) {
+    if (!recipe.image_url) continue
+    const score = words.filter(w => recipe.name?.includes(w)).length
+    if (score > bestScore) {
+      bestScore = score
+      bestMatch = recipe
+    }
+  }
+
+  if (bestScore >= 1) return bestMatch?.image_url
+  return null
+}
+
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 const addDays = (dateStr, n) => {
@@ -788,7 +816,29 @@ export default function Meals() {
     if (!data || !user) return
     setSaving(true)
     try {
-      const body = { userId: user.id, mealType, meal_date: viewDate, ...data }
+      const matchedImage = findRecipeImage(data.meal_name || result?.meal_name, recipes)
+
+      let photoUrl = null
+      if (imgB64 && imgMime) {
+        try {
+          const blob = await fetch(`data:${imgMime};base64,${imgB64}`).then(r => r.blob())
+          const filename = `meal-${user.id}-${Date.now()}.jpg`
+          const { error: uploadError } = await supabase.storage
+            .from('meal-photos')
+            .upload(filename, blob, { contentType: imgMime, upsert: true })
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from('meal-photos')
+              .getPublicUrl(filename)
+            photoUrl = urlData.publicUrl
+          }
+        } catch (e) {
+          console.error('Photo upload failed:', e)
+        }
+      }
+
+      const finalImageUrl = photoUrl || matchedImage
+      const body = { userId: user.id, mealType, meal_date: viewDate, ...data, image_url: finalImageUrl }
       const r = await fetch('/api/meals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const d = await r.json()
       if (r.ok) { await loadDay(user.id, viewDate); resetAdd(); setTab('daily') }
@@ -1104,6 +1154,16 @@ export default function Meals() {
           }}>
             {/* Handle bar */}
             <div style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: 'var(--accent-soft)', margin: '12px auto' }} />
+            {/* Hero image */}
+            {selectedMeal.image_url && (
+              <div style={{ width: '100%', height: 180, overflow: 'hidden', borderRadius: '24px 24px 0 0' }}>
+                <img
+                  src={selectedMeal.image_url}
+                  alt={selectedMeal.meal_name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            )}
             {/* Title row */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingInline: 16, paddingBlock: 8 }}>
               <button onClick={() => setSelectedMeal(null)} style={{ fontSize: 20, border: 'none', background: 'none', color: 'var(--text-secondary)', cursor: 'pointer', lineHeight: 1 }}>×</button>
@@ -1870,14 +1930,31 @@ export default function Meals() {
                                   borderBottom:'1px solid var(--accent-faint)',
                                   cursor:'pointer',
                                 }}>
-                                  {/* Avatar */}
+                                  {/* Meal avatar — photo or emoji fallback */}
                                   <div style={{
-                                    width:48, height:48, borderRadius:12, flexShrink:0,
+                                    width:52, height:52, borderRadius:12,
+                                    flexShrink:0, overflow:'hidden',
                                     backgroundColor: MEAL_COLORS[m.meal_type]?.bg || '#F5F5F5',
-                                    display:'flex', alignItems:'center', justifyContent:'center',
-                                    fontSize:22,
                                   }}>
-                                    {MEAL_COLORS[m.meal_type]?.emoji || '🍽️'}
+                                    {m.image_url ? (
+                                      <img
+                                        src={m.image_url}
+                                        alt={m.meal_name}
+                                        style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                                        onError={(e) => {
+                                          e.target.style.display = 'none'
+                                          e.target.nextSibling.style.display = 'flex'
+                                        }}
+                                      />
+                                    ) : null}
+                                    <div style={{
+                                      width:'100%', height:'100%',
+                                      display: m.image_url ? 'none' : 'flex',
+                                      alignItems:'center', justifyContent:'center',
+                                      fontSize:22,
+                                    }}>
+                                      {MEAL_COLORS[m.meal_type]?.emoji || '🍽️'}
+                                    </div>
                                   </div>
                                   {/* Info */}
                                   <div style={{flex:1, textAlign:'right'}}>
