@@ -610,6 +610,9 @@ export default function Meals() {
   const [showCustom, setShowCustom]             = useState(false)
   const [showRecentMeals, setShowRecentMeals]   = useState(false)
   const [recentMealsByType, setRecentMealsByType] = useState({})
+  const [addMealType, setAddMealType]             = useState('breakfast')
+  const [addMealName, setAddMealName]             = useState('')
+  const [addMealCal, setAddMealCal]               = useState('')
   const [barcode, setBarcode]                   = useState('')
   const [barcodeLoading, setBarcodeLoading]     = useState(false)
   const [savingTemplate, setSavingTemplate]     = useState(false)
@@ -958,6 +961,37 @@ export default function Meals() {
   const resetAdd = () => {
     setAddStep('type'); setMealType(null); setImgB64(null); setImgPreview(null)
     setTextInput(''); setResult(null); setErr(''); setShowRecentMeals(false)
+    setAddMealName(''); setAddMealCal('')
+  }
+
+  const handleAddMeal = async () => {
+    if (!addMealName.trim() || !user) return
+    setSaving(true)
+    setErr('')
+    try {
+      const r = await fetch('/api/meals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          mealType: addMealType,
+          meal_date: viewDate,
+          meal_name: addMealName.trim(),
+          total_calories: parseInt(addMealCal) || 0,
+        }),
+      })
+      const d = await r.json()
+      if (r.ok) {
+        await loadDay(user.id, viewDate)
+        setAddMealName(''); setAddMealCal('')
+        setTab('daily')
+      } else {
+        setErr(d.error || 'تعذر الحفظ')
+      }
+    } catch (e) {
+      setErr('Save error: ' + e.message)
+    }
+    setSaving(false)
   }
 
   const prevDay = () => { const d = new Date(viewDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setViewDate(d.toISOString().split('T')[0]) }
@@ -2057,194 +2091,48 @@ export default function Meals() {
 
               {/* ── ADD ── */}
               {tab==='add' && (
-                <div style={{paddingTop:16}}>
-                  {addStep==='type' && (
-                    <div>
-                      <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:14}}>نوع الوجبة</div>
-                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                        {MEAL_TYPES.map(mt=>(
-                          <div key={mt.id} onClick={()=>{setMealType(mt.id);setAddStep('capture')}}
-                            style={{background:`${mt.color}0c`,border:`1px solid ${mt.color}2a`,borderRadius:16,padding:'20px 16px',cursor:'pointer',textAlign:'center'}}
-                            onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'} onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-                            <div style={{fontSize:'2.2rem',marginBottom:8}}>{mt.icon}</div>
-                            <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,color:mt.color}}>{mt.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {addStep==='capture' && (
-                    <div>
-                      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
-                        <button onClick={()=>setAddStep('type')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:'1.1rem'}}>←</button>
-                        <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700}}>{MEAL_TYPES.find(m=>m.id===mealType)?.label}</div>
-                      </div>
-                      <div onClick={()=>{fileRef.current.removeAttribute('capture');fileRef.current.click()}}
-                        style={{border:`2px dashed ${imgPreview?'rgba(255,255,255,0.1)':'rgba(203,162,59,0.10)'}`,borderRadius:16,overflow:'hidden',marginBottom:10,cursor:'pointer',minHeight:imgPreview?0:130,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.2)'}}>
-                        {imgPreview?<div style={{position:'relative',width:'100%'}}><img src={imgPreview} alt="" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/><div style={{position:'absolute',bottom:6,right:6,background:'rgba(0,0,0,.7)',borderRadius:6,padding:'3px 8px',fontSize:'.68rem',color:'rgba(255,255,255,.5)'}}>tap to change</div></div>
-                        :<div style={{textAlign:'center',padding:'24px'}}><div style={{fontSize:'2.5rem',marginBottom:6}}>📸</div><div style={{color:'rgba(255,255,255,0.25)',fontSize:'.85rem',fontWeight:600}}>صوّر وجبتك 📸</div></div>}
-                      </div>
-                      <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={e=>loadImg(e.target.files[0])}/>
-                      <div style={{display:'flex',gap:8,marginBottom:10}}>
-                        <button onClick={()=>{fileRef.current.removeAttribute('capture');fileRef.current.click()}} style={{flex:1,padding:'10px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',fontWeight:600}}>🖼 Gallery</button>
-                        <button onClick={()=>{fileRef.current.setAttribute('capture','environment');fileRef.current.click()}} style={{flex:1,padding:'10px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,color:'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.82rem',fontWeight:600}}>📷 Camera</button>
-                        {imgPreview&&<button onClick={()=>{setImgB64(null);setImgPreview(null)}} style={{padding:'10px 12px',background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,color:'#f87171',cursor:'pointer'}}>✕</button>}
-                      </div>
-                      {/* GCC food database */}
-                      <div style={{marginBottom:12}}>
-                        <button onClick={()=>setShowGcc(v=>!v)}
-                          style={{width:'100%',padding:'11px 14px',background:showGcc?'rgba(203,162,59,0.1)':'rgba(255,255,255,0.03)',border:`1px solid ${showGcc?'rgba(203,162,59,0.3)':'rgba(203,162,59,0.12)'}`,borderRadius:12,color:showGcc?'#CBA23B':'rgba(255,255,255,0.6)',cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.85rem',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all .15s'}}>
-                          <span>🍽️ قاعدة بيانات الأكل الخليجي</span>
-                          <span style={{fontSize:'.7rem',opacity:.6}}>{showGcc?'▲':'▼'} 250+ وجبة</span>
-                        </button>
-                        {showGcc&&(
-                          <div style={{marginTop:8}}>
-                            <div style={{position:'relative',marginBottom:8}}>
-                              <input type="text" value={gccSearch} onChange={e=>searchGcc(e.target.value)} placeholder="ابحث: كبسة، شاورما، حمص، تمر..."
-                                style={{width:'100%',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(203,162,59,0.2)',color:'#ECE3CF',padding:'10px 14px',borderRadius:10,outline:'none',fontFamily:"'Tajawal',sans-serif",fontSize:'.88rem',direction:'rtl',boxSizing:'border-box'}} autoFocus/>
-                              {gccLoading&&<div style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:14,height:14,border:'2px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .7s linear infinite'}}/>}
-                            </div>
-                            {!gccSearch&&(
-                              <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:8}}>
-                                {[['أطباق رئيسية','🍛'],['فطور','☀️'],['بروتين','💪'],['مشروبات','🥤'],['حلويات','🍯'],['فواكه','🍊']].map(([cat,icon])=>(
-                                  <button key={cat} onClick={()=>searchGcc(cat)} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',color:'rgba(255,255,255,0.55)',padding:'5px 10px',borderRadius:20,cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',fontWeight:600}}>{icon} {cat}</button>
-                                ))}
-                              </div>
-                            )}
-                            {gccResults.length>0&&(
-                              <div style={{display:'flex',flexDirection:'column',gap:5,maxHeight:280,overflowY:'auto'}}>
-                                {gccResults.map(food=>(
-                                  <div key={food.id} onClick={()=>useGccFood(food)}
-                                    style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.1)',borderRadius:10,cursor:'pointer',transition:'all .15s'}}
-                                    onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(203,162,59,0.3)'}
-                                    onMouseLeave={e=>e.currentTarget.style.borderColor='rgba(203,162,59,0.1)'}>
-                                    <div style={{flex:1,minWidth:0}}>
-                                      <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',marginBottom:2}}>{food.name_ar}</div>
-                                      <div style={{fontSize:'.68rem',color:'rgba(255,255,255,0.35)',fontFamily:"'Tajawal',sans-serif"}}>{food.serving_desc_ar||food.serving_size_g+'g'} · {food.category}</div>
-                                    </div>
-                                    <div style={{textAlign:'left',flexShrink:0,paddingRight:4}}>
-                                      <div style={{fontWeight:900,color:'#CBA23B',fontFamily:'monospace',fontSize:'.92rem'}}>{food.calories}</div>
-                                      <div style={{fontSize:'.62rem',color:'rgba(255,255,255,0.3)'}}>سعرة</div>
-                                    </div>
-                                    <div style={{display:'flex',gap:6,marginRight:8,flexShrink:0}}>
-                                      {[['B',food.protein_g,'#3b82f6'],['C',food.carbs_g,'#f97316'],['F',food.fat_g,'#22c55e']].map(([l,v,c])=>(
-                                        <div key={l} style={{textAlign:'center'}}>
-                                          <div style={{fontSize:'.65rem',fontWeight:700,color:c,fontFamily:'monospace'}}>{Math.round(v||0)}g</div>
-                                          <div style={{fontSize:'.55rem',color:'rgba(255,255,255,0.25)'}}>{l}</div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {gccSearch.length>=2&&!gccLoading&&gccResults.length===0&&(
-                              <div style={{textAlign:'center',padding:'14px',color:'rgba(255,255,255,0.25)',fontSize:'.82rem',fontFamily:"'Tajawal',sans-serif"}}>ما وجدنا "{gccSearch}" — جرّب صف الوجبة بالأعلى للتحليل بالذكاء</div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-                        <div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/><span style={{color:'rgba(255,255,255,0.2)',fontSize:'.68rem',fontWeight:700,whiteSpace:'nowrap'}}>أو حلّل بالذكاء</span><div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/>
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-                        <div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/><span style={{color:'rgba(255,255,255,0.2)',fontSize:'.68rem',fontWeight:700,whiteSpace:'nowrap'}}>أو صفها بكلامك</span><div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/>
-                      </div>
-                      <textarea placeholder="مثال: ٢٠٠g دجاج مشوي، ١٥٠g أرز أبيض، سلطة بملعقة زيت زيتون…" value={textInput} onChange={e=>setTextInput(e.target.value)} rows={3} style={{marginBottom:8,resize:'none',lineHeight:1.6}}/>
-                      {textInput&&imgB64&&<div style={{color:'#CBA23B',fontSize:'.7rem',marginBottom:8,fontWeight:600}}>✓ AI cross-checks photo + description</div>}
-                      {/* Barcode scanner */}
-                      <div style={{display:'flex',alignItems:'center',gap:8,margin:'4px 0 8px'}}>
-                        <div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/><span style={{color:'rgba(255,255,255,0.2)',fontSize:'.68rem',fontWeight:700,whiteSpace:'nowrap'}}>أو امسح الباركود</span><div style={{flex:1,height:1,background:'rgba(255,255,255,0.06)'}}/>
-                      </div>
-                      <div style={{display:'flex',gap:8,marginBottom:10}}>
-                        <input type="text" inputMode="numeric" placeholder="رقم الباركود…" value={barcode} onChange={e=>setBarcode(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupBarcode()} style={{flex:1}}/>
-                        <button onClick={lookupBarcode} disabled={!barcode.trim()||barcodeLoading}
-                          style={{padding:'0 13px',background:barcode.trim()?'rgba(6,182,212,0.2)':'rgba(255,255,255,0.04)',border:'1px solid '+(barcode.trim()?'rgba(6,182,212,0.4)':'rgba(255,255,255,0.1)'),borderRadius:10,color:barcode.trim()?'#06b6d4':'rgba(255,255,255,0.25)',cursor:barcode.trim()?'pointer':'not-allowed',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.8rem',height:44,display:'flex',alignItems:'center'}}>
-                          {barcodeLoading?'…':'🔍'}
-                        </button>
-                      </div>
-                      <div style={{display:'flex',gap:8,marginBottom:10}}>
-                        <button onClick={()=>scanBarcodeImage(true)} style={{flex:1,padding:'9px',background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.25)',borderRadius:10,color:'#06b6d4',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.8rem',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>📷 Scan with Camera</button>
-                        <button onClick={()=>scanBarcodeImage(false)} style={{flex:1,padding:'9px',background:'rgba(6,182,212,0.08)',border:'1px solid rgba(6,182,212,0.2)',borderRadius:10,color:'#06b6d4',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.8rem',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>🖼️ Scan from Gallery</button>
-                      </div>
-                      {barcodeLoading&&<div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',background:'rgba(6,182,212,0.06)',border:'1px solid rgba(6,182,212,0.15)',borderRadius:10,marginBottom:8}}><div style={{width:16,height:16,border:'2px solid rgba(6,182,212,0.3)',borderTopColor:'#06b6d4',borderRadius:'50%',animation:'spin .7s linear infinite',flexShrink:0}}/><span style={{fontSize:'.78rem',color:'#06b6d4',fontWeight:600}}>Scanning barcode...</span></div>}
-                      {/* Copy from yesterday */}
-                      {mealType && (() => {
-                        const yd = new Date(viewDate+'T12:00:00'); yd.setDate(yd.getDate()-1)
-                        const ydStr = yd.toISOString().split('T')[0]
-                        const ydLabel = yd.toLocaleDateString('ar-SA',{weekday:'long',month:'long',day:'numeric'})
-                        return (
-                          <div style={{marginBottom:10}}>
-                            <button onClick={async()=>{await copyFromDate(ydStr,mealType);resetAdd();setTab('daily')}}
-                              style={{width:'100%',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:10,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                              <span>📋 Copy {MEAL_TYPES.find(m=>m.id===mealType)?.label} from {ydLabel}</span>
-                              <span style={{fontSize:'.7rem',opacity:.5}}>no AI needed ←</span>
-                            </button>
-                          </div>
-                        )
-                      })()}
-                      {/* Saved meal templates */}
-                      {customMeals.length>0&&(
-                        <div style={{marginBottom:10}}>
-                          <button onClick={()=>setShowCustom(v=>!v)} style={{width:'100%',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:10,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                            <span>⭐ My Saved Meals ({customMeals.length})</span>
-                            <span style={{color:'rgba(255,255,255,0.25)'}}>{showCustom?'▲':'▼'}</span>
-                          </button>
-                          {showCustom&&(
-                            <div style={{marginTop:6,display:'flex',flexDirection:'column',gap:5}}>
-                              {customMeals.map(m=>(
-                                <button key={m.id} onClick={()=>useCustomMeal(m)}
-                                  style={{padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:10,color:'rgba(255,255,255,0.7)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                                  <div><div style={{fontWeight:600}}>{m.meal_name}</div><div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{m.portion_note||''} · used {m.times_used}x</div></div>
-                                  <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,color:'#CBA23B',fontSize:'.9rem'}}>{m.total_calories} kcal</span>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {/* Recent meals from yesterday */}
-                      {mealType && recentMealsByType[mealType]?.length > 0 && (
-                        <div style={{marginBottom:10}}>
-                          <button onClick={()=>setShowRecentMeals(v=>!v)}
-                            style={{width:'100%',padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:10,color:'rgba(255,255,255,0.5)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:600,fontSize:'.82rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                            <span>📅 Yesterday's {MEAL_TYPES.find(m=>m.id===mealType)?.label} ({recentMealsByType[mealType].length} item{recentMealsByType[mealType].length>1?'s':''})</span>
-                            <span style={{color:'rgba(255,255,255,0.25)'}}>{showRecentMeals?'▲':'▼'}</span>
-                          </button>
-                          {showRecentMeals && (
-                            <div style={{marginTop:6,display:'flex',flexDirection:'column',gap:5}}>
-                              {recentMealsByType[mealType].map((m,i) => (
-                                <button key={i} onClick={async()=>{
-                                    const yesterday = new Date(viewDate+'T12:00:00'); yesterday.setDate(yesterday.getDate()-1)
-                                    await copyFromDate(yesterday.toISOString().split('T')[0], mealType)
-                                    setShowRecentMeals(false); resetAdd(); setTab('daily')
-                                  }}
-                                  style={{padding:'10px 14px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.10)',borderRadius:10,color:'rgba(255,255,255,0.7)',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontSize:'.85rem',textAlign:'right',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                                  <div><div style={{fontWeight:600}}>{m.meal_name||'Meal'}</div><div style={{fontSize:'.7rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>{m.portion_note||''}</div></div>
-                                  <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,color:'#CBA23B',fontSize:'.9rem'}}>{m.total_calories} kcal</span>
-                                </button>
-                              ))}
-                              <button onClick={async()=>{
-                                  const yesterday = new Date(viewDate+'T12:00:00'); yesterday.setDate(yesterday.getDate()-1)
-                                  await copyFromDate(yesterday.toISOString().split('T')[0], mealType)
-                                  setShowRecentMeals(false); resetAdd(); setTab('daily')
-                                }}
-                                style={{padding:'9px',background:'rgba(203,162,59,0.07)',border:'1px solid rgba(203,162,59,0.2)',borderRadius:10,color:'#CBA23B',cursor:'pointer',fontFamily:"'DM Sans','Tajawal',sans-serif",fontWeight:700,fontSize:'.8rem'}}>
-                                انسخ من وجبات أمس ({recentMealsByType[mealType].length} وجبة) ←
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
-                      {analyzing
-                        ?<div style={{textAlign:'center',padding:'24px'}}><div style={{width:40,height:40,border:'3px solid rgba(203,162,59,0.2)',borderTopColor:'#CBA23B',borderRadius:'50%',animation:'spin .8s linear infinite',margin:'0 auto 12px'}}/><div style={{color:'#CBA23B',fontWeight:700,fontFamily:"'Space Grotesk','Tajawal',sans-serif",letterSpacing:1}}>جاري التحليل...</div></div>
-                        :<button onClick={analyze} disabled={!imgB64&&!textInput.trim()} style={{width:'100%',padding:'15px',background:(!imgB64&&!textInput.trim())?'rgba(255,255,255,0.05)':'#CBA23B',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:(!imgB64&&!textInput.trim())?'rgba(255,255,255,0.2)':'#0C0B0D',cursor:(!imgB64&&!textInput.trim())?'not-allowed':'pointer'}}>تحليل الوجبة</button>}
-                    </div>
-                  )}
-                  {addStep==='result' && result && (
-                    <ResultView result={result} imgPreview={imgPreview} goals={G} onBack={()=>setAddStep('capture')} onSave={saveMeal} saving={saving} savingTemplate={savingTemplate} onSaveTemplate={saveAsTemplate} err={err} NUTRIENTS={NUTRIENTS} pct={pct}/>
-                  )}
+                <div style={{paddingTop:16,paddingBottom:32}}>
+                  <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)',marginBottom:14,textAlign:'right'}}>+ سجّل وجبة جديدة</div>
+                  {/* Meal type pills */}
+                  <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
+                    {MEAL_TYPES.map(mt=>(
+                      <button key={mt.id} onClick={()=>setAddMealType(mt.id)}
+                        style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?mt.color:'rgba(255,255,255,0.1)'}`,background:addMealType===mt.id?`${mt.color}20`:'transparent',color:addMealType===mt.id?mt.color:'rgba(255,255,255,0.45)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
+                        {mt.icon} {mt.label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Meal name */}
+                  <input type="text" placeholder="اسم الوجبة (مثال: كبسة دجاج)" value={addMealName} onChange={e=>setAddMealName(e.target.value)}
+                    style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--card)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
+                  {/* Calories */}
+                  <input type="number" placeholder="السعرات الحرارية" value={addMealCal} onChange={e=>setAddMealCal(e.target.value)}
+                    style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--card)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
+                  {/* Quick calorie pills */}
+                  <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:18}}>
+                    {['150','250','350','450','550','650','750'].map(cal=>(
+                      <button key={cal} onClick={()=>setAddMealCal(cal)}
+                        style={{padding:'5px 12px',borderRadius:20,border:'1px solid rgba(255,255,255,0.08)',background:addMealCal===cal?'rgba(203,162,59,0.18)':'rgba(255,255,255,0.04)',color:addMealCal===cal?'#CBA23B':'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'Space Grotesk',monospace",fontWeight:700,fontSize:'.75rem',transition:'all .12s'}}>
+                        {cal}
+                      </button>
+                    ))}
+                  </div>
+                  {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
+                  <button onClick={handleAddMeal} disabled={!addMealName.trim()||saving}
+                    style={{width:'100%',padding:'15px',background:addMealName.trim()?'#CBA23B':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#0C0B0D':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
+                    {saving?'جاري الحفظ...':'حفظ الوجبة'}
+                  </button>
+                  {/* Divider */}
+                  <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+                    <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
+                    <span style={{color:'rgba(255,255,255,0.25)',fontSize:'.72rem',fontWeight:700,whiteSpace:'nowrap'}}>أو حللي صورة الوجبة</span>
+                    <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
+                  </div>
+                  {/* Shortcut to AI analyzer */}
+                  <button onClick={()=>setActiveTab('analyze')}
+                    style={{width:'100%',padding:'13px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:12,color:'#CBA23B',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.88rem',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+                    📸 تحليل الوجبة بالذكاء الاصطناعي
+                  </button>
                 </div>
               )}
 
