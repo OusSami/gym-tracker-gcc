@@ -1,8 +1,12 @@
 ═══════════════════════════════════════════════════════════════
 CHECK 1 — Missing or empty fields
 ═══════════════════════════════════════════════════════════════
-⚠️   Check 1 — 96 issues found:
+⚠️   Check 1 — 89 issues found:
     "كباب الميرو على الطريقة السعودية مع رز ا" (id: 0cfd98b7) — cook_time missing
+    "الكبسة السعودية بالفيديو" (id: 86ccbe04) — cook_time missing
+    "ثريد لحم مع الخضار.. الوصفة الأصلية" (id: ef4a5fa8) — cook_time missing
+    "كبسة الدجاج المبتكرة من السعودية" (id: f544437e) — cook_time missing
+    "كبسة الدجاج السعودية الأصلية" (id: fcf96361) — cook_time missing
     "خبز الخمير على الطريقة الخليجية" (id: e10c6f93) — cook_time missing
     "فيديو أسهل كبسة بالجزر" (id: 9a66df3e) — cook_time missing
     "كبسة اللحم بالموزات" (id: 97594360) — cook_time missing
@@ -10,94 +14,83 @@ CHECK 1 — Missing or empty fields
     "مدفون الدجاج من المطبخ الخليجي" (id: 77a003f7) — cook_time missing
     "برياني بلحم الخروف" (id: f7f23b95) — cook_time missing
     "برياني دجاج" (id: c86bc146) — cook_time missing
-    "بالفيديو المطبق السعودي" (id: 10efae54) — cook_time missing
-    "برياني دجاج بالطعم المميز والرائع" (id: f9ea87cf) — cook_time missing
-    "مندي اللحم بالفيديو" (id: 3b41d896) — cook_time missing
-    "الكبسة السعودية بالدجاج" (id: 620a7fd3) — cook_time missing
-    "الكبسة السعودية بالفيديو" (id: 86ccbe04) — cook_time missing
-    "المندي الوصفة الأصلية" (id: 371cbfc3) — cook_time missing
-    "الارز البخاري بالفيديو" (id: 6d22d780) — cook_time missing
-    "ثريد لحم مع الخضار.. الوصفة الأصلية" (id: ef4a5fa8) — cook_time missing
-    "كبسة الدجاج المبتكرة من السعودية" (id: f544437e) — cook_time missing
-    "كبسة الدجاج السعودية الأصلية" (id: fcf96361) — cook_time missing
-    "ثريد اللحم" (id: 2595a8fb) — cook_time missing
-    "الحنيذ على الطريقة الأصلية بالفيديو" (id: 7e17e0ac) — cook_time missing
-    "ثريد اللحم على الطريقة الخليجية" (id: e8974a12) — cook_time missing
     "بالفيديو المثلوثة السعودية" (id: 43cf963e) — cook_time missing
-    "المدفونة بالدجاج بالفيديو" (id: dadb848f) — cook_time missing
-    "مقلوبة الدجاج الخليجية السهلة" (id: 0bd2a703) — cook_time missing
-    "برياني بالجمبري" (id: 59bf4b31) — cook_time missing
-    "رز برياني الخضار" (id: 1c03fc84) — cook_time missing
-    "بالفيديو مجبوس دجاج" (id: ae4df971) — cook_time missing
-    "كبسة الدجاج" (id: 6e210ba0) — cook_time missing
-    "بالفيديو المنتو على الطريقة الحجازية" (id: 26d64a39) — cook_time missing
     "خلطة بهارات الكبسة السعودية المنزلية" (id: 4e7105d3) — cook_time missing
     "المطبق السعودي" (id: c179a5b1) — cook_time missing
+    "الكبسة السعودية بالدجاج" (id: 620a7fd3) — cook_time missing
     "زربيان اللحم.. من المطبخ السعودي" (id: 75196834) — cook_time missing
-    "الكبسة مع كريّات اللحم والخرشوف الشهية" (id: 95d1a5fb) — cook_time missing
-    "برياني الكفتة.. لسفرة مميزة" (id: c7518501) — cook_time missing
-    "مندي الدجاج .. مذاق ساحر ورائع" (id: 6e0b5a40) — cook_time missing
-    "مجبوس فخذ الخروف (2)" (id: 90a68961) — cook_time missing
-    "كبسة بالدجاج" (id: 59d17231) — cook_time missing
-    "البرياني بالدجاج.. بالطعم الرائع" (id: 841e6b3b) — cook_time missing
-    "الرز الكابلي باللحم" (id: 0228f4f7) — cook_time missing
-    "مموش كويتي" (id: 7b2c7dbe) — cook_time missing
+    "الارز البخاري بالفيديو" (id: 6d22d780) — cook_time missing
+    "المندي الوصفة الأصلية" (id: 371cbfc3) — cook_time missing
+    "بالفيديو المطبق السعودي" (id: 10efae54) — cook_time missing
+    "مندي اللحم بالفيديو" (id: 3b41d896) — cook_time missing
+    "برياني دجاج بالطعم المميز والرائع" (id: f9ea87cf) — cook_time missing
+    "مقلوبة الدجاج الخليجية السهلة" (id: 0bd2a703) — cook_time missing
+    "ثريد اللحم" (id: 2595a8fb) — cook_time missing
+    "ثريد اللحم على الطريقة الخليجية" (id: e8974a12) — cook_time missing
+    "المدفونة بالدجاج بالفيديو" (id: dadb848f) — cook_time missing
+    "برياني بالجمبري" (id: 59bf4b31) — cook_time missing
+    "رز برياني الخضار" (id: 1c03fc84) — cook_time missing
+    "بالفيديو المنتو على الطريقة الحجازية" (id: 26d64a39) — cook_time missing
+    "بالفيديو مجبوس دجاج" (id: ae4df971) — cook_time missing
+    "الحنيذ على الطريقة الأصلية بالفيديو" (id: 7e17e0ac) — cook_time missing
+    "كبسة الدجاج" (id: 6e210ba0) — cook_time missing
     "الوصفة الأصلية للمندي" (id: 70af2482) — cook_time missing
     "حنيذ اللحم طبق خليجي مميز" (id: 5113b8d5) — cook_time missing
-    "سلطة المكرونة بالتونة" (id: c9bbad42) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة التونة بالزيتون والمعكرونة" (id: f1389979) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "السوشي في المنزل" (id: 1dcfa008) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "السوشي بشكل صحي" (id: 3f3aee2c) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "جيب التاجر بالتونة" (id: 64f41d6c) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة الكينوا بالدجاج خطوة بخطوة: وصفة صح" (id: 6773a0c5) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "الكينوا المقرمشة مع الدجاج والزعتر" (id: 2f716042) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "كوكيز الشوفان بالشوكولاته" (id: ecd9bfa4) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
+    "مجبوس فخذ الخروف (2)" (id: 90a68961) — cook_time missing
+    "الكبسة مع كريّات اللحم والخرشوف الشهية" (id: 95d1a5fb) — cook_time missing
+    "البرياني بالدجاج.. بالطعم الرائع" (id: 841e6b3b) — cook_time missing
+    "مندي الدجاج .. مذاق ساحر ورائع" (id: 6e0b5a40) — cook_time missing
+    "مموش كويتي" (id: 7b2c7dbe) — cook_time missing
+    "برياني الكفتة.. لسفرة مميزة" (id: c7518501) — cook_time missing
+    "كبسة بالدجاج" (id: 59d17231) — cook_time missing
+    "الرز الكابلي باللحم" (id: 0228f4f7) — cook_time missing
+    "سلطة التونة بالزيتون والمعكرونة" (id: f1389979) — ingredients < 2 (0) | cook_time missing | servings missing
+    "السوشي في المنزل" (id: 1dcfa008) — cook_time missing | servings missing
+    "جيب التاجر بالتونة" (id: 64f41d6c) — ingredients < 2 (0) | cook_time missing | servings missing
+    "سلطة الكينوا بالدجاج خطوة بخطوة: وصفة صح" (id: 6773a0c5) — cook_time missing | servings missing
+    "سلطة المكرونة بالتونة" (id: c9bbad42) — cook_time missing | servings missing
+    "السوشي بشكل صحي" (id: 3f3aee2c) — cook_time missing | servings missing
+    "الكينوا المقرمشة مع الدجاج والزعتر" (id: 2f716042) — cook_time missing | servings missing
+    "كوكيز الشوفان بالشوكولاته" (id: ecd9bfa4) — cook_time missing | servings missing
     "شوربة الكوسا بالشوفان الشهية" (id: 519302cc) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة السلمون والأفوكادو" (id: 28cd5a54) — steps < 1 (0)
-    "ساندوتش التونة" (id: 9d4d4ea8) — steps < 1 (0)
-    "اليغمش – وصفة تقليدية سهلة ولذيذة | يمي" (id: e8a1ccfa) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة فواكه بالكريمة الشهية والمنعشة | يم" (id: 09e254fe) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة الزبادي بالخيار" (id: 24218a55) — steps < 1 (0)
-    "سلطة الباذنجان المشوي الصحية" (id: 96c17a09) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة الأفوكادو والخس: طبق صحي ولذيذ يناس" (id: 88d7bc16) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة الذرة والخيار" (id: 7d2e6ebd) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة الخضار مع الكينوا: دليلكِ لتحضير سو" (id: bc8ddd48) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "سلطة ناتشوز سهله" (id: 58e6e1fe) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "هل ترغبين بطبق جانبي شهي؟ اكتشفي وصفة سل" (id: 7df8ccf4) — ingredients < 2 (0) | steps < 1 (0) | cook_time missing | servings missing
-    "تشيلي اللحم" (id: 90b3ec19) — steps < 1 (0)
-    "مقلقل لحم الحاشي" (id: d798c4eb) — steps < 1 (0)
-    "شاكرية باللحم" (id: d8b0499e) — steps < 1 (0)
-    "الكمونية باللحم" (id: 87959fc7) — steps < 1 (0)
+    "سلطة الباذنجان المشوي الصحية" (id: 96c17a09) — ingredients < 2 (0) | cook_time missing | servings missing
+    "اليغمش – وصفة تقليدية سهلة ولذيذة | يمي" (id: e8a1ccfa) — ingredients < 2 (0) | cook_time missing | servings missing
+    "سلطة فواكه بالكريمة الشهية والمنعشة | يم" (id: 09e254fe) — cook_time missing | servings missing
+    "هل ترغبين بطبق جانبي شهي؟ اكتشفي وصفة سل" (id: 7df8ccf4) — cook_time missing | servings missing
+    "سلطة ناتشوز سهله" (id: 58e6e1fe) — cook_time missing | servings missing
+    "سلطة الخضار مع الكينوا: دليلكِ لتحضير سو" (id: bc8ddd48) — cook_time missing | servings missing
+    "سلطة الذرة والخيار" (id: 7d2e6ebd) — cook_time missing | servings missing
+    "سلطة الأفوكادو والخس: طبق صحي ولذيذ يناس" (id: 88d7bc16) — ingredients < 2 (0) | cook_time missing | servings missing
+    "المدفونة بالدجاج (2)" (id: 2c3ffe37) — cook_time missing
+    "الحنيذ على الطريقة الأصلية" (id: e502709c) — cook_time missing
     "الارز البخاري" (id: a594dcca) — cook_time missing
     "مندي اللحم" (id: d5a8de29) — cook_time missing
-    "المدفونة بالدجاج (2)" (id: 2c3ffe37) — cook_time missing
-    "الكبسة السعودية" (id: c8b866d4) — cook_time missing
-    "الحنيذ على الطريقة الأصلية" (id: e502709c) — cook_time missing
     "اليغمش السعودي" (id: bcb2adaf) — cook_time missing
+    "الكبسة السعودية" (id: c8b866d4) — cook_time missing
+    "سلطة السبانخ والفراولة" (id: c219a21e) — cook_time missing
     "شوربة العدس بالخضار" (id: 810363da) — cook_time missing
     "سلطة الدجاج والمانجا" (id: af58acfd) — cook_time missing
     "بقلاوة تركية بالفستق الحلبي" (id: 4c1efb52) — cook_time missing
-    "سلطة السبانخ والفراولة" (id: c219a21e) — cook_time missing
-    "فيليه سمك هامور مع صلصة الحبق" (id: ad5181b7) — cook_time missing
-    "الفلافل والطرطور .. لسحور مثالي" (id: ca83cf61) — cook_time missing
-    "سلطة الشمندر بالبطاطس والجوز" (id: dad470de) — cook_time missing
-    "الفتة الحلبية" (id: 0e21c0f2) — cook_time missing
-    "شوربة الذرة" (id: 73d594bc) — cook_time missing
     "حلا الشعيرية" (id: d5659fa9) — cook_time missing
-    "سلطة السبانخ بالبرتقال" (id: 06d2921c) — cook_time missing
-    "بابا غنوج" (id: 772dcc6b) — cook_time missing
-    "كرات اللحمة بالأفوكادو" (id: 27f75d8b) — cook_time missing
-    "مقلوبة الباذنجان المميزة" (id: 5c2cacf3) — cook_time missing
     "سمكة حرّة بالخضر" (id: bd0586a1) — cook_time missing
-    "فتة الدجاج بالريحان والنعناع" (id: e38b1bc9) — cook_time missing
-    "حضّري شرائح اللحم مع الخضر المنوعة" (id: d9012326) — cook_time missing
+    "سلطة السبانخ بالبرتقال" (id: 06d2921c) — cook_time missing
+    "مقلوبة الباذنجان المميزة" (id: 5c2cacf3) — cook_time missing
     "شوربة القرع" (id: f663c9ec) — cook_time missing
-    "سلطة الذرة المميزة" (id: 81342bb9) — cook_time missing
-    "سمكة اللقز مع الهليون الأخضر" (id: 2e090b77) — cook_time missing
     "رولات الخيار محشوة باللبنة" (id: eb10a75b) — cook_time missing
-    "البايلّلا" (id: 682a9e78) — cook_time missing
-    "مجدرة البرغل بالخطوات" (id: b6513ed2) — cook_time missing
     "سلطة البروكلي بالطحينة واللبن الزبادي لر" (id: db6befce) — cook_time missing
+    "سمكة اللقز مع الهليون الأخضر" (id: 2e090b77) — cook_time missing
+    "بابا غنوج" (id: 772dcc6b) — cook_time missing
+    "سلطة الشمندر بالبطاطس والجوز" (id: dad470de) — cook_time missing
+    "سلطة الذرة المميزة" (id: 81342bb9) — cook_time missing
+    "مجدرة البرغل بالخطوات" (id: b6513ed2) — cook_time missing
+    "كرات اللحمة بالأفوكادو" (id: 27f75d8b) — cook_time missing
+    "حضّري شرائح اللحم مع الخضر المنوعة" (id: d9012326) — cook_time missing
+    "البايلّلا" (id: 682a9e78) — cook_time missing
+    "فتة الدجاج بالريحان والنعناع" (id: e38b1bc9) — cook_time missing
+    "فيليه سمك هامور مع صلصة الحبق" (id: ad5181b7) — cook_time missing
+    "شوربة الذرة" (id: 73d594bc) — cook_time missing
+    "الفلافل والطرطور .. لسحور مثالي" (id: ca83cf61) — cook_time missing
+    "الفتة الحلبية" (id: 0e21c0f2) — cook_time missing
 
 ═══════════════════════════════════════════════════════════════
 CHECK 2 — Nutrition sanity
@@ -119,29 +112,59 @@ CHECK 4 — Ingredient quality
 ═══════════════════════════════════════════════════════════════
 CHECK 5 — Steps quality
 ═══════════════════════════════════════════════════════════════
-⚠️   Check 5 — 22 recipes with step problems:
+⚠️   Check 5 — 34 recipes with step problems:
     "صالونة لحم خليجية" (id: 6dc9d8cf) — ingredient quantities in step: "انقعي الأرز بماء فاتر لمدة 10 دقائق ثم صفيه وضعيه في طنجرة م"
     "كبسة لحم بالعظم على الطريقة السعودية" (id: cc405f9d) — ingredient quantities in step: "أخرجي قطع اللحم مؤقتاً من المرق واتركيها جانباً، ثم اضبطي كم"
     "مطبق زبيدي" (id: d33010d8) — ingredient quantities in step: "أضيفي الملح، والكزبرة، والكركم، والهيل، والشبث، ومقدار 4 ملا"
     "المدفونة بالدجاج" (id: a71d22a1) — ingredient quantities in step: "ضعي في قدر 3 ملعقة كبيرة من الزيت وشرائح البصل والفلفل الحلو"
     "مطبق زبيدي بالأرز البسمتي" (id: 0d3e4d35) — ingredient quantities in step: "أضيفي الملح، والكزبرة، والكركم، والهيل، والشبث، ومقدار 4 ملا"
     "مشخول لحم" (id: 7b81b162) — ingredient quantities in step: "قومي بتحمية 3 ملاعق كبيرة من الزيت وضعي البصل واتركيه حتى يح"
-    "مندي اللحم بالفيديو" (id: 3b41d896) — ingredient quantities in step: "4. في قدر ضعي اللحم واغمريه بالماء ثم دعيه يغلي وتخلصي من ال" | ingredient quantities in step: "5. في قدر سخني 3 ملعقة كبيرة من الزيت، أضيفي الثوم، الزنجبيل"
-    "المدفونة بالدجاج بالفيديو" (id: dadb848f) — ingredient quantities in step: "3. في قدر ضعي 3 ملعقة كبيرة من الزيت، شرائح البصل، الفلفل ال"
     "خلطة بهارات الكبسة السعودية المنزلية" (id: 4e7105d3) — only 1 step — likely all steps merged
     "المطبق السعودي" (id: c179a5b1) — ingredient quantities in step: "3. افردي على سطح نظيف خبز التورتيا وادهنيها بالزيت ثم أضيفي "
+    "مندي اللحم بالفيديو" (id: 3b41d896) — ingredient quantities in step: "4. في قدر ضعي اللحم واغمريه بالماء ثم دعيه يغلي وتخلصي من ال" | ingredient quantities in step: "5. في قدر سخني 3 ملعقة كبيرة من الزيت، أضيفي الثوم، الزنجبيل"
+    "المدفونة بالدجاج بالفيديو" (id: dadb848f) — ingredient quantities in step: "3. في قدر ضعي 3 ملعقة كبيرة من الزيت، شرائح البصل، الفلفل ال"
     "مموش كويتي" (id: 7b2c7dbe) — ingredient quantities in step: "1. نضع في قدر الزيت ثم تضاف 3 ملاعق كبيرة من الحشو المحضر سا"
+    "السوشي في المنزل" (id: 1dcfa008) — too many steps: 37 | ingredient quantities in step: "1/4 كوب من الخل" | ingredient quantities in step: "1/2 كوب من الأرز قصير الحبة" | ingredient quantities in step: "500 غرام من الخيار المقشر والمقطع إلى شرائح" | ingredient quantities in step: "100 غرام من أصابع الكابوريا" | ingredient quantities in step: "500 غرام من المانجا المقشرة والمقطعة إلى شرائح" | ingredient quantities in step: "200 غرام من السلمون المدخن"
+    "جيب التاجر بالتونة" (id: 64f41d6c) — too many steps: 28 | step too short: "بيضتان." | step too short: "بقسماط."
+    "سلطة الكينوا بالدجاج خطوة بخطوة: وصفة صح" (id: 6773a0c5) — step too long (509 chars) — likely merged: "تاريخ النشر:  
+          2018-04-08 
+    
+
+    
+        
+   …"
+    "سلطة المكرونة بالتونة" (id: c9bbad42) — too many steps: 24 | ingredient quantities in step: "مكرونة (500 غرام)."
+    "السوشي بشكل صحي" (id: 3f3aee2c) — too many steps: 25 | ingredient quantities in step: "1 ملعقة صغيرة من الملح" | ingredient quantities in step: "3/4 كوب من الماء" | ingredient quantities in step: "3 كوب من الأرز الياباني" | ingredient quantities in step: "1/3 كوب من خل الأرز" | ingredient quantities in step: "3 ملعقة كبيرة من السكر" | step too long (557 chars) — likely merged: "يعتبر السوشي من الأطباق اليابانية الشهيرة في كافة أنحاء العا…"
+    "سلطة السلمون والأفوكادو" (id: 28cd5a54) — ingredient quantities in step: "تمليح هذه السلطة مهم جدًا للنكهة. تأكد من تناول الملح الكافي"
+    "اليغمش – وصفة تقليدية سهلة ولذيذة | يمي" (id: e8a1ccfa) — too many steps: 37 | step too long (511 chars) — likely merged: "تاريخ النشر:  
+          2016-05-17 
+    
+
+    
+        
+   …" | step too long (727 chars) — likely merged: "يعد هذا الطبق من الأطباق التقليدية التي تعكس تراث المطبخ الي…" | step too long (531 chars) — likely merged: "طريقة عمل اليغمش الحجازي هو طبق معروف في المطبخ الخليجي، ويط…"
+    "سلطة فواكه بالكريمة الشهية والمنعشة | يم" (id: 09e254fe) — too many steps: 25 | step too long (511 chars) — likely merged: "تاريخ النشر:  
+          2018-06-05 
+    
+
+    
+        
+   …" | step too short: "ثمرة رمان"
     "المصابيب بالعسل من المطبخ السعودي" (id: f1a37d40) — ingredient quantities in step: "رشي مقلاة متوسطة برذاذ الطبخ وسخنيها على نار متوسطة، اسكبي ح"
+    "سلطة ناتشوز سهله" (id: 58e6e1fe) — only 1 step — likely all steps merged
+    "سلطة الذرة والخيار" (id: 7d2e6ebd) — too many steps: 54
+    "سلطة الأفوكادو والخس: طبق صحي ولذيذ يناس" (id: 88d7bc16) — too many steps: 49
+    "شاكرية باللحم" (id: d8b0499e) — only 1 step — likely all steps merged | step too long (1035 chars) — likely merged: "يوضع اللحم في قدر على النار ويضاف لترًا من الماء المغلي. يوض…"
     "برياني الدجاج" (id: 46eb0ea7) — ingredient quantities in step: "ضعي 2 كوب من الأرز البسمتي بعد غسله ونقعه وتصفيته جيدا."
-    "مندي اللحم" (id: d5a8de29) — ingredient quantities in step: "4. في قدر ضعي اللحم واغمريه بالماء ثم دعيه يغلي وتخلصي من ال" | ingredient quantities in step: "5. في قدر سخني 3 ملعقة كبيرة من الزيت، أضيفي الثوم، الزنجبيل"
     "المدفونة بالدجاج (2)" (id: 2c3ffe37) — ingredient quantities in step: "3. في قدر ضعي 3 ملعقة كبيرة من الزيت، شرائح البصل، الفلفل ال"
+    "مندي اللحم" (id: d5a8de29) — ingredient quantities in step: "4. في قدر ضعي اللحم واغمريه بالماء ثم دعيه يغلي وتخلصي من ال" | ingredient quantities in step: "5. في قدر سخني 3 ملعقة كبيرة من الزيت، أضيفي الثوم، الزنجبيل"
     "فستقية" (id: 6fe6eba2) — ingredient quantities in step: "اعصري القليل من عصير الليمون الحامض، وأضيفي 2 كوب من الفستق "
+    "سمسمية" (id: df5fd9a7) — ingredient quantities in step: "أضيفي 2 كوب من السمسم"
     "المنتو السعودي" (id: bf114652) — ingredient quantities in step: "لطبخ المنتو: في قدر نضع 3 كوب ماء، مع القليل من الملح وحبات "
     "سحلب" (id: 77829060) — ingredient quantities in step: "خذي القليل من الحليب واخلطيه بـ 3 ملعقة كبيرة من النشا، ثم أ" | ingredient quantities in step: "أضيفي 4 ملعقة كبيرة من السكر فوق الحليب وحركي"
-    "سمسمية" (id: df5fd9a7) — ingredient quantities in step: "أضيفي 2 كوب من السمسم"
-    "الفلافل والطرطور .. لسحور مثالي" (id: ca83cf61) — only 1 step — likely all steps merged
     "سمكة حرّة بالخضر" (id: bd0586a1) — only 1 step — likely all steps merged
     "حضّري شرائح اللحم مع الخضر المنوعة" (id: d9012326) — step too short: "الخطوة 4" | step too short: "الخطوة 1" | step too short: "الخطوة 3" | step too short: "الخطوة 2"
+    "الفلافل والطرطور .. لسحور مثالي" (id: ca83cf61) — only 1 step — likely all steps merged
 
 ═══════════════════════════════════════════════════════════════
 CHECK 6 — Category check
@@ -157,12 +180,12 @@ Total recipes audited: 370
 ┌──────────────────────────┬───────┬──────────────────────────────┐
 │ Check                    │ Count │ Action needed                │
 ├──────────────────────────┼───────┼──────────────────────────────┤
-│ Missing fields           │ ⚠️  96  │ Manual fix or re-scrape      │
+│ Missing fields           │ ⚠️  89  │ Manual fix or re-scrape      │
 │ Nutrition errors         │ ✅  0    │ Re-estimate                  │
 │ Cook time issues         │ ✅  0    │ Clean or null                │
 │ Ingredient problems      │ ⚠️  2   │ Review                       │
-│ Step problems            │ ⚠️  22  │ Review                       │
+│ Step problems            │ ⚠️  34  │ Review                       │
 │ Category mismatches      │ ⚠️  1   │ Re-assign                    │
 └──────────────────────────┴───────┴──────────────────────────────┘
 
-Total issues: 121 across 370 recipes
+Total issues: 126 across 370 recipes
