@@ -50,24 +50,46 @@ const MEAL_COLORS = {
   snack:     { bg: '#FCE4EC', emoji: '🍎' },
 }
 
-const FOOD_VISUALS = [
-  { keywords:['أرز','برياني','مجبوس','كبسة','رز','بخاري','مقلوبة','زربيان','قبولي'], emoji:'🍚', bg:'#FFF3E0' },
-  { keywords:['دجاج','فراخ','دجاجة'], emoji:'🍗', bg:'#FBE9E7' },
-  { keywords:['لحم','مندي','هريسة','كباب','كفتة'], emoji:'🥩', bg:'#FCE4EC' },
-  { keywords:['سمك','ربيان','جمبري','قريدس','تونة'], emoji:'🐟', bg:'#E3F2FD' },
-  { keywords:['شوربة','حساء'], emoji:'🥣', bg:'#E8F5E9' },
-  { keywords:['سلطة','خضار','تبولة'], emoji:'🥗', bg:'#F1F8E9' },
-  { keywords:['حلوى','كيك','تمر','لقيمات','بسبوسة','كنافة'], emoji:'🍯', bg:'#FFFDE7' },
-  { keywords:['بيض','فطور','فول','فلافل','عجة'], emoji:'🥚', bg:'#FFF9C4' },
-  { keywords:['فاكهة','تفاح','موز','برتقال'], emoji:'🍎', bg:'#FCE4EC' },
-  { keywords:['ماء','عصير','شاي','قهوة'], emoji:'🥤', bg:'#E8EAF6' },
-]
-
 function getFoodVisual(name) {
   if (!name) return { emoji:'🍽️', bg:'#F7E9DF' }
-  for (const v of FOOD_VISUALS) {
-    if (v.keywords.some(k => name.includes(k))) return v
-  }
+  const n = name
+  if (n.includes('أرز') || n.includes('رز') ||
+      n.includes('كبسة') || n.includes('مجبوس') ||
+      n.includes('برياني') || n.includes('مندي'))
+    return { emoji:'🍚', bg:'#FFF3E0' }
+  if (n.includes('دجاج') || n.includes('فراخ') ||
+      n.includes('دجاجة'))
+    return { emoji:'🍗', bg:'#FBE9E7' }
+  if (n.includes('لحم') || n.includes('لحمة') ||
+      n.includes('كباب') || n.includes('كفتة') ||
+      n.includes('مشوي'))
+    return { emoji:'🥩', bg:'#FCE4EC' }
+  if (n.includes('سمك') || n.includes('ربيان') ||
+      n.includes('تونة') || n.includes('جمبري'))
+    return { emoji:'🐟', bg:'#E3F2FD' }
+  if (n.includes('شوربة') || n.includes('حساء'))
+    return { emoji:'🥣', bg:'#E8F5E9' }
+  if (n.includes('سلطة') || n.includes('تبولة'))
+    return { emoji:'🥗', bg:'#F1F8E9' }
+  if (n.includes('حلوى') || n.includes('حلا') ||
+      n.includes('كيك') || n.includes('تمر') ||
+      n.includes('لقيمات') || n.includes('بسبوسة'))
+    return { emoji:'🍯', bg:'#FFFDE7' }
+  if (n.includes('بيض') || n.includes('فطور') ||
+      n.includes('فول') || n.includes('فلافل'))
+    return { emoji:'🥚', bg:'#FFF9C4' }
+  if (n.includes('موز') || n.includes('تفاح') ||
+      n.includes('فاكهة') || n.includes('أفوكادو'))
+    return { emoji:'🍎', bg:'#FCE4EC' }
+  if (n.includes('عصير') || n.includes('شاي') ||
+      n.includes('قهوة') || n.includes('ماء') ||
+      n.includes('حليب') || n.includes('لبن'))
+    return { emoji:'🥤', bg:'#E8EAF6' }
+  if (n.includes('خبز') || n.includes('توست') ||
+      n.includes('نافوش') || n.includes('شوفان'))
+    return { emoji:'🍞', bg:'#FFF8E1' }
+  if (n.includes('جبن') || n.includes('لبنة'))
+    return { emoji:'🧀', bg:'#FFFDE7' }
   return { emoji:'🍽️', bg:'#F7E9DF' }
 }
 
@@ -1737,21 +1759,27 @@ export default function Meals() {
                           {day.plan.map((meal, mi) => {
                             const fv = getFoodVisual(meal.food?.name_ar)
                             return (
-                              <div key={mi} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderBottom:mi<day.plan.length-1?'1px solid rgba(255,255,255,0.04)':'none'}}>
-                                {/* Food emoji badge */}
-                                <div style={{width:40,height:40,borderRadius:12,background:fv.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',flexShrink:0}}>
+                              <div key={mi} style={{display:'flex',alignItems:'center',gap:12,paddingInline:16,paddingBlock:14,borderBottom:mi<day.plan.length-1?'1px solid var(--accent-faint)':'none'}}>
+                                {/* food visual avatar (RTL: first in DOM = visual right) */}
+                                <div style={{width:52,height:52,borderRadius:14,flexShrink:0,backgroundColor:fv.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>
                                   {fv.emoji}
                                 </div>
-                                <div style={{flex:1,minWidth:0}}>
-                                  <div style={{fontFamily:F,fontWeight:700,fontSize:'.85rem',color:'rgba(255,255,255,0.9)',marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
-                                  <div style={{fontFamily:F,fontSize:'.7rem',color:'rgba(255,255,255,0.35)',marginBottom:4}}>{meal.meal_time} · {meal.food?.portion_desc}</div>
-                                  <div style={{display:'flex',gap:8}}>
+                                {/* food info */}
+                                <div style={{flex:1,minWidth:0,textAlign:'right'}}>
+                                  <div style={{fontSize:11,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
+                                  <div style={{fontSize:14,fontWeight:600,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
+                                  <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>{meal.food?.portion_desc}</div>
+                                  <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
                                     {[['B',meal.protein_g,'#3b82f6'],['C',meal.carbs_g,'#f97316'],['F',meal.fat_g,'#a855f7']].map(([l,v,c])=>(
                                       <span key={l} style={{background:c+'18',border:'1px solid '+c+'30',color:c,borderRadius:6,padding:'2px 6px',fontSize:'.62rem',fontWeight:700,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
                                     ))}
                                   </div>
                                 </div>
-                                <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'.9rem',color:'#CBA23B',flexShrink:0}}>{meal.actual_calories}<span style={{fontSize:'.58rem',opacity:.6,marginRight:2}}>kcal</span></div>
+                                {/* calories (RTL: last in DOM = visual left) */}
+                                <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:60}}>
+                                  <span style={{fontSize:15,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
+                                  <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
+                                </div>
                               </div>
                             )
                           })}
@@ -2060,41 +2088,62 @@ export default function Meals() {
 
               {/* ── NUTRIENTS ── */}
               {tab==='nutrients' && (
-                <div style={{paddingTop:14}}>
-                  <div style={{background:'rgba(203,162,59,0.07)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:14,padding:'14px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                    <div>
-                      <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(203,162,59,0.5)',marginBottom:4}}>سعراتك اليوم</div>
-                      <div style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:900,fontSize:'1.8rem',color:'#CBA23B',lineHeight:1}}>{Math.round(totals.calories||0)}</div>
-                      <div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.3)',marginTop:2}}>هدفك: {G.calories} سعرة · {pct(totals.calories||0,G.calories)}%</div>
+                <div style={{paddingTop:14,paddingBottom:20}}>
+                  {/* Daily summary card */}
+                  <div style={{marginInline:16,marginBlockEnd:16,padding:20,backgroundColor:'var(--card)',borderRadius:20,boxShadow:'var(--shadow-card)'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBlockEnd:16}}>
+                      <span style={{fontSize:13,color:'var(--text-secondary)',fontFamily:F}}>{Math.round(totals.calories||0)} / {G.calories||0} سعرة</span>
+                      <span style={{fontSize:13,color:'var(--text-secondary)',fontFamily:F}}>سعراتك اليوم</span>
                     </div>
-                    {!goals&&<div style={{fontSize:'.72rem',color:'rgba(255,255,255,0.25)',maxWidth:120,textAlign:'right',lineHeight:1.4}}>أكمل بياناتك للأهداف الشخصية</div>}
+                    <div style={{textAlign:'center',fontSize:48,fontWeight:800,color:'var(--accent)',marginBlockEnd:8,fontFamily:F,lineHeight:1}}>
+                      {Math.round(totals.calories||0)}
+                    </div>
+                    <div style={{textAlign:'center',marginBlockEnd:16,fontSize:13,fontFamily:F,color:(totals.calories||0)<=(G.calories||0)?'#22C55E':'#EF4444'}}>
+                      {(totals.calories||0)<=(G.calories||0)
+                        ? `باقي ${(G.calories||0) - Math.round(totals.calories||0)} سعرة`
+                        : `تجاوزتَ الهدف بـ ${Math.round(totals.calories||0) - (G.calories||0)} سعرة`}
+                    </div>
+                    {[
+                      {label:'بروتين', val:Math.round(totals.protein_g||0), goal:G.protein_g||0, color:'#3B82F6'},
+                      {label:'كارب',   val:Math.round(totals.carbs_g||0),   goal:G.carbs_g||0,   color:'#F59E0B'},
+                      {label:'دهن',    val:Math.round(totals.fat_g||0),     goal:G.fat_g||0,     color:'#8B5CF6'},
+                    ].map(({label,val,goal,color},i,arr)=>(
+                      <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBlock:8,borderBottom:i<arr.length-1?'1px solid var(--accent-faint)':'none'}}>
+                        <span style={{fontSize:14,fontWeight:600,color,fontFamily:F}}>{val}g / {goal}g</span>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <span style={{fontSize:14,color:'var(--text-primary)',fontFamily:F}}>{label}</span>
+                          <div style={{width:10,height:10,borderRadius:5,backgroundColor:color,flexShrink:0}}/>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                  {/* Nutrient groups */}
                   {['macro','fat','micro','vitamin','mineral'].map(group => {
                     const groupNutrients = NUTRIENTS.filter(n=>n.group===group)
                     const groupLabels = {macro:'الكربوهيدرات والبروتين',fat:'الدهون',micro:'الكهارل',vitamin:'الفيتامينات',mineral:'المعادن'}
                     return (
-                      <div key={group} style={{marginBottom:14}}>
-                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.25)',marginBottom:10}}>{groupLabels[group].toUpperCase()}</div>
-                        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:'10px 14px'}}>
+                      <div key={group} style={{marginInline:16,marginBottom:14}}>
+                        <div style={{fontSize:'.6rem',fontWeight:700,letterSpacing:1.5,color:'var(--text-secondary)',marginBottom:10}}>{groupLabels[group].toUpperCase()}</div>
+                        <div style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-faint)',borderRadius:14,padding:'10px 14px'}}>
                           {groupNutrients.map((n, i) => {
                             const val = totals[n.key]||0
                             const goalVal = G[n.key]||0
                             const p = pct(val, goalVal)
                             const over = val > goalVal && goalVal > 0
                             return (
-                              <div key={n.key} style={{padding:'8px 0',borderBottom:i<groupNutrients.length-1?'1px solid rgba(255,255,255,0.04)':'none'}}>
+                              <div key={n.key} style={{padding:'8px 0',borderBottom:i<groupNutrients.length-1?'1px solid var(--accent-faint)':'none'}}>
                                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
-                                  <span style={{fontSize:'.82rem',color:'rgba(255,255,255,0.65)',fontWeight:500}}>{n.label}</span>
+                                  <span style={{fontSize:'.82rem',color:'var(--text-primary)',fontWeight:500,fontFamily:F}}>{n.label}</span>
                                   <div style={{display:'flex',alignItems:'baseline',gap:5}}>
                                     <span style={{fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:700,fontSize:'.88rem',color:n.color}}>{fmt(val)}<span style={{fontSize:'.6rem',opacity:.7,marginLeft:1}}>{n.unit}</span></span>
-                                    {goalVal>0&&<span style={{fontSize:'.68rem',color:over?'#ef4444':'rgba(255,255,255,0.25)',fontWeight:over?700:400}}>/ {fmt(goalVal)}{n.unit}</span>}
-                                    {goalVal>0&&<span style={{fontSize:'.65rem',color:over?'#ef4444':p>=80?'#4ade80':'rgba(255,255,255,0.3)',fontWeight:700,minWidth:32,textAlign:'right'}}>{p}%{over&&' ⚠'}</span>}
+                                    {goalVal>0&&<span style={{fontSize:'.68rem',color:over?'#ef4444':'var(--text-secondary)',fontWeight:over?700:400}}>/ {fmt(goalVal)}{n.unit}</span>}
+                                    {goalVal>0&&<span style={{fontSize:'.65rem',color:over?'#ef4444':p>=80?'#4ade80':'var(--text-secondary)',fontWeight:700,minWidth:32,textAlign:'right'}}>{p}%{over&&' ⚠'}</span>}
                                   </div>
                                 </div>
                                 {goalVal>0&&(
-                                  <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:2,overflow:'hidden',position:'relative'}}>
-                                    <div style={{height:'100%',width:`${Math.min(100,p)}%`,background:over?'#ef4444':n.color,borderRadius:2,transition:'width .5s ease'}}/>
-                                    {over&&<div style={{position:'absolute',top:0,left:`${Math.min(100,Math.round((goalVal/Math.max(val,goalVal))*100))}%`,width:2,height:'100%',background:'rgba(255,255,255,0.4)'}}/>}
+                                  <div style={{height:4,backgroundColor:'var(--accent-faint)',borderRadius:2,overflow:'hidden',position:'relative'}}>
+                                    <div style={{height:'100%',width:`${Math.min(100,p)}%`,backgroundColor:over?'#ef4444':n.color,borderRadius:2,transition:'width .5s ease'}}/>
+                                    {over&&<div style={{position:'absolute',top:0,left:`${Math.min(100,Math.round((goalVal/Math.max(val,goalVal))*100))}%`,width:2,height:'100%',backgroundColor:'var(--text-secondary)'}}/>}
                                   </div>
                                 )}
                               </div>
@@ -2104,7 +2153,7 @@ export default function Meals() {
                       </div>
                     )
                   })}
-                  {!goals&&<div style={{background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:12,padding:'12px 16px',fontSize:'.8rem',color:'rgba(203,162,59,0.6)',lineHeight:1.6}}>
+                  {!goals&&<div style={{marginInline:16,background:'rgba(203,162,59,0.05)',border:'1px solid rgba(203,162,59,0.12)',borderRadius:12,padding:'12px 16px',fontSize:'.8rem',color:'rgba(203,162,59,0.6)',lineHeight:1.6,fontFamily:F}}>
                     💡 أضف عمرك ووزنك وطولك وهدفك في الإعدادات للحصول على أهداف غذائية مخصصة بناءً على معادلة ميفلين-سانت جيور.
                   </div>}
                 </div>
