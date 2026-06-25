@@ -1177,6 +1177,10 @@ export default function Meals() {
             ...data.plan.slice(i % data.plan.length),
             ...data.plan.slice(0, i % data.plan.length)
           ]
+          rotated.sort((a, b) => {
+            const order = ['الفطور','الغداء','وجبة خفيفة','العشاء']
+            return order.indexOf(a.meal_time) - order.indexOf(b.meal_time)
+          })
           return {
             date,
             dateStr: date.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }),
@@ -1186,7 +1190,15 @@ export default function Meals() {
             tip: data.tip
           }
         })
-        setWeekPlan(built)
+        const recipeSnapshot = recipes.length ? recipes : []
+        const enriched = built.map(day => ({
+          ...day,
+          plan: day.plan.map(meal => {
+            const img = findRecipeImage(meal.food?.name_ar, recipeSnapshot)
+            return { ...meal, food: { ...meal.food, image_url: img } }
+          })
+        }))
+        setWeekPlan(enriched)
         const todayIdx = built.findIndex(d => d.isToday)
         if (todayIdx >= 0) setExpandedDay(todayIdx)
       }
@@ -1218,17 +1230,17 @@ export default function Meals() {
               <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
                 {MEAL_TYPES.map(mt=>(
                   <button key={mt.id} onClick={()=>setAddMealType(mt.id)}
-                    style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?mt.color:'rgba(255,255,255,0.1)'}`,background:addMealType===mt.id?`${mt.color}20`:'transparent',color:addMealType===mt.id?mt.color:'rgba(255,255,255,0.45)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
+                    style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?'var(--text-primary)':'var(--accent-soft)'}`,backgroundColor:addMealType===mt.id?'var(--text-primary)':'var(--accent-faint)',color:addMealType===mt.id?'#FFFFFF':'var(--text-secondary)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
                     {mt.icon} {mt.label}
                   </button>
                 ))}
               </div>
               {/* Meal name */}
               <input type="text" placeholder="اسم الوجبة (مثال: كبسة دجاج)" value={addMealName} onChange={e=>setAddMealName(e.target.value)}
-                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--surface)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
+                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid var(--accent-soft)',backgroundColor:'var(--surface-inset)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
               {/* Calories */}
               <input type="number" placeholder="السعرات الحرارية" value={addMealCal} onChange={e=>setAddMealCal(e.target.value)}
-                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid rgba(255,255,255,0.1)',background:'var(--surface)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
+                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid var(--accent-soft)',backgroundColor:'var(--surface-inset)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
               {/* Quick calorie pills */}
               <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:18}}>
                 {['150','250','350','450','550','650','750'].map(cal=>(
@@ -1240,7 +1252,7 @@ export default function Meals() {
               </div>
               {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
               <button onClick={handleAddMeal} disabled={!addMealName.trim()||saving}
-                style={{width:'100%',padding:'15px',background:addMealName.trim()?'#CBA23B':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#0C0B0D':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
+                style={{width:'100%',padding:'15px',backgroundColor:addMealName.trim()?'var(--text-primary)':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#FFFFFF':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
                 {saving?'جاري الحفظ...':'حفظ الوجبة'}
               </button>
               <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
@@ -1997,8 +2009,12 @@ export default function Meals() {
                             return (
                               <div key={mi} style={{display:'flex',alignItems:'center',gap:12,paddingInline:16,paddingBlock:14,borderBottom:mi<day.plan.length-1?'1px solid var(--accent-faint)':'none'}}>
                                 {/* food visual avatar (RTL: first in DOM = visual right) */}
-                                <div style={{width:52,height:52,borderRadius:14,flexShrink:0,backgroundColor:fv.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>
-                                  {fv.emoji}
+                                <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
+                                  {meal.food?.image_url ? (
+                                    <img src={meal.food.image_url} style={{width:'100%',height:'100%',objectFit:'cover'}}
+                                      onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
+                                  ) : null}
+                                  <div style={{width:'100%',height:'100%',display:meal.food?.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
                                 </div>
                                 {/* food info */}
                                 <div style={{flex:1,minWidth:0,textAlign:'right'}}>

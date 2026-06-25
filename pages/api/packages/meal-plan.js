@@ -157,6 +157,14 @@ export default async function handler(req, res) {
     }
   }
 
+  // Ensure canonical meal order: الفطور → الغداء → وجبة خفيفة → العشاء
+  const MEAL_ORDER = ['الفطور','الغداء','وجبة خفيفة','العشاء']
+  plan.sort((a, b) => {
+    const ai = MEAL_ORDER.indexOf(a.meal_time)
+    const bi = MEAL_ORDER.indexOf(b.meal_time)
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+  })
+
   // Tip based on goal — overridden by health conditions when present
   const tips = {
     weight: 'ركّز على البروتين في كل وجبة — يساعد على الشبع وحفظ العضل مع الحمية',
