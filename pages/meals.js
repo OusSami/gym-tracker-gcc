@@ -610,8 +610,6 @@ export default function Meals() {
   const [showRecentMeals, setShowRecentMeals]   = useState(false)
   const [recentMealsByType, setRecentMealsByType] = useState({})
   const [addMealType, setAddMealType]             = useState('breakfast')
-  const [addMealName, setAddMealName]             = useState('')
-  const [addMealCal, setAddMealCal]               = useState('')
   const [showAddMeal, setShowAddMeal]             = useState(false)
   const [barcode, setBarcode]                   = useState('')
   const [barcodeLoading, setBarcodeLoading]     = useState(false)
@@ -961,37 +959,6 @@ export default function Meals() {
   const resetAdd = () => {
     setMealType(null); setImgB64(null); setImgPreview(null)
     setTextInput(''); setResult(null); setErr(''); setShowRecentMeals(false)
-    setAddMealName(''); setAddMealCal('')
-  }
-
-  const handleAddMeal = async () => {
-    if (!addMealName.trim() || !user) return
-    setSaving(true)
-    setErr('')
-    try {
-      const r = await fetch('/api/meals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          mealType: addMealType,
-          meal_date: viewDate,
-          meal_name: addMealName.trim(),
-          total_calories: parseInt(addMealCal) || 0,
-        }),
-      })
-      const d = await r.json()
-      if (r.ok) {
-        await loadDay(user.id, viewDate)
-        setAddMealName(''); setAddMealCal('')
-        setShowAddMeal(false)
-      } else {
-        setErr(d.error || 'تعذر الحفظ')
-      }
-    } catch (e) {
-      setErr('Save error: ' + e.message)
-    }
-    setSaving(false)
   }
 
   const prevDay = () => { const d = new Date(viewDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setViewDate(d.toISOString().split('T')[0]) }
@@ -1459,43 +1426,6 @@ export default function Meals() {
                   >تحليل التغذية ←</button>
                 )}
 
-                {/* ── MANUAL ENTRY ── */}
-                <div style={{display:'flex',alignItems:'center',gap:10,marginBlockEnd:14}}>
-                  <div style={{flex:1,height:1,backgroundColor:'#ECCDBA'}}/>
-                  <span style={{color:'#8A6A4F',fontSize:12,fontWeight:600,whiteSpace:'nowrap'}}>أو أدخلي يدوياً</span>
-                  <div style={{flex:1,height:1,backgroundColor:'#ECCDBA'}}/>
-                </div>
-                <input
-                  value={addMealName}
-                  onChange={e => setAddMealName(e.target.value)}
-                  placeholder="اسم الوجبة"
-                  style={{width:'100%',padding:13,borderRadius:12,marginBlockEnd:10,border:'1.5px solid #ECCDBA',backgroundColor:'#F7F1EC',textAlign:'right',fontSize:14,color:'#3D2A1F',outline:'none',direction:'rtl',boxSizing:'border-box'}}
-                />
-                <input
-                  type="number"
-                  value={addMealCal}
-                  onChange={e => setAddMealCal(e.target.value)}
-                  placeholder="السعرات الحرارية"
-                  style={{width:'100%',padding:13,borderRadius:12,marginBlockEnd:12,border:'1.5px solid #ECCDBA',backgroundColor:'#F7F1EC',textAlign:'right',fontSize:14,color:'#3D2A1F',outline:'none',direction:'rtl',boxSizing:'border-box'}}
-                />
-                <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end',marginBlockEnd:14}}>
-                  {['150','250','350','450','550','650','750'].map(cal => (
-                    <button key={cal} onClick={() => setAddMealCal(cal)}
-                      style={{paddingInline:12,paddingBlock:6,borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer',border:'none',backgroundColor:addMealCal===cal?'#D89B7A':'#F7E9DF',color:addMealCal===cal?'#FFFFFF':'#D89B7A'}}>
-                      {cal}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={handleAddMeal}
-                  disabled={!addMealName.trim()||saving}
-                  style={{
-                    width:'100%', padding:14,
-                    backgroundColor: addMealName.trim() ? '#D89B7A' : '#C4B5A5',
-                    color:'#FFFFFF', border:'none', borderRadius:14, fontSize:15,
-                    fontWeight:700, cursor: addMealName.trim() ? 'pointer' : 'not-allowed',
-                  }}
-                >{saving ? 'جاري الإضافة...' : '✓ إضافة الوجبة'}</button>
               </>
             )}
           </div>
