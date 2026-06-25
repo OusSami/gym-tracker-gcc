@@ -1218,53 +1218,180 @@ export default function Meals() {
       {/* Add meal modal */}
       {showAddMeal && (
         <>
-          <div onClick={()=>{setShowAddMeal(false);setErr('')}} style={{position:'fixed',inset:0,zIndex:300,backgroundColor:'rgba(0,0,0,0.55)'}}/>
-          <div onClick={e=>e.stopPropagation()} style={{position:'fixed',bottom:0,insetInlineStart:0,insetInlineEnd:0,zIndex:301,backgroundColor:'var(--card)',borderRadius:'24px 24px 0 0',maxHeight:'85vh',overflowY:'auto',paddingBlockEnd:48,direction:'rtl'}}>
-            <div style={{width:40,height:4,borderRadius:2,backgroundColor:'var(--accent-soft)',margin:'12px auto'}}/>
-            <div style={{padding:'0 20px 20px'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
-                <button onClick={()=>{setShowAddMeal(false);setErr('')}} style={{background:'none',border:'none',color:'var(--text-secondary)',cursor:'pointer',fontSize:'1.3rem',lineHeight:1}}>×</button>
-                <div style={{fontSize:'.62rem',fontWeight:700,letterSpacing:1.5,color:'rgba(255,255,255,0.3)'}}>+ سجّل وجبة جديدة</div>
-              </div>
-              {/* Meal type pills */}
-              <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
-                {MEAL_TYPES.map(mt=>(
-                  <button key={mt.id} onClick={()=>setAddMealType(mt.id)}
-                    style={{padding:'7px 16px',borderRadius:20,border:`1px solid ${addMealType===mt.id?'var(--text-primary)':'var(--accent-soft)'}`,backgroundColor:addMealType===mt.id?'var(--text-primary)':'var(--accent-faint)',color:addMealType===mt.id?'#FFFFFF':'var(--text-secondary)',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.82rem',transition:'all .15s'}}>
-                    {mt.icon} {mt.label}
-                  </button>
-                ))}
-              </div>
-              {/* Meal name */}
-              <input type="text" placeholder="اسم الوجبة (مثال: كبسة دجاج)" value={addMealName} onChange={e=>setAddMealName(e.target.value)}
-                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid var(--accent-soft)',backgroundColor:'var(--surface-inset)',color:'var(--text-primary)',fontFamily:F,fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:12,boxSizing:'border-box'}}/>
-              {/* Calories */}
-              <input type="number" placeholder="السعرات الحرارية" value={addMealCal} onChange={e=>setAddMealCal(e.target.value)}
-                style={{width:'100%',padding:'13px 16px',borderRadius:14,border:'1px solid var(--accent-soft)',backgroundColor:'var(--surface-inset)',color:'var(--text-primary)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontSize:'.92rem',direction:'rtl',outline:'none',marginBottom:10,boxSizing:'border-box'}}/>
-              {/* Quick calorie pills */}
-              <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:18}}>
-                {['150','250','350','450','550','650','750'].map(cal=>(
-                  <button key={cal} onClick={()=>setAddMealCal(cal)}
-                    style={{padding:'5px 12px',borderRadius:20,border:'1px solid rgba(255,255,255,0.08)',background:addMealCal===cal?'rgba(203,162,59,0.18)':'rgba(255,255,255,0.04)',color:addMealCal===cal?'#CBA23B':'rgba(255,255,255,0.4)',cursor:'pointer',fontFamily:"'Space Grotesk',monospace",fontWeight:700,fontSize:'.75rem',transition:'all .12s'}}>
-                    {cal}
-                  </button>
-                ))}
-              </div>
-              {err&&<div style={{color:'#fca5a5',fontSize:'.8rem',marginBottom:8,padding:'10px 14px',background:'rgba(239,68,68,.08)',borderRadius:10,border:'1px solid rgba(239,68,68,.2)'}}>{err}</div>}
-              <button onClick={handleAddMeal} disabled={!addMealName.trim()||saving}
-                style={{width:'100%',padding:'15px',backgroundColor:addMealName.trim()?'var(--text-primary)':'rgba(255,255,255,0.05)',border:'none',borderRadius:12,fontFamily:"'Space Grotesk','Tajawal',sans-serif",fontWeight:800,fontSize:'.95rem',color:addMealName.trim()?'#FFFFFF':'rgba(255,255,255,0.2)',cursor:addMealName.trim()?'pointer':'not-allowed',marginBottom:20,transition:'all .15s'}}>
-                {saving?'جاري الحفظ...':'حفظ الوجبة'}
-              </button>
-              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
-                <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
-                <span style={{color:'rgba(255,255,255,0.25)',fontSize:'.72rem',fontWeight:700,whiteSpace:'nowrap'}}>أو حللي صورة الوجبة</span>
-                <div style={{flex:1,height:1,background:'rgba(255,255,255,0.07)'}}/>
-              </div>
-              <button onClick={()=>{setShowAddMeal(false);setActiveTab('analyze')}}
-                style={{width:'100%',padding:'13px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(203,162,59,0.18)',borderRadius:12,color:'#CBA23B',cursor:'pointer',fontFamily:F,fontWeight:700,fontSize:'.88rem',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
-                📸 تحليل الوجبة بالذكاء الاصطناعي
-              </button>
+          {/* Backdrop */}
+          <div onClick={() => { setShowAddMeal(false); setErr('') }} style={{
+            position:'fixed', inset:0, zIndex:100,
+            backgroundColor:'rgba(0,0,0,0.5)'
+          }}/>
+
+          {/* Sheet */}
+          <div onClick={e => e.stopPropagation()} style={{
+            position:'fixed', bottom:0,
+            insetInlineStart:0, insetInlineEnd:0,
+            zIndex:101, backgroundColor:'#FFFFFF',
+            borderRadius:'24px 24px 0 0',
+            paddingInline:20, paddingBlockStart:16,
+            paddingBlockEnd:40,
+            maxHeight:'90vh', overflowY:'auto'
+          }}>
+            {/* Handle */}
+            <div style={{
+              width:40, height:4, borderRadius:2,
+              backgroundColor:'#E0D5CC',
+              margin:'0 auto 16px'
+            }}/>
+
+            {/* Header */}
+            <div style={{
+              display:'flex', justifyContent:'space-between',
+              alignItems:'center', marginBlockEnd:20
+            }}>
+              <button onClick={() => { setShowAddMeal(false); setErr('') }}
+                style={{
+                  width:32, height:32, borderRadius:16,
+                  backgroundColor:'#F5F0EB',
+                  border:'none', cursor:'pointer',
+                  fontSize:18, color:'#3D2A1F',
+                  display:'flex', alignItems:'center',
+                  justifyContent:'center'
+                }}>×</button>
+              <span style={{
+                fontSize:18, fontWeight:700,
+                color:'#3D2A1F'
+              }}>إضافة وجبة</span>
             </div>
+
+            {/* Meal type pills */}
+            <p style={{
+              fontSize:13, color:'#8A6A4F',
+              textAlign:'right', margin:'0 0 8px'
+            }}>نوع الوجبة</p>
+            <div style={{
+              display:'flex', gap:8, flexWrap:'wrap',
+              justifyContent:'flex-end', marginBlockEnd:20
+            }}>
+              {[
+                {id:'breakfast', label:'الفطور ☀️'},
+                {id:'lunch',     label:'الغداء 🌤️'},
+                {id:'dinner',    label:'العشاء 🌙'},
+                {id:'snack',     label:'سناك 🍎'}
+              ].map(t => (
+                <button key={t.id}
+                  onClick={() => setAddMealType(t.id)}
+                  style={{
+                    paddingInline:16, paddingBlock:10,
+                    borderRadius:20, fontSize:13,
+                    fontWeight:600, cursor:'pointer',
+                    border: addMealType === t.id
+                      ? 'none'
+                      : '1px solid #ECCDBA',
+                    backgroundColor: addMealType === t.id
+                      ? '#3D2A1F' : '#F7E9DF',
+                    color: addMealType === t.id
+                      ? '#FFFFFF' : '#8A6A4F'
+                  }}
+                >{t.label}</button>
+              ))}
+            </div>
+
+            {/* Meal name input */}
+            <p style={{
+              fontSize:13, color:'#8A6A4F',
+              textAlign:'right', margin:'0 0 6px'
+            }}>اسم الوجبة</p>
+            <input
+              value={addMealName}
+              onChange={e => setAddMealName(e.target.value)}
+              placeholder="مثال: دجاج مشوي مع أرز"
+              style={{
+                width:'100%', padding:14,
+                borderRadius:14, marginBlockEnd:14,
+                border:'1.5px solid #ECCDBA',
+                backgroundColor:'#F7F1EC',
+                textAlign:'right', fontSize:15,
+                color:'#3D2A1F', outline:'none',
+                direction:'rtl',
+                boxSizing:'border-box'
+              }}
+            />
+
+            {/* Calories input */}
+            <p style={{
+              fontSize:13, color:'#8A6A4F',
+              textAlign:'right', margin:'0 0 6px'
+            }}>السعرات الحرارية</p>
+            <input
+              type="number"
+              value={addMealCal}
+              onChange={e => setAddMealCal(e.target.value)}
+              placeholder="مثال: 450"
+              style={{
+                width:'100%', padding:14,
+                borderRadius:14, marginBlockEnd:14,
+                border:'1.5px solid #ECCDBA',
+                backgroundColor:'#F7F1EC',
+                textAlign:'right', fontSize:15,
+                color:'#3D2A1F', outline:'none',
+                direction:'rtl',
+                boxSizing:'border-box'
+              }}
+            />
+
+            {/* Quick cal suggestions */}
+            <p style={{
+              fontSize:12, color:'#8A6A4F',
+              textAlign:'right', margin:'0 0 8px'
+            }}>اختاري سريعاً</p>
+            <div style={{
+              display:'flex', gap:8, flexWrap:'wrap',
+              justifyContent:'flex-end', marginBlockEnd:20
+            }}>
+              {['150','250','350','450','550','650','750'].map(cal => (
+                <button key={cal}
+                  onClick={() => setAddMealCal(cal)}
+                  style={{
+                    paddingInline:12, paddingBlock:6,
+                    borderRadius:14, fontSize:12,
+                    backgroundColor: addMealCal === cal
+                      ? '#D89B7A' : '#F7E9DF',
+                    color: addMealCal === cal
+                      ? '#FFFFFF' : '#D89B7A',
+                    border:'none', cursor:'pointer',
+                    fontWeight:600
+                  }}
+                >{cal}</button>
+              ))}
+            </div>
+
+            {err && <div style={{color:'#B91C1C',fontSize:13,marginBlockEnd:12,padding:'10px 14px',backgroundColor:'#FEF2F2',borderRadius:10,border:'1px solid #FECACA'}}>{err}</div>}
+
+            {/* Submit button */}
+            <button
+              onClick={handleAddMeal}
+              disabled={!addMealName.trim() || saving}
+              style={{
+                width:'100%', padding:16,
+                backgroundColor: addMealName.trim()
+                  ? '#3D2A1F' : '#C4B5A5',
+                color:'#FFFFFF', border:'none',
+                borderRadius:16, fontSize:16,
+                fontWeight:700, cursor: addMealName.trim()
+                  ? 'pointer' : 'not-allowed',
+                marginBlockEnd:16
+              }}
+            >{saving ? 'جاري الإضافة...' : '✓ إضافة الوجبة'}</button>
+
+            {/* AI analyzer shortcut */}
+            <button
+              onClick={() => { setShowAddMeal(false); setActiveTab('analyze') }}
+              style={{
+                width:'100%', padding:14,
+                backgroundColor:'#F7E9DF',
+                color:'#D89B7A', border:'none',
+                borderRadius:14, fontSize:14,
+                fontWeight:600, cursor:'pointer'
+              }}
+            >📸 تحليل الوجبة بالذكاء الاصطناعي</button>
           </div>
         </>
       )}
