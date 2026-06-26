@@ -2290,6 +2290,16 @@ export default function Meals() {
                     </div>
                   )}
 
+                  {weekPlan.length > 0 && (
+                    <p style={{
+                      fontSize:12, color:'var(--text-secondary)',
+                      textAlign:'right', paddingInline:16,
+                      marginBlockEnd:12
+                    }}>
+                      💡 اضغطي "سجّلي" لإضافة الوجبة لسجلك اليومي
+                    </p>
+                  )}
+
                   {/* Loading skeletons */}
                   {weekLoading && (
                     <div>
@@ -2365,19 +2375,29 @@ export default function Meals() {
                                   <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
                                 </div>
                                 {/* log button (RTL: last in DOM = visual left) */}
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); logSinglePlanMeal(meal, idx) }}
-                                  style={{
-                                    width:36, height:36, borderRadius:18, flexShrink:0,
-                                    backgroundColor: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '#E8F5E9' : 'var(--accent-faint)',
-                                    border: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '1.5px solid #A5D6A7' : '1.5px solid var(--accent-soft)',
-                                    cursor: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? 'default' : 'pointer',
-                                    display:'flex', alignItems:'center', justifyContent:'center',
-                                    fontSize:18, transition:'all 0.2s'
-                                  }}
-                                >
-                                  {loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '✅' : '+'}
-                                </button>
+                                {loggedPlanMeals.has(idx+'-'+meal.meal_time) ? (
+                                  <div style={{
+                                    flexShrink:0, paddingInline:12, paddingBlock:6,
+                                    borderRadius:20, backgroundColor:'#E8F5E9',
+                                    fontSize:12, fontWeight:700, color:'#2E7D32',
+                                    display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
+                                  }}>
+                                    <span>✓</span><span>تم</span>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); logSinglePlanMeal(meal, idx) }}
+                                    style={{
+                                      flexShrink:0, paddingInline:12, paddingBlock:6,
+                                      borderRadius:20, backgroundColor:'var(--text-primary)',
+                                      color:'#FFFFFF', border:'none', cursor:'pointer',
+                                      fontSize:12, fontWeight:700,
+                                      display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
+                                    }}
+                                  >
+                                    <span>+</span><span>سجّلي</span>
+                                  </button>
+                                )}
                               </div>
                             )
                           })}
