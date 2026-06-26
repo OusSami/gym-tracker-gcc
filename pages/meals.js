@@ -1206,31 +1206,31 @@ export default function Meals() {
             <div style={{width:40,height:4,borderRadius:2,backgroundColor:'#E0D5CC',margin:'0 auto 16px'}}/>
 
             {/* Header */}
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBlockEnd:20}}>
-              <button onClick={() => { setShowAddMeal(false); resetAdd() }}
-                style={{width:32,height:32,borderRadius:16,backgroundColor:'#F5F0EB',border:'none',cursor:'pointer',fontSize:18,color:'#3D2A1F',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
-              <span style={{fontSize:18,fontWeight:700,color:'#3D2A1F'}}>تسجيل وجبة</span>
-            </div>
-
-            {/* Meal type pills */}
-            <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end',marginBlockEnd:20}}>
-              {[
-                {id:'breakfast', label:'الفطور ☀️'},
-                {id:'lunch',     label:'الغداء 🌤️'},
-                {id:'dinner',    label:'العشاء 🌙'},
-                {id:'snack',     label:'سناك 🍎'}
-              ].map(t => (
-                <button key={t.id}
-                  onClick={() => { setAddMealType(t.id); setMealType(t.id) }}
-                  style={{
-                    paddingInline:14, paddingBlock:8,
-                    borderRadius:20, fontSize:13, fontWeight:600, cursor:'pointer',
-                    border: addMealType === t.id ? 'none' : '1px solid #ECCDBA',
-                    backgroundColor: addMealType === t.id ? '#3D2A1F' : '#F7E9DF',
-                    color: addMealType === t.id ? '#FFFFFF' : '#8A6A4F'
-                  }}
-                >{t.label}</button>
-              ))}
+            <div style={{
+              display:'flex', justifyContent:'space-between',
+              alignItems:'center', paddingBlockEnd:16,
+              borderBottom:'1px solid #F0E8E0',
+              marginBlockEnd:16
+            }}>
+              <button onClick={() => setShowAddMeal(false)} style={{
+                width:32, height:32, borderRadius:16,
+                backgroundColor:'#F5F0EB', border:'none',
+                cursor:'pointer', fontSize:18, color:'#3D2A1F',
+                display:'flex', alignItems:'center',
+                justifyContent:'center'
+              }}>×</button>
+              <div style={{textAlign:'center'}}>
+                <div style={{fontSize:16, fontWeight:700, color:'#3D2A1F'}}>
+                  {addMealType === 'breakfast' ? '☀️ الفطور' :
+                   addMealType === 'lunch' ? '🌤️ الغداء' :
+                   addMealType === 'dinner' ? '🌙 العشاء' :
+                   '🍎 سناك'}
+                </div>
+                <div style={{fontSize:12, color:'#8A6A4F'}}>
+                  أضيفي وجبتك
+                </div>
+              </div>
+              <div style={{width:32}}/>{/* spacer for centering */}
             </div>
 
             {/* Hidden file input */}
@@ -1348,7 +1348,12 @@ export default function Meals() {
                       setShowAddMeal(false)
                     }}
                     style={{paddingInline:14,paddingBlock:9,borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer',border:'1px solid #ECCDBA',backgroundColor:'#F7F1EC',color:'#8A6A4F'}}>
-                    📋 نسخ من أمس
+                    {'📋 نسخ ' + (
+                      addMealType === 'breakfast' ? 'فطور الأمس' :
+                      addMealType === 'lunch' ? 'غداء الأمس' :
+                      addMealType === 'dinner' ? 'عشاء الأمس' :
+                      'سناك الأمس'
+                    )}
                   </button>
                   {customMeals.length > 0 && (
                     <button onClick={() => setShowCustom(!showCustom)}
@@ -1422,10 +1427,10 @@ export default function Meals() {
                     disabled={!imgB64 && !textInput.trim()}
                     style={{
                       width:'100%', padding:15,
-                      backgroundColor: (imgB64||textInput.trim()) ? '#3D2A1F' : '#C4B5A5',
+                      backgroundColor: analyzing ? '#8A6A4F' : '#3D2A1F',
                       color:'#FFFFFF', border:'none', borderRadius:14, fontSize:15,
                       fontWeight:700, cursor:(imgB64||textInput.trim()) ? 'pointer' : 'not-allowed',
-                      marginBlockEnd:20
+                      marginBlockEnd:20, opacity: analyzing ? 0.7 : 1
                     }}
                   >تحليل التغذية ←</button>
                 )}
