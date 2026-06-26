@@ -392,9 +392,25 @@ function SearchAndChips({ search, onSearch, activeCategory, onCategory, showChip
   )
 }
 
-function RecipeDetail({ recipe, onBack, favorites, toggleFavorite }) {
+function RecipeDetail({ recipe, onBack, favorites, toggleFavorite, onLogMeal }) {
   const [detailTab, setDetailTab] = useState('ingredients')
   const [per100g, setPer100g] = useState(false)
+  const [addingToMeal, setAddingToMeal] = useState(false)
+  const [addedToMeal, setAddedToMeal] = useState(false)
+  const [showMealTypeSheet, setShowMealTypeSheet] = useState(false)
+
+  const handleAddToMeal = async (mealTypeId) => {
+    if (!onLogMeal) return
+    setAddingToMeal(true)
+    try {
+      await onLogMeal(mealTypeId)
+      setAddedToMeal(true)
+      setShowMealTypeSheet(false)
+      setTimeout(() => setAddedToMeal(false), 3000)
+    } catch(e) { console.error(e) }
+    finally { setAddingToMeal(false) }
+  }
+
   return (
     <div style={{ direction: 'rtl', backgroundColor: 'var(--surface)', minHeight: '100vh' }}>
       <div style={{ paddingInline: 16, paddingBlock: 12, textAlign: 'right' }}>
@@ -436,7 +452,59 @@ function RecipeDetail({ recipe, onBack, favorites, toggleFavorite }) {
             <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: F }}>{label}</span>
           </button>
         ))}
+        {onLogMeal && (
+          <button onClick={() => setShowMealTypeSheet(true)} style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            border: 'none', background: 'none', cursor: 'pointer',
+          }}>
+            <span style={{ fontSize: 22 }}>{addedToMeal ? '✅' : '🍽️'}</span>
+            <span style={{ fontSize: 11, color: addedToMeal ? '#22C55E' : 'var(--text-secondary)', fontFamily: F }}>
+              {addedToMeal ? 'تمت الإضافة' : 'أضيفي للوجبة'}
+            </span>
+          </button>
+        )}
       </div>
+
+      {/* Meal type picker sheet */}
+      {showMealTypeSheet && (
+        <>
+          <div onClick={() => setShowMealTypeSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            backgroundColor: 'rgba(0,0,0,0.5)'
+          }}/>
+          <div style={{
+            position: 'fixed', bottom: 0,
+            insetInlineStart: 0, insetInlineEnd: 0,
+            zIndex: 201, backgroundColor: '#FFFFFF',
+            borderRadius: '24px 24px 0 0',
+            padding: 24, paddingBlockEnd: 40,
+            direction: 'rtl',
+          }}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0D5CC', margin: '0 auto 20px' }}/>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#3D2A1F', textAlign: 'right', marginBlockEnd: 16 }}>أضيفي لأي وجبة؟</p>
+            {[
+              { id: 'breakfast', label: 'الفطور', emoji: '☀️', bg: '#FFF3E0', color: '#E65100' },
+              { id: 'lunch',     label: 'الغداء', emoji: '🌤️', bg: '#E8F5E9', color: '#2E7D32' },
+              { id: 'dinner',    label: 'العشاء', emoji: '🌙', bg: '#EDE7F6', color: '#4527A0' },
+              { id: 'snack',     label: 'سناك',   emoji: '🍎', bg: '#FCE4EC', color: '#880E4F' },
+            ].map(t => (
+              <button key={t.id}
+                onClick={() => handleAddToMeal(t.id)}
+                disabled={addingToMeal}
+                style={{
+                  width: '100%', padding: 16, marginBlockEnd: 10, borderRadius: 16,
+                  backgroundColor: t.bg, border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  opacity: addingToMeal ? 0.6 : 1,
+                }}
+              >
+                <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: t.color, fontFamily: F }}>{t.label}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       {(recipe.cook_time || recipe.servings) && (
         <div style={{ paddingInline: 16, paddingBlock: 10, display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
           {recipe.cook_time && <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: F }}>🕐 {recipe.cook_time}</span>}
@@ -622,6 +690,8 @@ export default function Meals() {
   const [weekStart, setWeekStart]               = useState(null)
   const [favorites, setFavorites]               = useState(new Set())
   const [selectedMeal, setSelectedMeal]         = useState(null)
+  const [loggingProgramMeals, setLoggingProgramMeals] = useState(false)
+  const [programMealsLogged, setProgramMealsLogged]   = useState(false)
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
   const [t3MealType, setT3MealType]       = useState('breakfast')
@@ -985,6 +1055,62 @@ export default function Meals() {
       }
       await loadDay(user.id, viewDate)
     } catch (e) { console.error('copyFromDate error:', e) }
+  }
+
+  const logProgramMeals = async () => {
+    if (!user?.id || loggingProgramMeals) return
+    setLoggingProgramMeals(true)
+    try {
+      const res = await fetch('/api/packages/meal-plan?userId=' + user.id)
+      const data = await res.json()
+      if (!data?.plan) return
+      const today = new Date().toISOString().split('T')[0]
+      const timeToType = { 'الفطور':'breakfast', 'الغداء':'lunch', 'وجبة خفيفة':'snack', 'العشاء':'dinner' }
+      for (const item of data.plan) {
+        await fetch('/api/meals', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            mealType: timeToType[item.meal_time] || 'lunch',
+            meal_name: item.food.name_ar,
+            meal_date: today,
+            total_calories: item.actual_calories || 0,
+            protein_g: item.protein_g || 0,
+            carbs_g: item.carbs_g || 0,
+            fat_g: item.fat_g || 0,
+            portion_note: item.food.portion_desc || '',
+            image_url: findRecipeImage(item.food.name_ar, recipes)
+          })
+        })
+      }
+      setProgramMealsLogged(true)
+      await loadDay(user.id, today)
+    } catch(e) { console.error(e) }
+    finally { setLoggingProgramMeals(false) }
+  }
+
+  const logRecipeAsMeal = async (mealTypeId) => {
+    if (!user?.id || !selectedRecipe) return
+    const today = new Date().toISOString().split('T')[0]
+    try {
+      await fetch('/api/meals', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          mealType: mealTypeId,
+          meal_name: selectedRecipe.name,
+          meal_date: today,
+          total_calories: selectedRecipe.calories || 0,
+          protein_g: selectedRecipe.protein_g || 0,
+          carbs_g: selectedRecipe.carbs_g || 0,
+          fat_g: selectedRecipe.fat_g || 0,
+          fiber_g: selectedRecipe.fiber_g || 0,
+          portion_note: selectedRecipe.servings ? 'حصة واحدة (' + selectedRecipe.servings + ')' : '',
+          image_url: selectedRecipe.image_url || null
+        })
+      })
+      await loadDay(user.id, today)
+    } catch(e) { console.error(e) }
   }
 
   // ── Tab 3: isolated analyze functions ────────────────────────────────────
@@ -1632,7 +1758,7 @@ export default function Meals() {
           <>
             {/* Recipe detail — renders in place so tab bar stays visible */}
             {selectedRecipe && (
-              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} favorites={favorites} toggleFavorite={toggleFavorite} />
+              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} favorites={favorites} toggleFavorite={toggleFavorite} onLogMeal={logRecipeAsMeal} />
             )}
 
             {/* Sub-screen A2: Full browser */}
@@ -2227,6 +2353,50 @@ export default function Meals() {
               {/* ── DAILY LOG ── */}
               {tab==='daily' && (
                 <div style={{paddingTop:14}}>
+                  {mealPlan?.plan && !programMealsLogged && (
+                    <div style={{
+                      marginInline:16, marginBlockEnd:16,
+                      padding:16, borderRadius:20,
+                      backgroundColor:'#F7E9DF',
+                      border:'1.5px solid #D89B7A',
+                      display:'flex', justifyContent:'space-between',
+                      alignItems:'center', gap:12
+                    }}>
+                      <button
+                        onClick={logProgramMeals}
+                        disabled={loggingProgramMeals}
+                        style={{
+                          paddingInline:16, paddingBlock:10,
+                          backgroundColor: loggingProgramMeals ? '#C4B5A5' : '#3D2A1F',
+                          color:'#FFFFFF', border:'none',
+                          borderRadius:14, fontSize:13,
+                          fontWeight:700, cursor:'pointer',
+                          flexShrink:0
+                        }}
+                      >
+                        {loggingProgramMeals ? 'جارٍ التسجيل...' : '✓ سجّل الآن'}
+                      </button>
+                      <div style={{textAlign:'right', flex:1}}>
+                        <div style={{ fontSize:14, fontWeight:700, color:'#3D2A1F', marginBlockEnd:2 }}>
+                          لديك خطة وجبات اليوم 🍽️
+                        </div>
+                        <div style={{ fontSize:12, color:'#8A6A4F' }}>
+                          سجّلي وجبات برنامجك بضغطة واحدة
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {programMealsLogged && (
+                    <div style={{
+                      marginInline:16, marginBlockEnd:16,
+                      padding:14, borderRadius:16,
+                      backgroundColor:'#E8F5E9',
+                      border:'1px solid #A5D6A7',
+                      textAlign:'right'
+                    }}>
+                      <span style={{ fontSize:14, fontWeight:600, color:'#2E7D32' }}>✅ تم تسجيل وجبات اليوم من برنامجك</span>
+                    </div>
+                  )}
                   <CalorieRing calories={totals.calories||0} goal={G.calories} protein={totals.protein_g||0} carbs={totals.carbs_g||0} fat={totals.fat_g||0} G={G}/>
                   {/* Water */}
                   <div style={{backgroundColor:'#E0F7FA',border:'1px solid #B2EBF2',borderRadius:14,padding:'13px 16px',marginBottom:12}}>
