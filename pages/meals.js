@@ -692,6 +692,7 @@ export default function Meals() {
   const [selectedMeal, setSelectedMeal]         = useState(null)
   const [loggingProgramMeals, setLoggingProgramMeals] = useState(false)
   const [programMealsLogged, setProgramMealsLogged]   = useState(false)
+  const [loggedPlanMeals, setLoggedPlanMeals]         = useState(new Set())
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
   const [t3MealType, setT3MealType]       = useState('breakfast')
@@ -1299,6 +1300,36 @@ export default function Meals() {
     setWeekLoading(false)
   }
 
+  const logSinglePlanMeal = async (meal, dayIndex) => {
+    if (!user?.id) return
+    const key = dayIndex + '-' + meal.meal_time
+    if (loggedPlanMeals.has(key)) return
+    const today = new Date().toISOString().split('T')[0]
+    const timeToType = { 'الفطور':'breakfast', 'الغداء':'lunch', 'وجبة خفيفة':'snack', 'العشاء':'dinner' }
+    try {
+      await fetch('/api/meals', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          userId: user.id,
+          mealType: timeToType[meal.meal_time] || 'lunch',
+          meal_name: meal.food?.name_ar,
+          meal_date: today,
+          total_calories: meal.actual_calories || 0,
+          protein_g: meal.protein_g || 0,
+          carbs_g: meal.carbs_g || 0,
+          fat_g: meal.fat_g || 0,
+          portion_note: meal.food?.portion_desc || '',
+          image_url: meal.food?.image_url || null
+        })
+      })
+      const newSet = new Set(loggedPlanMeals)
+      newSet.add(key)
+      setLoggedPlanMeals(newSet)
+      await loadDay(user.id, today)
+    } catch(e) { console.error(e) }
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <>
@@ -1732,7 +1763,6 @@ export default function Meals() {
           {[
             { key: 'recipes',   label: '🍽️ وصفات'  },
             { key: 'nutrition', label: '📊 تغذيتي'  },
-            { key: 'analyze',   label: '🔍 تحليل'   },
           ].map(({ key, label }) => {
             const isActive = activeTab === key
             return (
@@ -2329,11 +2359,25 @@ export default function Meals() {
                                     ))}
                                   </div>
                                 </div>
-                                {/* calories (RTL: last in DOM = visual left) */}
+                                {/* calories */}
                                 <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:60}}>
                                   <span style={{fontSize:16,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
                                   <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
                                 </div>
+                                {/* log button (RTL: last in DOM = visual left) */}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); logSinglePlanMeal(meal, idx) }}
+                                  style={{
+                                    width:36, height:36, borderRadius:18, flexShrink:0,
+                                    backgroundColor: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '#E8F5E9' : 'var(--accent-faint)',
+                                    border: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '1.5px solid #A5D6A7' : '1.5px solid var(--accent-soft)',
+                                    cursor: loggedPlanMeals.has(idx+'-'+meal.meal_time) ? 'default' : 'pointer',
+                                    display:'flex', alignItems:'center', justifyContent:'center',
+                                    fontSize:18, transition:'all 0.2s'
+                                  }}
+                                >
+                                  {loggedPlanMeals.has(idx+'-'+meal.meal_time) ? '✅' : '+'}
+                                </button>
                               </div>
                             )
                           })}
