@@ -800,6 +800,23 @@ export default function Meals() {
   // ── Load favorites once user is available ───────────────────────────────
   useEffect(() => { if (user?.id) loadFavorites() }, [user?.id])
 
+  // ── Re-enrich week plan with recipe images once both are loaded ───────────
+  // loadWeekPlan() runs before recipes are fetched (recipes=[] at that point),
+  // so findRecipeImage always returns null. This effect fires once when both
+  // weekPlan (7 days) and recipes are available and patches image_url in place.
+  useEffect(() => {
+    if (!weekPlan.length || !recipes.length) return
+    const enriched = weekPlan.map(day => ({
+      ...day,
+      plan: day.plan.map(meal => {
+        const img = findRecipeImage(meal.food?.name_ar, recipes)
+        return { ...meal, food: { ...meal.food, image_url: img || meal.food?.image_url } }
+      })
+    }))
+    setWeekPlan(enriched)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipes.length, weekPlan.length === 7 ? 7 : 0])
+
   // ── Tab 2: all functions from original e4f2f06 ───────────────────────────
 
   const loadImg = file => {
@@ -2349,7 +2366,7 @@ export default function Meals() {
                                 {/* food visual avatar (RTL: first in DOM = visual right) */}
                                 <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
                                   {meal.food?.image_url ? (
-                                    <img src={meal.food.image_url} style={{width:'100%',height:'100%',objectFit:'cover'}}
+                                    <img src={meal.food.image_url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}
                                       onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
                                   ) : null}
                                   <div style={{width:'100%',height:'100%',display:meal.food?.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
