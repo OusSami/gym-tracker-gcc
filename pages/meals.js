@@ -1312,11 +1312,14 @@ export default function Meals() {
                 />
 
                 {/* ── BARCODE SECTION ── */}
+                {false && (
                 <div style={{display:'flex',alignItems:'center',gap:10,marginBlockEnd:10}}>
                   <div style={{flex:1,height:1,backgroundColor:'#ECCDBA'}}/>
                   <span style={{color:'#8A6A4F',fontSize:12,fontWeight:600,whiteSpace:'nowrap'}}>أو استخدمي الباركود</span>
                   <div style={{flex:1,height:1,backgroundColor:'#ECCDBA'}}/>
                 </div>
+                )}
+                {false && (
                 <div style={{display:'flex',gap:8,marginBlockEnd:16}}>
                   <button onClick={() => scanBarcodeImage(true)} disabled={barcodeLoading}
                     style={{paddingInline:14,paddingBlock:11,borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer',border:'1px solid #ECCDBA',backgroundColor:'#F7E9DF',color:'#8A6A4F',flexShrink:0,display:'flex',alignItems:'center',gap:6}}>
@@ -1334,6 +1337,7 @@ export default function Meals() {
                     {barcodeLoading ? '...' : 'بحث'}
                   </button>
                 </div>
+                )}
 
                 {/* ── QUICK OPTIONS ── */}
                 <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBlockEnd:16}}>
