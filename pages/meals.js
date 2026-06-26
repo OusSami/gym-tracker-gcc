@@ -1194,6 +1194,21 @@ export default function Meals() {
     setT3Saving(false)
   }
 
+  // ── Gender-aware labels (defaults to female — app is women-first) ─────────
+  const isFemale = !profile?.sex || profile?.sex === 'female' ||
+    !profile?.gender || profile?.gender === 'female' || profile?.gender === 'أنثى'
+  const MEAL_LOG_LABELS = isFemale ? {
+    'الفطور':      '+ أضيفي للفطور',
+    'الغداء':      '+ أضيفي للغداء',
+    'وجبة خفيفة': '+ أضيفي للسناك',
+    'العشاء':      '+ أضيفي للعشاء',
+  } : {
+    'الفطور':      '+ أضف للفطور',
+    'الغداء':      '+ أضف للغداء',
+    'وجبة خفيفة': '+ أضف للسناك',
+    'العشاء':      '+ أضف للعشاء',
+  }
+
   // ── Derived (Tab 2) ──────────────────────────────────────────────────────
   const totals = meals.reduce((acc, m) => {
     NUTRIENTS.forEach(n => { acc[n.key] = (acc[n.key] || 0) + (m[n.key] || 0) })
@@ -2313,7 +2328,7 @@ export default function Meals() {
                       textAlign:'right', paddingInline:16,
                       marginBlockEnd:12
                     }}>
-                      💡 اضغطي على الزر لإضافة الوجبة لسجلك اليومي
+                      {isFemale ? '💡 اضغطي على الزر لإضافة الوجبة لسجلك اليومي' : '💡 اضغط على الزر لإضافة الوجبة لسجلك اليومي'}
                     </p>
                   )}
 
@@ -2412,7 +2427,7 @@ export default function Meals() {
                                       display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
                                     }}
                                   >
-                                    {`+ ${{ 'الفطور':'أضيفي للفطور', 'الغداء':'أضيفي للغداء', 'وجبة خفيفة':'أضيفي للسناك', 'العشاء':'أضيفي للعشاء' }[meal.meal_time] || 'أضيفي'}`}
+                                    {MEAL_LOG_LABELS[meal.meal_time] || (isFemale ? '+ أضيفي' : '+ أضف')}
                                   </button>
                                 )}
                               </div>
