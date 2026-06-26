@@ -2296,7 +2296,7 @@ export default function Meals() {
                       textAlign:'right', paddingInline:16,
                       marginBlockEnd:12
                     }}>
-                      💡 اضغطي "سجّلي" لإضافة الوجبة لسجلك اليومي
+                      💡 اضغطي على الزر لإضافة الوجبة لسجلك اليومي
                     </p>
                   )}
 
@@ -2382,7 +2382,7 @@ export default function Meals() {
                                     fontSize:12, fontWeight:700, color:'#2E7D32',
                                     display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
                                   }}>
-                                    <span>✓</span><span>تم</span>
+                                    <span>✓</span><span>تمت الإضافة</span>
                                   </div>
                                 ) : (
                                   <button
@@ -2395,7 +2395,7 @@ export default function Meals() {
                                       display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
                                     }}
                                   >
-                                    <span>+</span><span>سجّلي</span>
+                                    {`+ ${{ 'الفطور':'أضيفي للفطور', 'الغداء':'أضيفي للغداء', 'وجبة خفيفة':'أضيفي للسناك', 'العشاء':'أضيفي للعشاء' }[meal.meal_time] || 'أضيفي'}`}
                                   </button>
                                 )}
                               </div>
