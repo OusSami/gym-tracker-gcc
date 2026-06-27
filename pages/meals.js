@@ -819,6 +819,13 @@ export default function Meals() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipes.length, weekPlan.length === 7 ? 7 : 0])
 
+  // ── Scroll to top instantly when a recipe is opened ─────────────────────
+  useEffect(() => {
+    if (selectedRecipe) {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+  }, [selectedRecipe])
+
   // ── Tab 2: all functions from original e4f2f06 ───────────────────────────
 
   const loadImg = file => {
@@ -1380,6 +1387,7 @@ export default function Meals() {
       setPreviousTab(activeTab)
       setSelectedRecipe(match)
       setActiveTab('recipes')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
