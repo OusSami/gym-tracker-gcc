@@ -1304,39 +1304,52 @@ export default function Meals() {
     const days = getWeekDays(fromDate || today)
     setWeekStart(days[0])
     try {
-      const res = await fetch('/api/packages/meal-plan?userId=' + user.id)
-      const data = await res.json()
-      if (data?.plan) {
-        const built = days.map((date, i) => {
-          const rotated = [
-            ...data.plan.slice(i % data.plan.length),
-            ...data.plan.slice(0, i % data.plan.length)
-          ]
-          rotated.sort((a, b) => {
-            const order = ['الفطور','الغداء','وجبة خفيفة','العشاء']
-            return order.indexOf(a.meal_time) - order.indexOf(b.meal_time)
-          })
-          return {
-            date,
-            dateStr: date.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }),
-            isToday: date.toDateString() === today.toDateString(),
-            totalCal: data.total_calories,
-            plan: rotated,
-            tip: data.tip
-          }
+      // Fetch a different meal plan for each day (staggered 150ms to avoid rate limits)
+      const planPromises = days.map((date, i) =>
+        new Promise(resolve =>
+          setTimeout(() =>
+            fetch('/api/packages/meal-plan?userId=' + user.id + '&day=' + i)
+              .then(r => r.json())
+              .then(resolve)
+              .catch(() => resolve(null))
+          , i * 150)
+        )
+      )
+      const plans = await Promise.all(planPromises)
+
+      const ORDER = ['الفطور','الغداء','وجبة خفيفة','العشاء']
+      const built = days.map((date, i) => {
+        const data = plans[i]
+        if (!data?.plan) return {
+          date,
+          dateStr: date.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }),
+          isToday: date.toDateString() === today.toDateString(),
+          totalCal: 0, plan: [], tip: ''
+        }
+        const sorted = [...data.plan].sort((a, b) =>
+          ORDER.indexOf(a.meal_time) - ORDER.indexOf(b.meal_time)
+        )
+        return {
+          date,
+          dateStr: date.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }),
+          isToday: date.toDateString() === today.toDateString(),
+          totalCal: data.total_calories,
+          plan: sorted,
+          tip: data.tip
+        }
+      })
+
+      const recipeSnapshot = recipes.length ? recipes : []
+      const enriched = built.map(day => ({
+        ...day,
+        plan: day.plan.map(meal => {
+          const img = findRecipeImage(meal.food?.name_ar, recipeSnapshot)
+          return { ...meal, food: { ...meal.food, image_url: img } }
         })
-        const recipeSnapshot = recipes.length ? recipes : []
-        const enriched = built.map(day => ({
-          ...day,
-          plan: day.plan.map(meal => {
-            const img = findRecipeImage(meal.food?.name_ar, recipeSnapshot)
-            return { ...meal, food: { ...meal.food, image_url: img } }
-          })
-        }))
-        setWeekPlan(enriched)
-        const todayIdx = built.findIndex(d => d.isToday)
-        if (todayIdx >= 0) setExpandedDay(todayIdx)
-      }
+      }))
+      setWeekPlan(enriched)
+      const todayIdx = built.findIndex(d => d.isToday)
+      if (todayIdx >= 0) setExpandedDay(todayIdx)
     } catch(e) { console.error(e) }
     setWeekLoading(false)
   }

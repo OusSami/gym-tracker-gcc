@@ -44,8 +44,9 @@ const MEAL_STRUCTURE = {
 const PROTEIN_DIST = { 'الفطور': 0.20, 'الغداء': 0.40, 'وجبة خفيفة': 0.05, 'العشاء': 0.35 }
 
 export default async function handler(req, res) {
-  const { userId } = req.query
+  const { userId, day } = req.query
   if (!userId) return res.status(400).json({ error: 'Missing userId' })
+  const dayOffset = parseInt(day || '0', 10)
 
   const sb = supabaseAdmin()
 
@@ -89,8 +90,8 @@ export default async function handler(req, res) {
         .limit(15)
 
       if (foods?.length) {
-        // Pick by daily seed for variety
-        const idx = (seed + plan.length * 7 + Object.keys(MEAL_STRUCTURE).indexOf(mealTime)) % foods.length
+        // Pick by daily seed + day offset for per-day variety
+        const idx = (seed + plan.length * 7 + Object.keys(MEAL_STRUCTURE).indexOf(mealTime) + dayOffset * 13) % foods.length
 
         // Apply health filters — order matters (most restrictive first, fallback to full list)
         let candidates = foods
@@ -136,7 +137,7 @@ export default async function handler(req, res) {
       })
     } else {
       // Cultural fallback — always appropriate per meal time
-      const idx = seed % config.fallbackNames.length
+      const idx = (seed + dayOffset) % config.fallbackNames.length
       const fbCals = config.fallbackCals[idx]
       const mult = targetCals / fbCals
 
