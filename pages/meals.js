@@ -802,22 +802,7 @@ export default function Meals() {
   // ── Load favorites once user is available ───────────────────────────────
   useEffect(() => { if (user?.id) loadFavorites() }, [user?.id])
 
-  // ── Re-enrich week plan with recipe images once both are loaded ───────────
-  // loadWeekPlan() runs before recipes are fetched (recipes=[] at that point),
-  // so findRecipeImage always returns null. This effect fires once when both
-  // weekPlan (7 days) and recipes are available and patches image_url in place.
-  useEffect(() => {
-    if (!weekPlan.length || !recipes.length) return
-    const enriched = weekPlan.map(day => ({
-      ...day,
-      plan: day.plan.map(meal => {
-        const img = findRecipeImage(meal.food?.name_ar, recipes)
-        return { ...meal, food: { ...meal.food, image_url: img || meal.food?.image_url } }
-      })
-    }))
-    setWeekPlan(enriched)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipes.length, weekPlan.length === 7 ? 7 : 0])
+  // No longer needed — image_url now comes directly from the recipes API response
 
   // ── Scroll to top instantly when a recipe is opened ─────────────────────
   useEffect(() => {
@@ -1339,15 +1324,8 @@ export default function Meals() {
         }
       })
 
-      const recipeSnapshot = recipes.length ? recipes : []
-      const enriched = built.map(day => ({
-        ...day,
-        plan: day.plan.map(meal => {
-          const img = findRecipeImage(meal.food?.name_ar, recipeSnapshot)
-          return { ...meal, food: { ...meal.food, image_url: img } }
-        })
-      }))
-      setWeekPlan(enriched)
+      // image_url comes directly from the API — no client-side enrichment needed
+      setWeekPlan(built)
       const todayIdx = built.findIndex(d => d.isToday)
       if (todayIdx >= 0) setExpandedDay(todayIdx)
     } catch(e) { console.error(e) }
