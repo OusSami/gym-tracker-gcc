@@ -693,6 +693,8 @@ export default function Meals() {
   const [loggingProgramMeals, setLoggingProgramMeals] = useState(false)
   const [programMealsLogged, setProgramMealsLogged]   = useState(false)
   const [loggedPlanMeals, setLoggedPlanMeals]         = useState(new Set())
+  const [planMealRecipe, setPlanMealRecipe]           = useState(null)
+  const [previousTab, setPreviousTab]                 = useState(null)
 
   // ── Tab 3: AI analyzer (isolated state) ─────────────────────────────────
   const [t3MealType, setT3MealType]       = useState('breakfast')
@@ -1362,6 +1364,25 @@ export default function Meals() {
     } catch(e) { console.error(e) }
   }
 
+  function findAndOpenRecipe(foodName) {
+    if (!foodName || !recipes.length) return
+    let match = recipes.find(r => r.name === foodName)
+    if (!match) {
+      match = recipes.find(r =>
+        r.name?.includes(foodName) || foodName.includes(r.name)
+      )
+    }
+    if (!match) {
+      const words = foodName.split(/\s+/).filter(w => w.length > 2)
+      match = recipes.find(r => words.some(w => r.name?.includes(w)))
+    }
+    if (match) {
+      setPreviousTab(activeTab)
+      setSelectedRecipe(match)
+      setActiveTab('recipes')
+    }
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <>
@@ -1820,7 +1841,7 @@ export default function Meals() {
           <>
             {/* Recipe detail — renders in place so tab bar stays visible */}
             {selectedRecipe && (
-              <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} favorites={favorites} toggleFavorite={toggleFavorite} onLogMeal={logRecipeAsMeal} />
+              <RecipeDetail recipe={selectedRecipe} onBack={() => { setSelectedRecipe(null); if (previousTab) { setActiveTab(previousTab); setPreviousTab(null) } }} favorites={favorites} toggleFavorite={toggleFavorite} onLogMeal={logRecipeAsMeal} />
             )}
 
             {/* Sub-screen A2: Full browser */}
@@ -2377,34 +2398,42 @@ export default function Meals() {
                           {day.plan.map((meal, mi) => {
                             const fv = getFoodVisual(meal.food?.name_ar)
                             return (
-                              <div key={mi} style={{display:'flex',alignItems:'center',gap:12,paddingInline:16,paddingBlock:14,borderBottom:mi<day.plan.length-1?'1px solid var(--accent-faint)':'none'}}>
-                                {/* food visual avatar (RTL: first in DOM = visual right) */}
-                                <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
-                                  {meal.food?.image_url ? (
-                                    <img src={meal.food.image_url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}
-                                      onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
-                                  ) : null}
-                                  <div style={{width:'100%',height:'100%',display:meal.food?.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
-                                </div>
-                                {/* food info */}
-                                <div style={{flex:1,minWidth:0,textAlign:'right'}}>
-                                  <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
-                                  <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{meal.food?.name_ar}</div>
-                                  <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>{meal.food?.portion_desc}</div>
-                                  <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
-                                    {[
-                                      ['B',meal.protein_g,'#EFF6FF','#1D4ED8'],
-                                      ['C',meal.carbs_g,'#FFFBEB','#92400E'],
-                                      ['F',meal.fat_g,'#F5F3FF','#5B21B6'],
-                                    ].map(([l,v,bg,tc])=>(
-                                      <span key={l} style={{backgroundColor:bg,color:tc,borderRadius:6,padding:'2px 6px',fontSize:11,fontWeight:600,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
-                                    ))}
+                              <div key={mi} style={{display:'flex',alignItems:'center',gap:8,paddingInline:16,paddingBlock:14,borderBottom:mi<day.plan.length-1?'1px solid var(--accent-faint)':'none'}}>
+                                {/* tappable area: avatar + food info + calories */}
+                                <div
+                                  onClick={() => findAndOpenRecipe(meal.food?.name_ar)}
+                                  style={{flex:1,display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}
+                                >
+                                  {/* food visual avatar (RTL: first in DOM = visual right) */}
+                                  <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
+                                    {meal.food?.image_url ? (
+                                      <img src={meal.food.image_url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}
+                                        onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
+                                    ) : null}
+                                    <div style={{width:'100%',height:'100%',display:meal.food?.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
                                   </div>
-                                </div>
-                                {/* calories */}
-                                <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:60}}>
-                                  <span style={{fontSize:16,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
-                                  <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
+                                  {/* food info */}
+                                  <div style={{flex:1,minWidth:0,textAlign:'right'}}>
+                                    <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
+                                    <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
+                                      textDecoration:'underline',textDecorationStyle:'dotted',textDecorationColor:'var(--accent-soft)'}}>{meal.food?.name_ar}</div>
+                                    <span style={{fontSize:10,color:'var(--text-secondary)',marginInlineEnd:4}}>←</span>
+                                    <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>{meal.food?.portion_desc}</div>
+                                    <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
+                                      {[
+                                        ['B',meal.protein_g,'#EFF6FF','#1D4ED8'],
+                                        ['C',meal.carbs_g,'#FFFBEB','#92400E'],
+                                        ['F',meal.fat_g,'#F5F3FF','#5B21B6'],
+                                      ].map(([l,v,bg,tc])=>(
+                                        <span key={l} style={{backgroundColor:bg,color:tc,borderRadius:6,padding:'2px 6px',fontSize:11,fontWeight:600,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  {/* calories */}
+                                  <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:52}}>
+                                    <span style={{fontSize:16,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{meal.actual_calories}</span>
+                                    <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
+                                  </div>
                                 </div>
                                 {/* log button (RTL: last in DOM = visual left) */}
                                 {loggedPlanMeals.has(idx+'-'+meal.meal_time) ? (
