@@ -1,7 +1,7 @@
 # GYM Tracker GCC — Claude Handoff Document
-**Last updated:** 2026-07-02  
+**Last updated:** 2026-07-02 (updated)
 **App version:** 5.6.21  
-**Branch:** `main` — HEAD `7ed29da`
+**Branch:** `main` — HEAD `3c5e13e`
 
 ---
 
@@ -296,48 +296,60 @@ See `CLAUDE.md` §Data Models for full schemas: `profiles`, `sessions`, `exercis
 
 ## 6. Pending Tasks (Priority Order)
 
-### HIGH — Functional bugs
+### HIGH — Next session priority
 
-1. **41 breakfast recipes with raw CDN image URLs**
+1. **Home screen final polish** ← START HERE NEXT SESSION
+   - `pages/index.js` is the core workout logger hub. Review for v3 blush+beige token compliance.
+   - Check hero section uses `public/home-hero.png` (committed `3457f2e`) correctly.
+   - Verify no-program nudge and splash screen still use warm tokens (redesigned `9ac287a`).
+   - Audit any remaining `--bg: #09090B` or `--primary: #CBA23B` references in inline styles on this page and replace with v3 tokens.
+   - Test the HOME → WARMUP → EXERCISES → STRETCH → DONE state machine on mobile viewport.
+
+2. **86 recipes in `أخرى` category need manual review**
+   - Sample items: المعدس الكويتي, كيشة القمح السعودية, مطبق زبيدي, العريكة السعودية, القشد الملكي, المثلوثة السعودية, العريكة, حلى الشوروز
+   - Many are genuine Gulf dishes — they should move to `أطباق خليجية` (see item 3 below)
+   - Others are ambiguous fusion or dessert-adjacent — need case-by-case decision
+   - Suggested approach: fetch the 86, print with ingredients, classify manually or extend `reassign_all_categories.mjs` with Gulf keywords
+
+3. **Restore `أطباق خليجية` category**
+   - `reassign_all_categories.mjs` cleared it to 0 by absorbing recipes into parent cats
+   - The meal-plan API still lists `أطباق خليجية` as a lunch/dinner rotation option — it silently falls through to Tier 3/4 every time it's selected (wasted queries)
+   - Fix: either remove `أطباق خليجية` from `MEAL_STRUCTURE` categories arrays in `pages/api/packages/meal-plan.js`, OR add Gulf keywords to `reassign_all_categories.mjs` to populate it again
+   - Gulf-specific keywords to add: `غيمش`, `عريكة`, `قشد`, `كيشة`, `معدس`, `مطبق`, `رشوف`, `مضبي`, `حنيذ`, `هنيني`, `عصيد`, `مراصيع`, `مطازيز`, `هريس` (dish, not soup context)
+
+4. **41 breakfast recipes with raw CDN image URLs**
    - These recipes have `image_url` pointing to `media.sayidaty.net` CDN (not Supabase Storage)
    - They're the 41 that timed out during the scrape (connection closed)
    - Fix: query `WHERE image_url LIKE '%sayidaty%' OR image_url LIKE '%media%'`, download → convert WebP → upload → update
    - Or: just re-run `scrape_breakfast.mjs` (it's resume-safe) to retry the 41 failures
 
-2. **86 recipes in `أخرى` category**
-   - These are recipes with no Arabic keyword anchor — fusion dishes, generic names, unusual Gulf dishes
-   - Sample: المعدس الكويتي, كيشة القمح السعودية, مطبق زبيدي, العريكة السعودية, القشد الملكي
-   - Many of these are genuine Gulf dishes that need a revived `أطباق خليجية` category
-   - Fix: Add Gulf-specific keywords to `reassign_all_categories.mjs` (or manual pass)
-   - Consider: restaurant the `أطباق خليجية` category for dishes like هريس, مطازيز, عريكة, عصيد, قشد, كيشة
-
-3. **`وجبة خفيفة` sometimes picks soups or heavy dishes via الحلويات category**
+5. **`وجبة خفيفة` sometimes picks soups or heavy dishes via الحلويات category**
    - Some recipes in حلويات are ≥800 cal — too heavy for a snack slot
    - Calorie targeting should handle this (snack target ≈ 15% of goal) but worth monitoring
 
 ### MEDIUM — Data quality
 
-4. **`مقبلات` category includes recipes that are meal-level dishes** (e.g. hummus with meat)
+6. **`مقبلات` category includes recipes that are meal-level dishes** (e.g. hummus with meat)
    - Fine for now, but a future pass could split into `مقبلات` vs `أطباق جانبية`
 
-5. **`مشروبات` only has 6 recipes** — very sparse for that category
+7. **`مشروبات` only has 6 recipes** — very sparse for that category
    - The smoothies and drinks got narrowed to avoid false positives
    - Consider: add more drink recipes from a dedicated scrape
 
-6. **Nutrition accuracy for complex dishes**
+8. **Nutrition accuracy for complex dishes**
    - `estimate_nutrition.mjs` uses ingredient-parsing heuristics, not a real nutrition DB
    - Some dishes (e.g. كبسة الروبيان) show 892–1200 cal — plausible but unverified
    - For a production release, consider integrating a real USDA/Open Food Facts API
 
 ### LOW — Enhancement
 
-7. **`خطة اليوم` (7-day meal plan in meals.js)** calls `/api/packages/meal-plan` — now fixed with calorie targeting. Verify the UI shows the `daily_goal` and `target_breakdown` fields correctly.
+9. **`خطة اليوم` (7-day meal plan in meals.js)** calls `/api/packages/meal-plan` — now fixed with calorie targeting. Verify the UI shows the `daily_goal` and `target_breakdown` fields correctly.
 
-8. **Recipe favorites** (`feat: add recipe favorites with heart button`) — favorites table exists (`scripts/create_favorites_table.sql`). Confirm the table was applied in Supabase.
+10. **Recipe favorites** (`feat: add recipe favorites with heart button`) — favorites table exists (`scripts/create_favorites_table.sql`). Confirm the table was applied in Supabase.
 
-9. **Barcode lookup UI** is hidden (`{false && <BarcodeUI />}` in add-meal modal). Re-enable when barcode scanning is tested.
+11. **Barcode lookup UI** is hidden (`{false && <BarcodeUI />}` in add-meal modal). Re-enable when barcode scanning is tested.
 
-10. **`meals_backup` page** shows in build output — dead code that can be deleted.
+12. **`meals_backup` page** shows in build output — dead code that can be deleted.
 
 ---
 
@@ -456,6 +468,7 @@ The last clean build (2026-07-02) compiled 23 static pages + all API routes with
 
 | Hash | Description |
 |---|---|
+| `3c5e13e` | docs: add HANDOFF.md — comprehensive session handoff for fresh Claude instance |
 | `7ed29da` | fix: meal-plan — guarantee required meals never skipped (5-tier fallback) |
 | `460dacd` | feat: reassign_all_categories.mjs — smarter category classification for all 690 recipes |
 | `032978c` | fix: meal-plan calorie targeting — pick recipes within per-slot calorie band |
