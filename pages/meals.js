@@ -2401,7 +2401,7 @@ export default function Meals() {
                                 {/* tappable area: avatar + food info + calories */}
                                 <div
                                   onClick={() => findAndOpenRecipe(meal.food?.name_ar)}
-                                  style={{flex:1,display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}
+                                  style={{flex:1,minWidth:0,display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}
                                 >
                                   {/* food visual avatar (RTL: first in DOM = visual right) */}
                                   <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
