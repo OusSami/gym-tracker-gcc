@@ -123,40 +123,68 @@ function ingToGrams(text) {
 //  SECTION 2 — INGREDIENT TYPE CLASSIFIER
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Maps keyword patterns → macro ingredient category
+// Maps keyword patterns → macro ingredient category.
+// ORDER MATTERS: first match wins. Key ordering decisions:
+//
+// 1. Produce aromatics (onion, tomato, veggie, carrot, potato) are checked
+//    BEFORE proteins so "بصل مفروم" / "ثوم مفروم" resolve to the correct
+//    produce type rather than the 'meat' keyword 'مفروم'. Standalone
+//    "المفروم" / "كيلو من المفروم" (ground-meat shorthand) has no produce
+//    keyword and correctly falls through to 'meat'.
+//
+// 2. Nuts (nut, coconut) are BEFORE legumes/chickpea: 'حمص' is a substring
+//    of 'محمص' (roasted), so "لوز محمص" (roasted almonds) must match 'nut'
+//    via 'لوز' before reaching 'chickpea'.
+//
+// 3. Legumes are BEFORE yogurt: 'لبن' (yogurt keyword) is a substring of
+//    'البني' (brown, as in "الفول البني"), so "الفول البني" must match
+//    'legume' via 'فول' before reaching 'yogurt'.
+//
+// 4. Butter is BEFORE legumes: "زبدة الفول السوداني" must match 'butter'
+//    via 'زبدة' before 'legume' matches 'فول' (peanut butter ≠ legume).
 const ING_TYPES = [
+  // Starches
   ['rice',    ['أرز', 'رز']],
   ['grain',   ['قمح', 'هريس', 'جريش', 'بلغر', 'برغل']],
   ['noodle',  ['شعيرية']],
   ['pasta',   ['معكرونة', 'مكرونة', 'سباغيتي', 'باستا', 'لازانيا', 'فرموتشيني']],
   ['flour',   ['دقيق', 'طحين']],
   ['oat',     ['شوفان']],
+  // Produce — before proteins so "بصل مفروم" / "ثوم مفروم" match here first
+  ['potato',  ['بطاطس', 'بطاطا']],
+  ['pumpkin', ['قرع', 'يقطين']],
+  ['tomato',  ['طماطم', 'طماطة', 'تماطم', 'صلصة طماطم', 'معجون الطماطم', 'معجون طماطم']],
+  ['lentil',  ['عدس']],
+  ['onion',   ['بصل', 'بصلة', 'كراث', 'ثوم', 'ثومة']],
+  ['carrot',  ['جزر', 'جزرة']],
+  ['veggie',  ['خضار', 'فلفل', 'خيار', 'كوسا', 'باذنجان', 'ملفوف', 'كرنب', 'بروكلي']],
+  // Proteins — 'مفروم' only activates for standalone ground-meat shorthand
   ['chicken', ['دجاج', 'دجاجة', 'فراخ', 'فرخة', 'صدر دجاج', 'فيليه دجاج']],
   ['meat',    ['لحم', 'لحمة', 'لحوم', 'عجل', 'ضأن', 'خروف', 'ضلع', 'كبدة', 'هبرة', 'كفتة', 'كفته', 'مفروم']],
   ['shrimp',  ['ربيان', 'روبيان', 'جمبري', 'قريدس', 'كروفيتاس']],
-  ['fish',    ['سمك', 'هامور', 'ميرو', 'بلطي', 'تونة', 'سردين', 'فيليه سمك', 'حبار']],
+  ['fish',    ['سمك', 'هامور', 'ميرو', 'بلطي', 'تونة', 'سردين', 'فيليه سمك', 'حبار', 'سلمون']],
+  // Fats — butter before legumes to handle "زبدة الفول السوداني" (peanut butter)
   ['oil',     ['زيت']],
   ['butter',  ['زبدة', 'سمنة', 'سمن']],
   ['sugar',   ['سكر']],
   ['honey',   ['عسل']],
   ['chocolate',['شوكولا', 'شوكولاته', 'كاكاو']],
   ['egg',     ['بيض', 'بيضة', 'بيضات']],
+  // Legumes before dairy — 'لبن' (yogurt keyword) is a substring of 'البني'
+  // (brown), so "الفول البني" must match 'legume' via 'فول' before yogurt
+  ['legume',  ['فاصوليا', 'لوبيا', 'فول']],
+  // Dairy before nuts — "حليب لوز" (almond milk) must match 'milk' via
+  // 'حليب' before 'nut' matches via 'لوز'
   ['milk',    ['حليب', 'لبن حليب']],
   ['cream',   ['كريمة', 'قشطة', 'كريم']],
   ['yogurt',  ['زبادي', 'لبن', 'لبنة']],
   ['cheese',  ['جبنة', 'جبن', 'موزاريلا', 'شيدر', 'كريم تشيز']],
+  // Nuts before chickpea — 'حمص' is a substring of 'محمص' (roasted), so
+  // "لوز محمص" (roasted almonds) must match 'nut' via 'لوز' before 'chickpea'
   ['coconut', ['جوز هند', 'كوكونات']],
   ['nut',     ['لوز', 'جوز', 'فستق', 'كاجو', 'مكسرات', 'بندق']],
   ['date',    ['تمر', 'رطب']],
-  ['potato',  ['بطاطس', 'بطاطا']],
-  ['pumpkin', ['قرع', 'يقطين']],
-  ['tomato',  ['طماطم', 'طماطة', 'تماطم', 'صلصة طماطم', 'معجون الطماطم', 'معجون طماطم']],
-  ['lentil',  ['عدس']],
-  ['chickpea',['حمص']],   // as ingredient, not dish name
-  ['legume',  ['فاصوليا', 'لوبيا', 'فول']],
-  ['onion',   ['بصل', 'بصلة']],
-  ['carrot',  ['جزر', 'جزرة']],
-  ['veggie',  ['خضار', 'فلفل', 'خيار', 'كوسا', 'باذنجان', 'ملفوف', 'كرنب', 'بروكلي']],
+  ['chickpea',['حمص']],
   ['water',   ['ماء', 'مياه', 'ماءً']],
 ]
 
