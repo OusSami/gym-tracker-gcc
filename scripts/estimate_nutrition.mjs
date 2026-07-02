@@ -184,7 +184,14 @@ const ING_DEFAULT_G = {
   legume: 200, onion: 200, carrot: 150, veggie: 200, water: 800,
 }
 
-function buildProfile(ingredients) {
+// Per-person baselines for protein ingredients (ING_DEFAULT_G[type] ÷ 4).
+// Applied when a protein ingredient has no parseable gram quantity, scaled
+// by min(srv, 8) so large batch recipes don't compound the default.
+// At srv=4 the result equals the old flat default exactly.
+const PROTEIN_PER_PERSON_G = { chicken: 300, meat: 200, shrimp: 125, fish: 150 }
+const PROTEIN_SCALE_TYPES  = new Set(Object.keys(PROTEIN_PER_PERSON_G))
+
+function buildProfile(ingredients, srv) {
   const p = {
     riceG: 0, grainG: 0, noodleG: 0, pastaG: 0, flourG: 0, oatG: 0,
     chickenG: 0, meatG: 0, shrimpG: 0, fishG: 0,
@@ -207,7 +214,10 @@ function buildProfile(ingredients) {
       continue
     }
 
-    const g = grams > 0 ? grams : (ING_DEFAULT_G[type] ?? 0)
+    const g = grams > 0 ? grams
+      : PROTEIN_SCALE_TYPES.has(type)
+        ? PROTEIN_PER_PERSON_G[type] * Math.min(srv, 8)
+        : (ING_DEFAULT_G[type] ?? 0)
     if (g <= 0) continue
 
     switch (type) {
@@ -476,7 +486,7 @@ function estimateNutrition(recipe) {
   const name     = recipe.name     ?? ''
   const category = recipe.category ?? 'أخرى'
   const srv      = parseServings(recipe.servings)
-  const profile  = buildProfile(recipe.ingredients)
+  const profile  = buildProfile(recipe.ingredients, srv)
   const result   = calcFromProfile(profile, srv)
 
   let perSrv = result.perSrv
