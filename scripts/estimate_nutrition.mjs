@@ -126,66 +126,87 @@ function ingToGrams(text) {
 // Maps keyword patterns → macro ingredient category.
 // ORDER MATTERS: first match wins. Key ordering decisions:
 //
-// 1. Produce aromatics (onion, tomato, veggie, carrot, potato) are checked
-//    BEFORE proteins so "بصل مفروم" / "ثوم مفروم" resolve to the correct
-//    produce type rather than the 'meat' keyword 'مفروم'. Standalone
-//    "المفروم" / "كيلو من المفروم" (ground-meat shorthand) has no produce
-//    keyword and correctly falls through to 'meat'.
+// 1. Produce (onion, tomato, veggie, carrot, potato, fruit, avocado) checked
+//    BEFORE proteins so "بصل مفروم" / "ثوم مفروم" / "كزبرة مفرومة" resolve
+//    to the correct produce/herb type rather than the 'meat' keyword 'مفروم'.
+//    Standalone "المفروم" / "كيلو من المفروم" (ground-meat shorthand) has no
+//    produce keyword and correctly falls through to 'meat'.
 //
-// 2. Nuts (nut, coconut) are BEFORE legumes/chickpea: 'حمص' is a substring
-//    of 'محمص' (roasted), so "لوز محمص" (roasted almonds) must match 'nut'
-//    via 'لوز' before reaching 'chickpea'.
+// 2. 'ورق العنب' (grape leaves) is a veggie keyword checked BEFORE the fruit
+//    type's 'عنب' (grapes) keyword, since 'عنب' is a substring of 'ورق العنب'.
 //
-// 3. Legumes are BEFORE yogurt: 'لبن' (yogurt keyword) is a substring of
-//    'البني' (brown, as in "الفول البني"), so "الفول البني" must match
-//    'legume' via 'فول' before reaching 'yogurt'.
+// 3. 'ليمون' (lemon) intentionally excluded from veggie: the 200g default
+//    over-inflates trivial garnish quantities (lemon as flavoring ≈ 30g, not 200g).
 //
-// 4. Butter is BEFORE legumes: "زبدة الفول السوداني" must match 'butter'
+// 4. 'corn' type placed AFTER 'oil' so "زيت الذرة" (corn oil, 884 kcal/100g)
+//    hits 'oil' via 'زيت' before 'corn' via 'ذرة'. Same reason 'olive' is not
+//    a separate type: 'زيت' ⊂ 'زيتون' requires word-boundary matching (Stage N).
+//
+// 5. Nuts (nut, coconut) are BEFORE legumes/chickpea: 'حمص' is a substring
+//    of 'محمص' (roasted), so "لوز محمص" must match 'nut' before 'chickpea'.
+//
+// 6. Legumes are BEFORE yogurt: 'لبن' (yogurt keyword) is a substring of
+//    'البني' (brown), so "الفول البني" must match 'legume' before 'yogurt'.
+//
+// 7. Butter is BEFORE legumes: "زبدة الفول السوداني" must match 'butter'
 //    via 'زبدة' before 'legume' matches 'فول' (peanut butter ≠ legume).
 const ING_TYPES = [
   // Starches
-  ['rice',    ['أرز', 'رز']],
-  ['grain',   ['قمح', 'هريس', 'جريش', 'بلغر', 'برغل']],
-  ['noodle',  ['شعيرية']],
-  ['pasta',   ['معكرونة', 'مكرونة', 'سباغيتي', 'باستا', 'لازانيا', 'فرموتشيني']],
-  ['flour',   ['دقيق', 'طحين']],
-  ['oat',     ['شوفان']],
-  // Produce — before proteins so "بصل مفروم" / "ثوم مفروم" match here first
-  ['potato',  ['بطاطس', 'بطاطا']],
-  ['pumpkin', ['قرع', 'يقطين']],
-  ['tomato',  ['طماطم', 'طماطة', 'تماطم', 'صلصة طماطم', 'معجون الطماطم', 'معجون طماطم']],
-  ['lentil',  ['عدس']],
-  ['onion',   ['بصل', 'بصلة', 'كراث', 'ثوم', 'ثومة']],
-  ['carrot',  ['جزر', 'جزرة']],
-  ['veggie',  ['خضار', 'فلفل', 'خيار', 'كوسا', 'باذنجان', 'ملفوف', 'كرنب', 'بروكلي']],
+  ['rice',     ['أرز', 'رز']],
+  ['grain',    ['قمح', 'هريس', 'جريش', 'بلغر', 'برغل']],
+  ['noodle',   ['شعيرية']],
+  ['pasta',    ['معكرونة', 'مكرونة', 'سباغيتي', 'باستا', 'لازانيا', 'فرموتشيني']],
+  ['flour',    ['دقيق', 'طحين']],
+  ['oat',      ['شوفان']],
+  // Produce — before proteins (مفروم fix); ورق العنب before fruit's عنب
+  ['potato',   ['بطاطس', 'بطاطا']],
+  ['pumpkin',  ['قرع', 'يقطين']],
+  ['tomato',   ['طماطم', 'طماطة', 'تماطم', 'صلصة طماطم', 'معجون الطماطم', 'معجون طماطم']],
+  ['lentil',   ['عدس']],
+  ['onion',    ['بصل', 'بصلة', 'كراث', 'ثوم', 'ثومة']],
+  ['carrot',   ['جزر', 'جزرة']],
+  ['veggie',   [
+    'خضار', 'فلفل', 'خيار', 'كوسا', 'باذنجان', 'ملفوف', 'كرنب', 'بروكلي',
+    'سبانخ', 'كزبرة', 'بقدونس', 'نعناع', 'زعتر', 'ريحان',
+    'كرفس', 'هليون', 'شمندر', 'بنجر', 'فطر', 'مشروم',
+    'ورق العنب',
+  ]],
+  ['fruit',    [
+    'موز', 'تفاح', 'مانجو', 'فراولة', 'رمان', 'تين', 'توت', 'عنب',
+    'برتقال', 'أناناس', 'كيوي', 'مشمش', 'جوافة', 'كمثرى', 'خوخ',
+    'يوسفي', 'فاكهة',
+  ]],
+  ['avocado',  ['أفوكادو']],
   // Proteins — 'مفروم' only activates for standalone ground-meat shorthand
-  ['chicken', ['دجاج', 'دجاجة', 'فراخ', 'فرخة', 'صدر دجاج', 'فيليه دجاج']],
-  ['meat',    ['لحم', 'لحمة', 'لحوم', 'عجل', 'ضأن', 'خروف', 'ضلع', 'كبدة', 'هبرة', 'كفتة', 'كفته', 'مفروم']],
-  ['shrimp',  ['ربيان', 'روبيان', 'جمبري', 'قريدس', 'كروفيتاس']],
-  ['fish',    ['سمك', 'هامور', 'ميرو', 'بلطي', 'تونة', 'سردين', 'فيليه سمك', 'حبار', 'سلمون']],
-  // Fats — butter before legumes to handle "زبدة الفول السوداني" (peanut butter)
-  ['oil',     ['زيت']],
-  ['butter',  ['زبدة', 'سمنة', 'سمن']],
-  ['sugar',   ['سكر']],
-  ['honey',   ['عسل']],
+  ['chicken',  ['دجاج', 'دجاجة', 'فراخ', 'فرخة', 'صدر دجاج', 'فيليه دجاج']],
+  ['meat',     ['لحم', 'لحمة', 'لحوم', 'عجل', 'ضأن', 'خروف', 'ضلع', 'كبدة', 'هبرة', 'كفتة', 'كفته', 'مفروم']],
+  ['shrimp',   ['ربيان', 'روبيان', 'جمبري', 'قريدس', 'كروفيتاس']],
+  ['fish',     ['سمك', 'هامور', 'ميرو', 'بلطي', 'تونة', 'سردين', 'فيليه سمك', 'حبار', 'سلمون']],
+  // Fats — oil before corn so "زيت الذرة" (corn oil) → oil, not corn.
+  //        Butter before legumes to handle "زبدة الفول السوداني" (peanut butter).
+  ['oil',      ['زيت']],
+  ['butter',   ['زبدة', 'سمنة', 'سمن']],
+  ['corn',     ['ذرة']],
+  ['sugar',    ['سكر']],
+  ['honey',    ['عسل']],
   ['chocolate',['شوكولا', 'شوكولاته', 'كاكاو']],
-  ['egg',     ['بيض', 'بيضة', 'بيضات']],
+  ['egg',      ['بيض', 'بيضة', 'بيضات']],
   // Legumes before dairy — 'لبن' (yogurt keyword) is a substring of 'البني'
   // (brown), so "الفول البني" must match 'legume' via 'فول' before yogurt
-  ['legume',  ['فاصوليا', 'لوبيا', 'فول']],
+  ['legume',   ['فاصوليا', 'لوبيا', 'فول']],
   // Dairy before nuts — "حليب لوز" (almond milk) must match 'milk' via
   // 'حليب' before 'nut' matches via 'لوز'
-  ['milk',    ['حليب', 'لبن حليب']],
-  ['cream',   ['كريمة', 'قشطة', 'كريم']],
-  ['yogurt',  ['زبادي', 'لبن', 'لبنة']],
-  ['cheese',  ['جبنة', 'جبن', 'موزاريلا', 'شيدر', 'كريم تشيز']],
+  ['milk',     ['حليب', 'لبن حليب']],
+  ['cream',    ['كريمة', 'قشطة', 'كريم']],
+  ['yogurt',   ['زبادي', 'لبن', 'لبنة']],
+  ['cheese',   ['جبنة', 'جبن', 'موزاريلا', 'شيدر', 'كريم تشيز']],
   // Nuts before chickpea — 'حمص' is a substring of 'محمص' (roasted), so
   // "لوز محمص" (roasted almonds) must match 'nut' via 'لوز' before 'chickpea'
-  ['coconut', ['جوز هند', 'كوكونات']],
-  ['nut',     ['لوز', 'جوز', 'فستق', 'كاجو', 'مكسرات', 'بندق']],
-  ['date',    ['تمر', 'رطب']],
-  ['chickpea',['حمص']],
-  ['water',   ['ماء', 'مياه', 'ماءً']],
+  ['coconut',  ['جوز هند', 'كوكونات']],
+  ['nut',      ['لوز', 'جوز', 'فستق', 'كاجو', 'مكسرات', 'بندق']],
+  ['date',     ['تمر', 'رطب']],
+  ['chickpea', ['حمص']],
+  ['water',    ['ماء', 'مياه', 'ماءً']],
 ]
 
 function classifyIng(text) {
@@ -204,12 +225,14 @@ function classifyIng(text) {
 const ING_DEFAULT_G = {
   rice: 360, grain: 300, noodle: 250, pasta: 300, flour: 250, oat: 200,
   chicken: 1200, meat: 800, shrimp: 500, fish: 600,
-  oil: 45, butter: 60, sugar: 150, honey: 60, chocolate: 80,
+  oil: 45, butter: 60, corn: 150, sugar: 150, honey: 60, chocolate: 80,
   egg: 0,          // counted separately
   milk: 300, cream: 150, yogurt: 250, cheese: 120, coconut: 80,
   nut: 80, date: 100,
   potato: 300, pumpkin: 400, tomato: 300, lentil: 250, chickpea: 250,
-  legume: 200, onion: 200, carrot: 150, veggie: 200, water: 800,
+  legume: 200, onion: 200, carrot: 150, veggie: 200,
+  fruit: 150, avocado: 100,
+  water: 800,
 }
 
 // Per-person baselines for protein ingredients (ING_DEFAULT_G[type] ÷ 4).
@@ -228,7 +251,9 @@ function buildProfile(ingredients, srv) {
     milkML: 0, creamML: 0, yogurtG: 0, cheeseG: 0, coconutG: 0,
     nutG: 0, dateG: 0,
     potatoG: 0, pumpkinG: 0, tomatoG: 0, lentilG: 0, chickpeaG: 0,
-    legumesG: 0, onionG: 0, carrotG: 0, veggieG: 0, waterML: 0,
+    legumesG: 0, onionG: 0, carrotG: 0, veggieG: 0,
+    fruitG: 0, avocadoG: 0, cornG: 0,
+    waterML: 0,
   }
 
   for (const ing of (ingredients || [])) {
@@ -280,6 +305,9 @@ function buildProfile(ingredients, srv) {
       case 'onion':     p.onionG     += g; break
       case 'carrot':    p.carrotG    += g; break
       case 'veggie':    p.veggieG    += g; break
+      case 'fruit':     p.fruitG     += g; break
+      case 'avocado':   p.avocadoG   += g; break
+      case 'corn':      p.cornG      += g; break
       case 'water':     p.waterML    += g; break
     }
   }
@@ -325,6 +353,9 @@ const DENSITY = {
   onion:        [40,   1.1,  9.3,  0.1,1.7],
   carrot:       [41,   0.9,  9.6,  0.2,2.8],
   veggie:       [30,   2.0,  5.0,  0.3,2.5],
+  fruit:        [65,   0.8, 16.0,  0.3,2.0],   // avg of common fruits
+  avocado:      [160,  2.0,  9.0, 15.0,6.7],   // USDA per 100g raw
+  corn:         [86,   3.3, 19.0,  1.2,2.7],   // cooked corn kernels
 }
 
 function addDensity(key, rawG, expansionFactor = 1) {
@@ -386,6 +417,9 @@ function calcFromProfile(profile, srv) {
     addDensity('onion',        profile.onionG,    0.85),
     addDensity('carrot',       profile.carrotG,   1.0),
     addDensity('veggie',       profile.veggieG,   1.0),
+    addDensity('fruit',        profile.fruitG,    1.0),
+    addDensity('avocado',      profile.avocadoG,  1.0),
+    addDensity('corn',         profile.cornG,     1.0),
   )
 
   // For soups/stews: water inflates the weight but not calories.
