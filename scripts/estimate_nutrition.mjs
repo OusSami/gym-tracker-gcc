@@ -210,6 +210,16 @@ const ING_TYPES = [
 ]
 
 function classifyIng(text) {
+  // Olive check via negative exclusion — must run BEFORE the ING_TYPES loop.
+  // 'زيت' (oil) is a prefix of 'زيتون' (olive), so the oil keyword 'زيت' would
+  // otherwise match any olive ingredient. Exclude the two oil-context phrases
+  // ("زيت زيتون" / "زيت الزيتون") so olive oil stays classified as oil while
+  // standalone olives (زيتون أسود, الزيتون, 20 حبة زيتون, etc.) become 'olive'.
+  if (text.includes('زيتون') &&
+      !text.includes('زيت زيتون') &&
+      !text.includes('زيت الزيتون')) {
+    return 'olive'
+  }
   for (const [type, keywords] of ING_TYPES) {
     if (keywords.some(kw => text.includes(kw))) return type
   }
@@ -231,7 +241,7 @@ const ING_DEFAULT_G = {
   nut: 80, date: 100,
   potato: 300, pumpkin: 400, tomato: 300, lentil: 250, chickpea: 250,
   legume: 200, onion: 200, carrot: 150, veggie: 200,
-  fruit: 150, avocado: 100,
+  fruit: 150, avocado: 100, olive: 30,
   water: 800,
 }
 
@@ -252,7 +262,7 @@ function buildProfile(ingredients, srv) {
     nutG: 0, dateG: 0,
     potatoG: 0, pumpkinG: 0, tomatoG: 0, lentilG: 0, chickpeaG: 0,
     legumesG: 0, onionG: 0, carrotG: 0, veggieG: 0,
-    fruitG: 0, avocadoG: 0, cornG: 0,
+    fruitG: 0, avocadoG: 0, cornG: 0, oliveG: 0,
     waterML: 0,
   }
 
@@ -267,11 +277,21 @@ function buildProfile(ingredients, srv) {
       continue
     }
 
-    const g = grams > 0 ? grams
+    let g = grams > 0 ? grams
       : PROTEIN_SCALE_TYPES.has(type)
         ? PROTEIN_PER_PERSON_G[type] * Math.min(srv, 8)
         : (ING_DEFAULT_G[type] ?? 0)
     if (g <= 0) continue
+
+    // Olive-specific حبة override: the generic حبة unit is 130g (vegetable-piece
+    // size), but a single olive is ~4g. Re-parse the piece count with 4g/piece
+    // so "20 حبة زيتون" → 80g rather than the incorrect 2,600g.
+    if (type === 'olive' && /حبات|حبة/.test(ing)) {
+      const m = toWestern(ing).match(
+        /(نصف|ثلث|ربع|ثلاثة أرباع|\d+\.?\d*)\s*(?:و(?:نصف|ثلث|ربع))?\s*حب[اةت]/
+      )
+      if (m) g = parseLeadNum(m[1]) * 4
+    }
 
     switch (type) {
       case 'rice':      p.riceG      += g; break
@@ -308,6 +328,7 @@ function buildProfile(ingredients, srv) {
       case 'fruit':     p.fruitG     += g; break
       case 'avocado':   p.avocadoG   += g; break
       case 'corn':      p.cornG      += g; break
+      case 'olive':     p.oliveG     += g; break
       case 'water':     p.waterML    += g; break
     }
   }
@@ -356,6 +377,7 @@ const DENSITY = {
   fruit:        [65,   0.8, 16.0,  0.3,2.0],   // avg of common fruits
   avocado:      [160,  2.0,  9.0, 15.0,6.7],   // USDA per 100g raw
   corn:         [86,   3.3, 19.0,  1.2,2.7],   // cooked corn kernels
+  olive:        [115,  0.8,  6.0, 10.5,1.5],   // USDA ripe/canned per 100g
 }
 
 function addDensity(key, rawG, expansionFactor = 1) {
@@ -420,6 +442,7 @@ function calcFromProfile(profile, srv) {
     addDensity('fruit',        profile.fruitG,    1.0),
     addDensity('avocado',      profile.avocadoG,  1.0),
     addDensity('corn',         profile.cornG,     1.0),
+    addDensity('olive',        profile.oliveG,    1.0),
   )
 
   // For soups/stews: water inflates the weight but not calories.
