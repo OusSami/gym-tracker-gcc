@@ -179,7 +179,7 @@ const ING_TYPES = [
   ['avocado',  ['أفوكادو']],
   // Proteins — 'مفروم' only activates for standalone ground-meat shorthand
   ['chicken',  ['دجاج', 'دجاجة', 'فراخ', 'فرخة', 'صدر دجاج', 'فيليه دجاج']],
-  ['meat',     ['لحم', 'لحمة', 'لحوم', 'عجل', 'ضأن', 'خروف', 'ضلع', 'كبدة', 'هبرة', 'كفتة', 'كفته', 'مفروم']],
+  ['meat',     ['لحم', 'لحمة', 'لحوم', 'عجل', 'ضأن', 'خروف', 'غنم', 'ضلع', 'كبدة', 'هبرة', 'كفتة', 'كفته', 'مفروم']],
   ['shrimp',   ['ربيان', 'روبيان', 'جمبري', 'قريدس', 'كروفيتاس']],
   ['fish',     ['سمك', 'هامور', 'ميرو', 'بلطي', 'تونة', 'سردين', 'فيليه سمك', 'حبار', 'سلمون']],
   // Fats — oil before corn so "زيت الذرة" (corn oil) → oil, not corn.
@@ -219,6 +219,15 @@ function classifyIng(text) {
       !text.includes('زيت زيتون') &&
       !text.includes('زيت الزيتون')) {
     return 'olive'
+  }
+  // 'ستيك' (steak) check via negative exclusion — must run BEFORE the ING_TYPES loop.
+  // 'ستيك' as a standalone term = beef steak (meat). But "تونا ستيك" / "سمك ستيك"
+  // are fish products, not meat. Excluding those two contexts keeps tuna steak
+  // classified as fish while standalone "الستيك" and "بيف ستيك" become 'meat'.
+  if (text.includes('ستيك') &&
+      !text.includes('تونا') &&
+      !text.includes('سمك')) {
+    return 'meat'
   }
   for (const [type, keywords] of ING_TYPES) {
     if (keywords.some(kw => text.includes(kw))) return type
