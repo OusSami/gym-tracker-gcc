@@ -4,43 +4,21 @@
  * day=0..6 selects different recipes each day of the week.
  *
  * Calorie targeting: each slot gets a % of the user's daily goal.
- * Required meals (الفطور, الغداء, العشاء) use a 5-tier fallback so they
+ * Required meals (الفطور, الغداء, العشاء) use a full tier fallback so they
  * are NEVER skipped. Only وجبة خفيفة is optional.
+ *
+ * Each slot may contain 1–3 items (dish + optional extras) via the
+ * multi-item composer in lib/mealComposer.js. The top-level `food` field
+ * is kept for backward compatibility; `items[]` carries the full breakdown.
  */
 import { supabaseAdmin }     from '../../../lib/supabase'
 import { calcNutrientGoals } from '../../../lib/nutrition'
+import {
+  MEAL_STRUCTURE,
+  composeSlot,
+  portionLabel,
+} from '../../../lib/mealComposer'
 
-// ── Meal structure ────────────────────────────────────────────────────────────
-const MEAL_STRUCTURE = [
-  {
-    time:       'الفطور',
-    pct:        0.25,
-    required:   true,
-    categories: ['فطور'],
-  },
-  {
-    time:       'الغداء',
-    pct:        0.35,
-    required:   true,
-    categories: ['أرز ومجبوس', 'دجاج', 'لحم', 'سمك ومأكولات بحرية', 'أطباق خليجية'],
-  },
-  {
-    time:       'وجبة خفيفة',
-    pct:        0.15,
-    required:   false,
-    categories: ['حلويات', 'مقبلات', 'سلطة', 'مشروبات'],
-  },
-  {
-    time:       'العشاء',
-    pct:        0.25,
-    required:   true,
-    categories: ['دجاج', 'لحم', 'سمك ومأكولات بحرية', 'شوربة', 'سلطة', 'أرز ومجبوس'],
-  },
-]
-
-const MEAL_ORDER = MEAL_STRUCTURE.map(m => m.time)
-
-// Profile goal → calcCalorieGoal goal key
 const GOAL_MAP = {
   weight:    'weight_loss',
   muscle:    'muscle',
@@ -49,42 +27,67 @@ const GOAL_MAP = {
   general:   'general',
 }
 
-const RECIPE_FIELDS = 'id, name, category, calories, protein_g, carbs_g, fat_g, image_url, servings'
+const RECIPE_FIELDS = 'id, name, category, recipe_type, extra_type, calories, protein_g, carbs_g, fat_g, image_url, servings'
+const MEAL_ORDER    = MEAL_STRUCTURE.map(m => m.time)
 
-// categories can be a string or array; minCal/maxCal are optional
-async function queryRecipes(sb, categories, minCal, maxCal) {
-  const cats = Array.isArray(categories) ? categories : [categories]
-  let q = sb.from('recipes').select(RECIPE_FIELDS)
-    .in('category', cats)
-    .not('calories', 'is', null)
-    .gt('calories', 0)
-    .or('recipe_type.is.null,recipe_type.eq.dish')
-    .order('id')
-  if (minCal != null) q = q.gte('calories', minCal)
-  if (maxCal != null) q = q.lte('calories', maxCal)
-  const { data } = await q
-  return data || []
+function macroVal(val, scale) {
+  return Math.round((val || 0) * scale * 10) / 10
 }
 
-function buildMealEntry(mealTime, recipe, targetCal) {
+function buildItemEntry(item) {
+  const r     = item.recipe
+  const scale = item.type === 'dish' ? (item.portion || 1) : (item.units || 1)
+  const desc  = item.type === 'dish'
+    ? portionLabel(item.portion)
+    : item.units > 1
+      ? `${r.servings || 'حصة'} × ${item.units}`
+      : (r.servings || 'حصة')
+  return {
+    type:         item.type,
+    name_ar:      r.name,
+    calories:     item.calories,
+    protein_g:    macroVal(r.protein_g, scale),
+    carbs_g:      macroVal(r.carbs_g,   scale),
+    fat_g:        macroVal(r.fat_g,     scale),
+    image_url:    r.image_url  || null,
+    portion:      item.type === 'dish'  ? (item.portion || 1)  : null,
+    portion_desc: desc,
+    units:        item.type === 'extra' ? (item.units || 1)    : null,
+    extra_type:   r.extra_type || null,
+    category:     r.category,
+    recipe_id:    r.id,
+  }
+}
+
+function buildSlotEntry(mealTime, result, targetCal) {
+  const items    = result.items.map(buildItemEntry)
+  const primary  = items.find(i => i.type === 'dish') || items[0]
+  const totalP   = Math.round(items.reduce((s, i) => s + i.protein_g, 0) * 10) / 10
+  const totalC   = Math.round(items.reduce((s, i) => s + i.carbs_g,   0) * 10) / 10
+  const totalF   = Math.round(items.reduce((s, i) => s + i.fat_g,     0) * 10) / 10
+
   return {
     meal_time: mealTime,
-    food: {
-      name_ar:      recipe.name,
-      calories:     recipe.calories,
-      protein_g:    recipe.protein_g  || 0,
-      carbs_g:      recipe.carbs_g    || 0,
-      fat_g:        recipe.fat_g      || 0,
-      image_url:    recipe.image_url  || null,
-      portion_desc: recipe.servings   || 'حصة واحدة',
-      category:     recipe.category,
-      recipe_id:    recipe.id,
-    },
-    actual_calories: recipe.calories,
+    // v1-compatible primary food entry (calories reflects slot total)
+    food: primary ? {
+      name_ar:      primary.name_ar,
+      calories:     result.totalCal,
+      protein_g:    totalP,
+      carbs_g:      totalC,
+      fat_g:        totalF,
+      image_url:    primary.image_url,
+      portion_desc: primary.portion_desc,
+      category:     primary.category,
+      recipe_id:    primary.recipe_id,
+    } : null,
+    actual_calories: result.totalCal,
     target_calories: targetCal,
-    protein_g:  recipe.protein_g  || 0,
-    carbs_g:    recipe.carbs_g    || 0,
-    fat_g:      recipe.fat_g      || 0,
+    protein_g:       totalP,
+    carbs_g:         totalC,
+    fat_g:           totalF,
+    // per-item breakdown
+    items,
+    shape: result.shape,
   }
 }
 
@@ -95,7 +98,6 @@ export default async function handler(req, res) {
 
   const sb = supabaseAdmin()
 
-  // Full profile needed for calcNutrientGoals fallback
   const { data: profile } = await sb
     .from('profiles')
     .select('calorie_target, weight_kg, height_cm, birthday, fitness_level, goal, sex, unit_system, health_conditions')
@@ -107,7 +109,6 @@ export default async function handler(req, res) {
   const weight       = profile?.weight_kg || 75
   const proteinTotal = Math.round(weight * 1.6)
 
-  // Resolve daily calorie goal: stored target → computed via nutrition lib → 2000 default
   let dailyGoal = profile?.calorie_target
   if (!dailyGoal || dailyGoal <= 0) {
     const mapped = { ...profile, goal: GOAL_MAP[profile?.goal] || 'general' }
@@ -122,84 +123,74 @@ export default async function handler(req, res) {
     'عشاء':  Math.round(dailyGoal * 0.25),
   }
 
-  const seed = Math.floor(Date.now() / 86400000) // changes daily
-  const plan = []
+  // 2 queries upfront (vs up-to-20 per request in the previous version)
+  const [{ data: dishData }, { data: extraData }] = await Promise.all([
+    sb.from('recipes').select(RECIPE_FIELDS)
+      .or('recipe_type.is.null,recipe_type.eq.dish')
+      .not('calories', 'is', null).gt('calories', 0),
+    sb.from('recipes').select(RECIPE_FIELDS)
+      .eq('recipe_type', 'extra')
+      .not('calories', 'is', null).gt('calories', 0),
+  ])
+  const dishes = dishData || []
+  const extras = extraData || []
 
-  // ── Main loop — 5-tier fallback per slot ─────────────────────────────────
+  const seed       = Math.floor(Date.now() / 86400000)
+  const recentIds  = new Set()
+  const plan       = []
+  let dayDatesUsed = 0
+
   for (let mealIdx = 0; mealIdx < MEAL_STRUCTURE.length; mealIdx++) {
-    const { time: mealTime, pct, required, categories } = MEAL_STRUCTURE[mealIdx]
-
+    const { time: mealTime, pct, required } = MEAL_STRUCTURE[mealIdx]
     const targetCal = Math.round(dailyGoal * pct)
-    const min30     = Math.round(targetCal * 0.70)
-    const max30     = Math.round(targetCal * 1.30)
-    const min50     = Math.round(targetCal * 0.50)
-    const max50     = Math.round(targetCal * 1.50)
 
-    // Rotate category by seed+day+meal for variety
-    const primaryCat = categories[(seed + mealIdx + dayOffset) % categories.length]
+    const result = composeSlot({
+      mealTime,
+      targetCal,
+      dishes,
+      extras,
+      recentIds,
+      dayDatesUsed,
+      seed: seed + mealIdx * 17 + dayOffset * 13,
+    })
 
-    // Tier 1: ±30% in rotated category
-    let candidates = await queryRecipes(sb, primaryCat, min30, max30)
-    // Tier 2: ±50% in rotated category
-    if (!candidates.length) candidates = await queryRecipes(sb, primaryCat, min50, max50)
-    // Tier 3: any calories in rotated category
-    if (!candidates.length) candidates = await queryRecipes(sb, primaryCat, null, null)
-    // Tier 4: ±50% across all categories for this meal slot
-    if (!candidates.length) candidates = await queryRecipes(sb, categories, min50, max50)
-    // Tier 5: absolute emergency — any recipe with calories > 0
-    if (!candidates.length) {
-      const { data: any } = await sb.from('recipes').select(RECIPE_FIELDS)
-        .not('calories', 'is', null).gt('calories', 0)
-        .or('recipe_type.is.null,recipe_type.eq.dish')
-        .limit(50)
-      candidates = any || []
-    }
-
-    if (!candidates.length) {
-      if (!required) continue  // وجبة خفيفة — safe to skip
-      // Required meal with zero candidates is unexpected; skip here and catch in validation
-      console.error(`[meal-plan] WARN: no candidates for required meal ${mealTime}`)
+    if (!result || !result.items.length) {
+      if (!required) continue
+      console.error(`[meal-plan] WARN: no result for required slot ${mealTime}`)
       continue
     }
 
-    const idx    = (seed + dayOffset * 13 + mealIdx * 7) % candidates.length
-    const recipe = candidates[idx]
-    plan.push(buildMealEntry(mealTime, recipe, targetCal))
+    dayDatesUsed = result.dayDatesUsed
+    plan.push(buildSlotEntry(mealTime, result, targetCal))
   }
 
-  // ── Validation — ensure all required meals are present ───────────────────
+  // Emergency fallback for missing required meals
   const presentMeals = new Set(plan.map(p => p.meal_time))
-  const requiredMeals = MEAL_STRUCTURE.filter(m => m.required).map(m => m.time)
-
-  for (const required of requiredMeals) {
+  for (const { time: required, pct } of MEAL_STRUCTURE.filter(m => m.required)) {
     if (presentMeals.has(required)) continue
-
-    console.error(`[meal-plan] EMERGENCY: required meal ${required} missing — using fallback`)
-
+    console.error(`[meal-plan] EMERGENCY: required meal ${required} missing`)
     const { data: emergency } = await sb
-      .from('recipes')
-      .select(RECIPE_FIELDS)
-      .not('calories', 'is', null)
-      .gt('calories', 0)
+      .from('recipes').select(RECIPE_FIELDS)
+      .not('calories', 'is', null).gt('calories', 0)
       .or('recipe_type.is.null,recipe_type.eq.dish')
       .limit(10)
-
     if (emergency?.length) {
-      const pick       = emergency[(seed + dayOffset) % emergency.length]
-      const mealMeta   = MEAL_STRUCTURE.find(m => m.time === required)
-      const targetCal  = Math.round(dailyGoal * (mealMeta?.pct || 0.25))
-      plan.push(buildMealEntry(required, pick, targetCal))
+      const pick      = emergency[seed % emergency.length]
+      const targetCal = Math.round(dailyGoal * pct)
+      plan.push(buildSlotEntry(required, {
+        items:    [{ type: 'dish', recipe: pick, portion: 1.0, calories: pick.calories }],
+        totalCal: pick.calories,
+        shape:    'solo_dish',
+      }, targetCal))
     }
   }
 
-  // Re-sort after validation
   plan.sort((a, b) => MEAL_ORDER.indexOf(a.meal_time) - MEAL_ORDER.indexOf(b.meal_time))
 
-  const total_calories = plan.reduce((sum, item) => sum + (item.actual_calories || 0), 0)
+  const total_calories = plan.reduce((sum, p) => sum + (p.actual_calories || 0), 0)
 
   console.log('[meal-plan] Plan meals:', plan.map(p => p.meal_time))
 
-  // ── Tip ──────────────────────────────────────────────────────────────────
   const tips = {
     weight:    'ركّز على البروتين في كل وجبة — يساعد على الشبع وحفظ العضل مع الحمية',
     muscle:    'تأكد من الكمية الكافية من السعرات لدعم بناء العضل — خصوصاً بعد التمرين',
