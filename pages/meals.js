@@ -1078,22 +1078,29 @@ export default function Meals() {
       if (!data?.plan) return
       const today = new Date().toISOString().split('T')[0]
       const timeToType = { 'الفطور':'breakfast', 'الغداء':'lunch', 'وجبة خفيفة':'snack', 'العشاء':'dinner' }
-      for (const item of data.plan) {
-        await fetch('/api/meals', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: user.id,
-            mealType: timeToType[item.meal_time] || 'lunch',
-            meal_name: item.food.name_ar,
-            meal_date: today,
-            total_calories: item.actual_calories || 0,
-            protein_g: item.protein_g || 0,
-            carbs_g: item.carbs_g || 0,
-            fat_g: item.fat_g || 0,
-            portion_note: item.food.portion_desc || '',
-            image_url: findRecipeImage(item.food.name_ar, recipes)
+      for (const slot of data.plan) {
+        const mealType = timeToType[slot.meal_time] || 'lunch'
+        // Write one row per item so extras appear as separate diary entries
+        const rowsToLog = slot.items?.length
+          ? slot.items
+          : [{ name_ar: slot.food?.name_ar, calories: slot.actual_calories, protein_g: slot.protein_g, carbs_g: slot.carbs_g, fat_g: slot.fat_g, portion_desc: slot.food?.portion_desc, image_url: slot.food?.image_url }]
+        for (const it of rowsToLog) {
+          await fetch('/api/meals', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: user.id,
+              mealType,
+              meal_name: it.name_ar,
+              meal_date: today,
+              total_calories: it.calories || 0,
+              protein_g: it.protein_g || 0,
+              carbs_g: it.carbs_g || 0,
+              fat_g: it.fat_g || 0,
+              portion_note: it.portion_desc || '',
+              image_url: it.image_url || findRecipeImage(it.name_ar, recipes)
+            })
           })
-        })
+        }
       }
       setProgramMealsLogged(true)
       await loadDay(user.id, today)
@@ -1339,22 +1346,27 @@ export default function Meals() {
     const today = new Date().toISOString().split('T')[0]
     const timeToType = { 'الفطور':'breakfast', 'الغداء':'lunch', 'وجبة خفيفة':'snack', 'العشاء':'dinner' }
     try {
-      await fetch('/api/meals', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          userId: user.id,
-          mealType: timeToType[meal.meal_time] || 'lunch',
-          meal_name: meal.food?.name_ar,
-          meal_date: today,
-          total_calories: meal.actual_calories || 0,
-          protein_g: meal.protein_g || 0,
-          carbs_g: meal.carbs_g || 0,
-          fat_g: meal.fat_g || 0,
-          portion_note: meal.food?.portion_desc || '',
-          image_url: meal.food?.image_url || null
+      const rowsToLog = meal.items?.length
+        ? meal.items
+        : [{ name_ar: meal.food?.name_ar, calories: meal.actual_calories, protein_g: meal.protein_g, carbs_g: meal.carbs_g, fat_g: meal.fat_g, portion_desc: meal.food?.portion_desc, image_url: meal.food?.image_url }]
+      for (const it of rowsToLog) {
+        await fetch('/api/meals', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            userId: user.id,
+            mealType: timeToType[meal.meal_time] || 'lunch',
+            meal_name: it.name_ar,
+            meal_date: today,
+            total_calories: it.calories || 0,
+            protein_g: it.protein_g || 0,
+            carbs_g: it.carbs_g || 0,
+            fat_g: it.fat_g || 0,
+            portion_note: it.portion_desc || '',
+            image_url: it.image_url || null
+          })
         })
-      })
+      }
       const newSet = new Set(loggedPlanMeals)
       newSet.add(key)
       setLoggedPlanMeals(newSet)
@@ -2395,36 +2407,105 @@ export default function Meals() {
                       {expandedDay===idx && (
                         <div style={{backgroundColor:'var(--card)',border:'1px solid var(--accent-faint)',borderTop:'none',borderRadius:'0 0 14px 14px',overflow:'hidden'}}>
                           {day.plan.map((meal, mi) => {
-                            const fv = getFoodVisual(meal.food?.name_ar)
+                            const slotItems  = meal.items?.length ? meal.items : null
+                            const isMulti    = slotItems && slotItems.length > 1
+                            const borderBottom = mi < day.plan.length - 1 ? '1px solid var(--accent-faint)' : 'none'
+                            const loggedKey  = idx + '-' + meal.meal_time
+                            const macroChips = [
+                              ['B', meal.protein_g, '#EFF6FF', '#1D4ED8'],
+                              ['C', meal.carbs_g,   '#FFFBEB', '#92400E'],
+                              ['F', meal.fat_g,     '#F5F3FF', '#5B21B6'],
+                            ].map(([l,v,bg,tc]) => (
+                              <span key={l} style={{backgroundColor:bg,color:tc,borderRadius:6,padding:'2px 6px',fontSize:11,fontWeight:600,fontFamily:"'Space Grotesk','Tajawal',sans-serif",flexShrink:0}}>{l} {Math.round(v||0)}g</span>
+                            ))
+                            const logBtn = loggedPlanMeals.has(loggedKey) ? (
+                              <div style={{flexShrink:0,paddingInline:12,paddingBlock:6,borderRadius:20,backgroundColor:'#E8F5E9',fontSize:12,fontWeight:700,color:'#2E7D32',display:'flex',alignItems:'center',gap:4,whiteSpace:'nowrap'}}>
+                                <span>✓</span><span>تمت الإضافة</span>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); logSinglePlanMeal(meal, idx) }}
+                                style={{flexShrink:0,paddingInline:12,paddingBlock:6,borderRadius:20,backgroundColor:'var(--text-primary)',color:'#FFFFFF',border:'none',cursor:'pointer',fontSize:12,fontWeight:700,display:'flex',alignItems:'center',gap:4,whiteSpace:'nowrap'}}
+                              >
+                                {MEAL_LOG_LABELS[meal.meal_time] || (isFemale ? '+ أضيفي' : '+ أضف')}
+                              </button>
+                            )
+
+                            if (isMulti) {
+                              // Multi-item slot: header + stacked item rows + slot-total macro chips
+                              return (
+                                <div key={mi} style={{paddingInline:16,paddingBlock:14,borderBottom}}>
+                                  {/* header: meal-time label + total kcal + log button */}
+                                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                                    <div style={{fontSize:12,fontWeight:600,color:'var(--text-secondary)',fontFamily:F}}>{meal.meal_time}</div>
+                                    <div style={{display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
+                                      <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end'}}>
+                                        <span style={{fontSize:16,fontWeight:800,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif",lineHeight:1}}>{meal.actual_calories}</span>
+                                        <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
+                                      </div>
+                                      {logBtn}
+                                    </div>
+                                  </div>
+                                  {/* per-item rows */}
+                                  {slotItems.map((item, ii) => {
+                                    const fv     = getFoodVisual(item.name_ar)
+                                    const isDish = item.type === 'dish'
+                                    return (
+                                      <div
+                                        key={ii}
+                                        onClick={isDish ? () => findAndOpenRecipe(item.name_ar) : undefined}
+                                        style={{display:'flex',alignItems:'center',gap:10,paddingBlock:8,borderBottom:ii<slotItems.length-1?'1px solid var(--accent-faint)':'none',cursor:isDish?'pointer':'default'}}
+                                      >
+                                        {/* small avatar */}
+                                        <div style={{width:38,height:38,borderRadius:10,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
+                                          {item.image_url
+                                            ? <img src={item.image_url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
+                                            : null}
+                                          <div style={{width:'100%',height:'100%',display:item.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>{fv.emoji}</div>
+                                        </div>
+                                        {/* item text — minWidth:0 prevents RTL overflow clipping */}
+                                        <div style={{flex:1,minWidth:0,textAlign:'right'}}>
+                                          <div style={{fontSize:14,fontWeight:700,color:'var(--text-primary)',fontFamily:F,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textDecoration:isDish?'underline':'none',textDecorationStyle:'dotted',textDecorationColor:'var(--accent-soft)'}}>{item.name_ar}</div>
+                                          {item.portion_desc && <div style={{fontSize:11,color:'var(--text-secondary)',fontFamily:F,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.portion_desc}</div>}
+                                        </div>
+                                        {/* per-item kcal */}
+                                        <div style={{flexShrink:0,textAlign:'left',minWidth:44}}>
+                                          <span style={{fontSize:13,fontWeight:700,color:'var(--accent)',fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{item.calories}</span>
+                                          <span style={{fontSize:10,color:'var(--text-secondary)',marginRight:2,fontFamily:F}}> kcal</span>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                  {/* slot-total macro chips */}
+                                  <div style={{display:'flex',gap:6,justifyContent:'flex-end',marginTop:8}}>{macroChips}</div>
+                                </div>
+                              )
+                            }
+
+                            // Single-item slot — visually identical to before
+                            const primaryItem = slotItems?.[0]
+                            const foodName    = primaryItem?.name_ar || meal.food?.name_ar
+                            const imageUrl    = primaryItem?.image_url || meal.food?.image_url
+                            const fv          = getFoodVisual(foodName)
                             return (
-                              <div key={mi} style={{display:'flex',alignItems:'center',gap:8,paddingInline:16,paddingBlock:14,borderBottom:mi<day.plan.length-1?'1px solid var(--accent-faint)':'none'}}>
+                              <div key={mi} style={{display:'flex',alignItems:'center',gap:8,paddingInline:16,paddingBlock:14,borderBottom}}>
                                 {/* tappable area: avatar + food info + calories */}
                                 <div
-                                  onClick={() => findAndOpenRecipe(meal.food?.name_ar)}
+                                  onClick={() => findAndOpenRecipe(foodName)}
                                   style={{flex:1,minWidth:0,display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}
                                 >
-                                  {/* food visual avatar (RTL: first in DOM = visual right) */}
+                                  {/* food visual avatar */}
                                   <div style={{width:52,height:52,borderRadius:12,flexShrink:0,overflow:'hidden',backgroundColor:fv.bg}}>
-                                    {meal.food?.image_url ? (
-                                      <img src={meal.food.image_url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}
-                                        onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
-                                    ) : null}
-                                    <div style={{width:'100%',height:'100%',display:meal.food?.image_url?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
+                                    {imageUrl
+                                      ? <img src={imageUrl} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}} />
+                                      : null}
+                                    <div style={{width:'100%',height:'100%',display:imageUrl?'none':'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{fv.emoji}</div>
                                   </div>
-                                  {/* food info */}
+                                  {/* food info — minWidth:0 prevents RTL overflow clipping */}
                                   <div style={{flex:1,minWidth:0,textAlign:'right'}}>
                                     <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
-                                    <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:6,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
-                                      textDecoration:'underline',textDecorationStyle:'dotted',textDecorationColor:'var(--accent-soft)'}}>{meal.food?.name_ar}</div>
-                                    <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
-                                      {[
-                                        ['B',meal.protein_g,'#EFF6FF','#1D4ED8'],
-                                        ['C',meal.carbs_g,'#FFFBEB','#92400E'],
-                                        ['F',meal.fat_g,'#F5F3FF','#5B21B6'],
-                                      ].map(([l,v,bg,tc])=>(
-                                        <span key={l} style={{backgroundColor:bg,color:tc,borderRadius:6,padding:'2px 6px',fontSize:11,fontWeight:600,fontFamily:"'Space Grotesk','Tajawal',sans-serif"}}>{l} {Math.round(v||0)}g</span>
-                                      ))}
-                                    </div>
+                                    <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:6,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textDecoration:'underline',textDecorationStyle:'dotted',textDecorationColor:'var(--accent-soft)'}}>{foodName}</div>
+                                    <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>{macroChips}</div>
                                   </div>
                                   {/* calories */}
                                   <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',flexShrink:0,minWidth:52}}>
@@ -2432,30 +2513,7 @@ export default function Meals() {
                                     <span style={{fontSize:10,color:'var(--text-secondary)',fontFamily:F}}>kcal</span>
                                   </div>
                                 </div>
-                                {/* log button (RTL: last in DOM = visual left) */}
-                                {loggedPlanMeals.has(idx+'-'+meal.meal_time) ? (
-                                  <div style={{
-                                    flexShrink:0, paddingInline:12, paddingBlock:6,
-                                    borderRadius:20, backgroundColor:'#E8F5E9',
-                                    fontSize:12, fontWeight:700, color:'#2E7D32',
-                                    display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
-                                  }}>
-                                    <span>✓</span><span>تمت الإضافة</span>
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); logSinglePlanMeal(meal, idx) }}
-                                    style={{
-                                      flexShrink:0, paddingInline:12, paddingBlock:6,
-                                      borderRadius:20, backgroundColor:'var(--text-primary)',
-                                      color:'#FFFFFF', border:'none', cursor:'pointer',
-                                      fontSize:12, fontWeight:700,
-                                      display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap'
-                                    }}
-                                  >
-                                    {MEAL_LOG_LABELS[meal.meal_time] || (isFemale ? '+ أضيفي' : '+ أضف')}
-                                  </button>
-                                )}
+                                {logBtn}
                               </div>
                             )
                           })}

@@ -1094,7 +1094,10 @@ const B={minHeight:'100vh',background:'var(--surface)',color:'var(--text-primary
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:5}}>
                     {mealPlan.plan.map((m,i)=>(
                       <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingBottom:i<mealPlan.plan.length-1?5:0,borderBottom:i<mealPlan.plan.length-1?'1px solid rgba(0,0,0,0.06)':'none'}}>
-                        <div style={{fontSize:'.64rem',color:'var(--text-secondary)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,paddingInlineEnd:3}}>{m.food?.name_ar||m.meal_time}</div>
+                        <div style={{fontSize:'.64rem',color:'var(--text-secondary)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,paddingInlineEnd:3,minWidth:0}}>
+                          {m.items?.length>1&&<span style={{fontSize:'.55rem',color:'#22c55e',marginInlineEnd:3,flexShrink:0}}>+{m.items.length-1}</span>}
+                          {m.items?.[0]?.name_ar||m.food?.name_ar||m.meal_time}
+                        </div>
                         <div style={{fontFamily:'monospace',fontSize:'.58rem',color:'#22c55e',fontWeight:700,flexShrink:0}}>{m.actual_calories}</div>
                       </div>
                     ))}
