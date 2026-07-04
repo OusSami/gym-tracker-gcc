@@ -58,6 +58,7 @@ async function queryRecipes(sb, categories, minCal, maxCal) {
     .in('category', cats)
     .not('calories', 'is', null)
     .gt('calories', 0)
+    .or('recipe_type.is.null,recipe_type.eq.dish')
     .order('id')
   if (minCal != null) q = q.gte('calories', minCal)
   if (maxCal != null) q = q.lte('calories', maxCal)
@@ -148,7 +149,9 @@ export default async function handler(req, res) {
     // Tier 5: absolute emergency — any recipe with calories > 0
     if (!candidates.length) {
       const { data: any } = await sb.from('recipes').select(RECIPE_FIELDS)
-        .not('calories', 'is', null).gt('calories', 0).limit(50)
+        .not('calories', 'is', null).gt('calories', 0)
+        .or('recipe_type.is.null,recipe_type.eq.dish')
+        .limit(50)
       candidates = any || []
     }
 
@@ -178,6 +181,7 @@ export default async function handler(req, res) {
       .select(RECIPE_FIELDS)
       .not('calories', 'is', null)
       .gt('calories', 0)
+      .or('recipe_type.is.null,recipe_type.eq.dish')
       .limit(10)
 
     if (emergency?.length) {
