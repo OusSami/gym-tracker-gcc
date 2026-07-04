@@ -2414,10 +2414,8 @@ export default function Meals() {
                                   {/* food info */}
                                   <div style={{flex:1,minWidth:0,textAlign:'right'}}>
                                     <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:2}}>{meal.meal_time}</div>
-                                    <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
+                                    <div style={{fontSize:15,fontWeight:700,color:'var(--text-primary)',fontFamily:F,marginBottom:6,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
                                       textDecoration:'underline',textDecorationStyle:'dotted',textDecorationColor:'var(--accent-soft)'}}>{meal.food?.name_ar}</div>
-                                    <span style={{fontSize:10,color:'var(--text-secondary)',marginInlineEnd:4}}>←</span>
-                                    <div style={{fontSize:12,color:'var(--text-secondary)',fontFamily:F,marginBottom:4}}>{meal.food?.portion_desc}</div>
                                     <div style={{display:'flex',gap:6,justifyContent:'flex-end'}}>
                                       {[
                                         ['B',meal.protein_g,'#EFF6FF','#1D4ED8'],
