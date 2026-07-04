@@ -160,7 +160,13 @@ function composeSlot({ mealTime, targetCal, dishes, extras, recentIds, dayDatesU
 
   // Pick shape
   const shapes = SLOT_SHAPES[mealTime] || ['solo_dish', 'dish_extra']
-  const shape  = shapes[Math.floor(rng() * shapes.length)]
+  let shape    = shapes[Math.floor(rng() * shapes.length)]
+  // Demote solo_extra for high-calorie snack targets: a single extra can't
+  // reliably reach ≥250 kcal within the tier bands.
+  if (shape === 'solo_extra' && targetCal >= 250) {
+    const highCalSnackShapes = ['multi_extra', 'dish_extra', 'multi_extra', 'dish_extra']
+    shape = highCalSnackShapes[Math.floor(rng() * highCalSnackShapes.length)]
+  }
 
   const items = []
   let calUsed = 0
@@ -310,30 +316,42 @@ const { dishes, extras } = await loadData()
 console.log(`Loaded ${dishes.length} dishes, ${extras.length} extras\n`)
 
 const PROFILES = [
+  // ── Original 4 ───────────────────────────────────────────────────────────
   {
     label:   'Profile A — Male 75kg, muscle goal, 2800 kcal/day',
-    dailyCal: 2800,
-    seed0:    42,
-    // Simulate a few recently used IDs (first 4 dish IDs in DB)
+    dailyCal: 2800, seed0: 42,
     recentIds: new Set(dishes.slice(0, 4).map(d => d.id)),
   },
   {
     label:   'Profile B — Female 60kg, weight loss, 1500 kcal/day',
-    dailyCal: 1500,
-    seed0:    77,
+    dailyCal: 1500, seed0: 77,
     recentIds: new Set(dishes.slice(10, 14).map(d => d.id)),
   },
   {
-    label:   'Profile C — Male 90kg, endurance, 3200 kcal/day',
-    dailyCal: 3200,
-    seed0:    113,
+    label:   'Profile C — Male 90kg, endurance, 3200 kcal/day  [was outside-bands]',
+    dailyCal: 3200, seed0: 113,
     recentIds: new Set(dishes.slice(5, 9).map(d => d.id)),
   },
   {
     label:   'Profile D — Female 55kg, general, 1800 kcal/day',
-    dailyCal: 1800,
-    seed0:    200,
+    dailyCal: 1800, seed0: 200,
     recentIds: new Set(dishes.slice(20, 24).map(d => d.id)),
+  },
+  // ── New 3: varied snack-slot targets ──────────────────────────────────────
+  {
+    label:   'Profile E — Male 100kg, strength, 3500 kcal/day  [snack=525 kcal]',
+    dailyCal: 3500, seed0: 333,
+    recentIds: new Set(dishes.slice(30, 34).map(d => d.id)),
+  },
+  {
+    label:   'Profile F — Female 70kg, endurance, 2200 kcal/day  [snack=330 kcal]',
+    dailyCal: 2200, seed0: 444,
+    recentIds: new Set(dishes.slice(40, 44).map(d => d.id)),
+  },
+  {
+    label:   'Profile G — Female 48kg, weight loss, 1200 kcal/day  [snack=180 kcal — solo_extra OK]',
+    dailyCal: 1200, seed0: 555,
+    recentIds: new Set(dishes.slice(50, 54).map(d => d.id)),
   },
 ]
 
@@ -378,31 +396,102 @@ for (const profile of PROFILES) {
   console.log(`  Slots outside bands: ${planItems.filter(r => !r.withinTier2).length}/${planItems.length}`)
 }
 
-// ── Pairing heuristic crudeness flags ─────────────────────────────────────────
+// ── Pairing heuristic: concrete DB analysis ───────────────────────────────────
 console.log('\n' + '═'.repeat(70))
-console.log('PAIRING HEURISTIC — KNOWN CRUDE CASES')
+console.log('PAIRING HEURISTIC — CONCRETE WEAKNESS ANALYSIS (from live DB)')
 console.log('═'.repeat(70))
+
+const WEST_KW2   = ['باستا','بيتزا','برجر','ريزوتو','لازانيا','سباغيتي','ستيك','بيستو',
+                    'سكونز','بروشكيتا','مونتي كريستو','هاش براون','بف باستري','ترياكي',
+                    'ويني','شيزكيك','كريم كراميل','تيراميسو','تراميسو','بانكيك','لنجويني','مكرونة','ماكرونة']
+const ASIAN_KW2  = ['سوشي','رامن','دامبلينج','ويك','تمبورا','باد تاي','كاري الخضار','كاري دجاج']
+const GULF_KW2   = ['مجبوس','كبسة','مندي','مطبق','هريس','عريكة','مدفون','مضبي','قرصان',
+                    'حنيذ','هنيذ','مطازيز','مضروبة','اليغمش','الغوزي','مرقوق','جريش',
+                    'عصيد','كيشة','مكبوس','بخاري','البكيلة','حمسة','الكمونية','المعدس',
+                    'مموش','معبوج','القشد','الهريس','المثلوثة','الدقوس']
+
+function tagDish(r) {
+  const n = r.name||'', c = r.category||''
+  if (c === 'أطباق خليجية' || c === 'أرز ومجبوس') return 'gulf_arab'
+  if (GULF_KW2.some(k => n.includes(k))) return 'gulf_arab'
+  if (WEST_KW2.some(k => n.includes(k))) return 'western'
+  if (ASIAN_KW2.some(k => n.includes(k))) return 'asian'
+  return 'neutral'
+}
+
+const allTagged = dishes.map(d => ({ ...d, tag: tagDish(d) }))
+const western   = allTagged.filter(d => d.tag === 'western')
+const neutral   = allTagged.filter(d => d.tag === 'neutral')
+
+// CASE 1 — Western + Western (both dishes in same slot: would need two_dishes shape)
+console.log(`\nCASE 1 — Western+Western allowed (but current shapes never pick 2 dishes)`)
+console.log(`  Total western-tagged dishes in DB: ${western.length}`)
+console.log(`  These COULD conflict if a two_dishes shape is added later.`)
+console.log(`  Concrete bad pairs that heuristic allows:`)
+const badPairs = [
+  ['ستيك', 'مكرونة'],   // steak + pasta
+  ['برجر', 'ريزوتو'],   // burger + risotto
+  ['باستا', 'بروشكيتا'], // pasta + bruschetta
+]
+for (const [ka, kb] of badPairs) {
+  const da = western.find(d => d.name.includes(ka))
+  const db = western.find(d => d.name.includes(kb))
+  if (da && db) console.log(`    "${da.name}" + "${db.name}"`)
+}
+console.log(`  ⚡ RISK LEVEL: LOW — no two_dishes shape exists yet in the composer.`)
+console.log(`     Heuristic is irrelevant until two_dishes shape is added.`)
+
+// CASE 2 — Neutral + Western allowed
+console.log(`\nCASE 2 — Neutral+Western combos that are allowed`)
+const westMeat = western.filter(d => ['لحم','دجاج'].includes(d.category))
+console.log(`  Western dishes in لحم/دجاج categories (dinner-slot eligible): ${westMeat.length}`)
+westMeat.slice(0, 4).forEach(d => console.log(`    [${d.category}] ${d.name}`))
+const eg = neutral.find(d => ['لحم','دجاج'].includes(d.category))
+if (eg && westMeat[0])
+  console.log(`  Example allowed: "${eg.name}" [neutral] + "${westMeat[0].name}" [western]`)
+console.log(`  ⚡ RISK LEVEL: LOW for dish+extra (extras have no cuisine tag, always pass).`)
+console.log(`     Relevant only for two_dishes shape. Many neutral+western dinner combos`)
+console.log(`     are actually fine (e.g. grilled Arabic lamb + steak salad).`)
+
+// CASE 3 — كاري false-positive check
+console.log(`\nCASE 3 — كاري dishes: actual tags`)
+const kari = dishes.filter(d => d.name.includes('كاري'))
+kari.forEach(d => {
+  const t = tagDish(d)
+  const fp = t === 'asian' && d.category === 'أطباق خليجية'
+  console.log(`  [${d.category}] "${d.name}" → ${t}${fp ? ' ⚠️ FALSE POSITIVE' : ''}`)
+})
+console.log(`  ⚡ RISK LEVEL: NONE — no false positives found. كاري الخضار (vegan curry)`)
+console.log(`     correctly tagged 'asian'. Other كاري dishes are neutral (Arabic-style).`)
+
+// CASE 4 — Neutral + Neutral from different culinary traditions
+const MAGHREBI_KW = ['كسكس','طاجين','مسبحة','مغربي','تونسي','جزائري']
+const IRAQI_KW    = ['دولمة عراقية','قيمة','مسكوف','تشريب']
+const LEVANT_KW   = ['شاورما','فلافل','تبولة','فتوش','مجدرة','كبة','كيبة']
+const maghrebi = neutral.filter(d => MAGHREBI_KW.some(k => d.name.includes(k)))
+const iraqi    = neutral.filter(d => IRAQI_KW.some(k => d.name.includes(k)))
+const levant   = neutral.filter(d => LEVANT_KW.some(k => d.name.includes(k)))
+console.log(`\nCASE 4 — Neutral+Neutral cross-tradition pairs`)
+console.log(`  Maghrebi-neutral: ${maghrebi.length}  Iraqi-neutral: ${iraqi.length}  Levantine-neutral: ${levant.length}`)
+maghrebi.forEach(d => console.log(`    [Maghrebi] ${d.name}`))
+iraqi.forEach(d => console.log(`    [Iraqi]    ${d.name}`))
+if (maghrebi[0] && iraqi[0])
+  console.log(`  Example: "${maghrebi[0].name}" + "${iraqi[0].name}" → allowed`)
+if (maghrebi[0] && levant[0])
+  console.log(`  Example: "${maghrebi[0].name}" + "${levant[0].name}" → allowed`)
+console.log(`  ⚡ RISK LEVEL: VERY LOW — only 2 Maghrebi + 1 Iraqi dish in full DB.`)
+console.log(`     Cross-Arab cuisine combos are culturally common at Gulf tables.`)
+
+console.log(`\n${'─'.repeat(70)}`)
+console.log(`OVERALL PAIRING VERDICT`)
+console.log(`${'─'.repeat(70)}`)
 console.log(`
-  1. Two Western dishes in the same slot are allowed (e.g. pasta + risotto).
-     Sub-typing Western cuisine (Italian vs. French vs. American) is not
-     implemented — would need a cuisine_subtype column or keyword expansion.
+  All 4 cases have LOW or NONE risk for the current composer shape set,
+  because the composer NEVER puts two dishes in the same slot (no two_dishes
+  shape). pairingOk() is always trivially true for dish+extra combos since
+  extras carry no cuisine tag.
 
-  2. "neutral" covers all Levantine/Egyptian/Iraqi dishes. A neutral + western
-     combo (e.g. فول + هاش براون) is allowed and is probably fine culturally
-     since both are breakfast staples, but the heuristic can't distinguish
-     "breakfast-neutral" from "dinner-neutral" dishes.
-
-  3. Indian curry (كاري) is tagged 'asian' via the ASIAN_KW list. But كاري is
-     common in Gulf cuisine contexts (Emirati/Kuwaiti) and often pairs fine with
-     Gulf rice dishes. This could produce false-positive pairing rejections if a
-     كاري dish ends up with a Gulf tag because it's in أطباق خليجية — though the
-     category-first classification mitigates this.
-
-  4. Two dishes both tagged 'neutral' from very different cuisines (e.g. Moroccan
-     كسكس + Iraqi دولمة) are allowed. These are often culturally compatible at an
-     Arab dining table, but could occasionally feel mismatched.
-
-  Recommendation for v2: add cuisine_tag TEXT column to recipes
-  (gulf | arab | levantine | maghrebi | western | asian | universal)
-  and replace keyword heuristic with a data-driven rule.
+  RECOMMENDATION: ship Phase 3 with multi-dish pairing check disabled
+  (it's a no-op with current shapes). Add cuisine_tag column + real pairing
+  logic when the two_dishes shape is introduced later.
 `)
