@@ -57,6 +57,7 @@ function parseLeadNum(text) {
   const t = toWestern(text)
   if (/ثلاثة أرباع|¾/.test(t)) return 0.75
   if (/نصف/.test(t)) return 0.5
+  if (/ثلثان|ثلثا/.test(t)) return 0.667   // dual: "ثلثان كوب" / "ثلثا كوب" = 2/3
   if (/ثلث/.test(t)) return 0.333
   if (/ربع/.test(t)) return 0.25
   const m = t.match(/(\d+\.?\d*)/)
@@ -105,11 +106,18 @@ function ingToGrams(text) {
   for (const [pattern, perUnit] of UNIT_G) {
     // Match patterns like "2 كوب", "ثلث كوب", "نصف ملعقة كبيرة"
     const rx = new RegExp(
-      `(نصف|ثلث|ربع|ثلاثة أرباع|\\d+\\.?\\d*)\\s*(?:و(?:نصف|ثلث|ربع))?\\s*${pattern.source}`,
+      `(نصف|ثلثان|ثلثا|ثلث|ربع|ثلاثة أرباع|\\d+\\.?\\d*)\\s*(?:و(?:نصف|ثلث|ربع))?\\s*(?:${pattern.source})`,
       'i'
     )
     const m = t.match(rx)
     if (m) return parseLeadNum(m[1]) * perUnit
+  }
+
+  // Pass 2: bare singular unit — Arabic bare singular = "one unit" (grammatical rule).
+  // Word-boundary check prevents false matches inside longer words (e.g. "مل" inside "ملح").
+  for (const [pattern, perUnit] of UNIT_G) {
+    const rx2 = new RegExp(`(?:^|\\s)(?:${pattern.source})(?:\\s|$|[،,.;:])`, 'i')
+    if (rx2.test(t)) return perUnit
   }
 
   // Bare leading number with no unit → treat as grams (e.g. "500 روبيان")
@@ -587,8 +595,9 @@ function estimateNutrition(recipe) {
   let per100 = result.per100
   let usedFallback = false
 
-  // Fall back to category defaults if ingredients yielded almost nothing
-  if (!result.hasIngredients || perSrv.calories < 30) {
+  // Fall back to category defaults if ingredients yielded almost nothing.
+  // Threshold 80: below this a per-serving estimate is implausibly sparse for any real dish.
+  if (!result.hasIngredients || perSrv.calories < 80) {
     const fb = CAT_FALLBACK[category] ?? CAT_FALLBACK['أخرى']
     perSrv = {
       calories:  fb.calories,  protein_g: fb.protein_g,
