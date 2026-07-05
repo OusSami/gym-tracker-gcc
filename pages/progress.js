@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 import { BottomTabs } from '../components/Nav'
 
-const G = '#CBA23B', F = "'Tajawal',sans-serif"
-const B = { minHeight: '100vh', background: '#09090B', color: '#ECE3CF', fontFamily: F, direction: 'rtl' }
+const G = 'var(--accent)', F = "'Tajawal',sans-serif"
+const B = { minHeight: '100vh', background: 'var(--surface)', color: 'var(--text-primary)', fontFamily: F, direction: 'rtl' }
 
 export default function Progress() {
   const router = useRouter()
@@ -41,8 +41,8 @@ export default function Progress() {
   }
 
   if (loading) return (
-    <div style={{ ...B, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, color: 'rgba(255,255,255,0.35)' }}>
-      <div style={{ width: 28, height: 28, border: '3px solid rgba(203,162,59,0.15)', borderTopColor: G, borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
+    <div style={{ ...B, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, color: 'var(--text-muted)' }}>
+      <div style={{ width: 28, height: 28, border: '3px solid var(--accent-dim)', borderTopColor: G, borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
@@ -52,8 +52,8 @@ export default function Progress() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       <div style={{ fontSize: '3rem', marginBottom: 16 }}>📊</div>
       <div style={{ fontWeight: 800, fontSize: '1.2rem', marginBottom: 8 }}>ما عندك برنامج نشط</div>
-      <div style={{ fontSize: '.88rem', color: 'rgba(255,255,255,0.4)', marginBottom: 24 }}>ابدأ برنامجك لمتابعة تقدمك</div>
-      <button onClick={() => router.push('/packages')} style={{ background: G, color: '#09090B', border: 'none', borderRadius: 14, padding: '14px 32px', fontFamily: F, fontWeight: 900, fontSize: '1rem', cursor: 'pointer' }}>ابدأ برنامجي 🚀</button>
+      <div style={{ fontSize: '.88rem', color: 'var(--text-muted)', marginBottom: 24 }}>ابدأ برنامجك لمتابعة تقدمك</div>
+      <button onClick={() => router.push('/packages')} style={{ background: 'var(--btn-primary-bg)', color: 'var(--btn-primary-fg)', border: 'none', borderRadius: 14, padding: '14px 32px', fontFamily: F, fontWeight: 900, fontSize: '1rem', cursor: 'pointer' }}>ابدأ برنامجي 🚀</button>
       <BottomTabs active="dashboard" />
     </div>
   )
@@ -93,14 +93,14 @@ export default function Progress() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} .fu{animation:fu .3s ease}`}</style>
 
       {/* Top bar */}
-      <div style={{ background: 'linear-gradient(180deg,rgba(10,8,5,0.95) 0%,rgba(10,8,5,0.8) 100%)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(203,162,59,0.15)', padding: '13px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ background: 'var(--card)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', padding: '13px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-card)' }}>
         <div>
           <div style={{ fontWeight: 800, fontSize: '.88rem' }}>{program.roadmap?.program_name || program.package_name}</div>
-          <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,0.35)' }}>اليوم {currentDay} من {totalDays}</div>
+          <div style={{ fontSize: '.65rem', color: 'var(--text-muted)' }}>اليوم {currentDay} من {totalDays}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ height: 4, width: 60, background: 'rgba(255,255,255,0.08)', borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: pct + '%', background: G, borderRadius: 10, transition: 'width .5s' }} />
+          <div style={{ height: 4, width: 60, background: 'var(--accent-faint)', borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: pct + '%', background: 'var(--accent)', borderRadius: 10, transition: 'width .5s' }} />
           </div>
           <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '.92rem', color: G }}>{pct}%</div>
         </div>
@@ -108,53 +108,53 @@ export default function Progress() {
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px 100px' }} className="fu">
 
-        {/* Stats — futuristic panel */}
-        <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', background: 'rgba(4,4,7,0.95)', border: '1px solid rgba(203,162,59,0.12)', marginBottom: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
-          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(203,162,59,0.5),transparent)' }} />
+        {/* Stats panel */}
+        <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', background: 'var(--card)', border: '1px solid var(--border)', marginBottom: 12, boxShadow: 'var(--shadow-card)' }}>
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,var(--accent),transparent)' }} />
           <div style={{ display: 'flex' }}>
             {[
-              ['مكتملة', completedCount, '#22c55e', '0 0 12px rgba(34,197,94,0.45)'],
-              ['اليوم', currentDay, '#60a5fa', '0 0 12px rgba(96,165,250,0.45)'],
-              ['متبقية', Math.max(0, totalDays - currentDay + 1), G, '0 0 12px rgba(203,162,59,0.4)'],
-            ].map(([l, v, c, glow], i) => (
-              <div key={l} style={{ flex: 1, textAlign: 'center', padding: '11px 4px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.15rem', color: c, textShadow: glow, lineHeight: 1 }}>{v}</div>
-                <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.22)', marginTop: 5, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>{l}</div>
+              ['مكتملة', completedCount, '#22c55e'],
+              ['اليوم', currentDay, '#60a5fa'],
+              ['متبقية', Math.max(0, totalDays - currentDay + 1), G],
+            ].map(([l, v, c], i) => (
+              <div key={l} style={{ flex: 1, textAlign: 'center', padding: '11px 4px', borderInlineEnd: i < 2 ? '1px solid var(--border-subtle)' : 'none' }}>
+                <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.15rem', color: c, lineHeight: 1 }}>{v}</div>
+                <div style={{ fontSize: '.5rem', color: 'var(--text-muted)', marginTop: 5, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>{l}</div>
               </div>
             ))}
           </div>
-          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent)', margin: '0 16px' }} />
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,var(--border-subtle),transparent)', marginInline: 16 }} />
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
-              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: streak >= 3 ? '#f97316' : 'rgba(255,255,255,0.3)', textShadow: streak >= 3 ? '0 0 10px rgba(249,115,22,0.5)' : 'none', lineHeight: 1 }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderInlineEnd: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: streak >= 3 ? '#f97316' : 'var(--text-muted)', lineHeight: 1 }}>
                 {streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'} {streak}
               </div>
-              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>streak</div>
+              <div style={{ fontSize: '.5rem', color: 'var(--text-muted)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>streak</div>
             </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
-              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: '#22c55e', textShadow: '0 0 10px rgba(34,197,94,0.45)', lineHeight: 1 }}>
-                {weekCompleted}<span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '.68rem' }}>/{weekTotal}</span>
+            <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderInlineEnd: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: '#22c55e', lineHeight: 1 }}>
+                {weekCompleted}<span style={{ color: 'var(--text-muted)', fontSize: '.68rem' }}>/{weekTotal}</span>
               </div>
-              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>this week</div>
+              <div style={{ fontSize: '.5rem', color: 'var(--text-muted)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>this week</div>
             </div>
             <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px' }}>
-              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: 'rgba(255,255,255,0.28)', lineHeight: 1 }}>{totalDays}</div>
-              <div style={{ fontSize: '.5rem', color: 'rgba(255,255,255,0.2)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>total</div>
+              <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: 'var(--text-muted)', lineHeight: 1 }}>{totalDays}</div>
+              <div style={{ fontSize: '.5rem', color: 'var(--text-muted)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>total</div>
             </div>
           </div>
-          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(203,162,59,0.2),transparent)' }} />
+          <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,var(--accent-dim),transparent)' }} />
         </div>
 
         {/* Milestones */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
-          <div style={{ fontWeight: 700, fontSize: '.75rem', color: 'rgba(255,255,255,0.35)', marginBottom: 12, letterSpacing: 1 }}>الإنجازات</div>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
+          <div style={{ fontWeight: 700, fontSize: '.75rem', color: 'var(--text-secondary)', marginBottom: 12, letterSpacing: 1 }}>الإنجازات</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {MILESTONES.map(m => {
               const done = completedCount >= m.need
               return (
                 <div key={m.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 52, opacity: done ? 1 : 0.3, filter: done ? 'none' : 'grayscale(1)' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: done ? `${G}18` : 'rgba(255,255,255,0.04)', border: `2px solid ${done ? G : 'rgba(255,255,255,0.08)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: done ? `0 0 12px ${G}30` : 'none' }}>{m.icon}</div>
-                  <div style={{ fontSize: '.58rem', color: done ? G : 'rgba(255,255,255,0.3)', fontWeight: done ? 700 : 400, textAlign: 'center' }}>{m.label}</div>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: done ? 'var(--accent-dim)' : 'var(--surface-inset)', border: `2px solid ${done ? 'var(--accent)' : 'var(--border-subtle)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: done ? 'var(--shadow-glow)' : 'none' }}>{m.icon}</div>
+                  <div style={{ fontSize: '.58rem', color: done ? G : 'var(--text-muted)', fontWeight: done ? 700 : 400, textAlign: 'center' }}>{m.label}</div>
                 </div>
               )
             })}
@@ -162,21 +162,21 @@ export default function Progress() {
         </div>
 
         {/* Progress bar */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '.8rem' }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>تقدم البرنامج</span>
+            <span style={{ color: 'var(--text-secondary)' }}>تقدم البرنامج</span>
             <span style={{ color: G, fontWeight: 700, fontFamily: 'monospace' }}>{pct}%</span>
           </div>
-          <div style={{ height: 10, background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}>
-            <div style={{ height: '100%', width: pct + '%', background: `linear-gradient(90deg,#8B6914,${G},#e8c55a)`, borderRadius: 10, transition: 'width 1s ease', boxShadow: `0 0 12px rgba(203,162,59,0.4)` }} />
+          <div style={{ height: 10, background: 'var(--accent-faint)', borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: pct + '%', background: 'linear-gradient(90deg,var(--accent-soft),var(--accent))', borderRadius: 10, transition: 'width 1s ease', boxShadow: 'var(--shadow-glow)' }} />
           </div>
         </div>
 
         {/* Day grid */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '16px', marginBottom: 12 }}>
-          <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'rgba(255,255,255,0.45)', marginBottom: 10 }}>خريطة البرنامج <span style={{ fontWeight: 400, fontSize: '.68rem', color: 'rgba(255,255,255,0.25)' }}>· اضغط على يوم لترى تقريره</span></div>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border-subtle)', borderRadius: 16, padding: '16px', marginBottom: 12 }}>
+          <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'var(--text-secondary)', marginBottom: 10 }}>خريطة البرنامج <span style={{ fontWeight: 400, fontSize: '.68rem', color: 'var(--text-muted)' }}>· اضغط على يوم لترى تقريره</span></div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 5, marginBottom: 8 }}>
-            {['أح', 'إث', 'ث', 'أر', 'خ', 'ج', 'س'].map(d => <div key={d} style={{ textAlign: 'center', fontSize: '.58rem', color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>{d}</div>)}
+            {['أح', 'إث', 'ث', 'أر', 'خ', 'ج', 'س'].map(d => <div key={d} style={{ textAlign: 'center', fontSize: '.58rem', color: 'var(--text-muted)', fontWeight: 700 }}>{d}</div>)}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 5 }}>
             {Array.from({ length: totalDays }, (_, i) => {
@@ -186,14 +186,14 @@ export default function Progress() {
               const isRestDot = tgt.day_type === 'راحة' || tgt.day_type === 'نشاط خفيف'
               const isCur = dn === currentDay
               const cs = rec?.checkin_status
-              const bg = isCur ? `${G}30` : cs === 'completed' ? 'rgba(34,197,94,0.2)' : cs === 'partial' ? 'rgba(251,146,60,0.15)' : cs === 'missed' ? 'rgba(239,68,68,0.15)' : isRestDot && dn < currentDay ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.04)'
-              const border = isCur ? `${G}80` : cs === 'completed' ? 'rgba(34,197,94,0.5)' : cs === 'partial' ? 'rgba(251,146,60,0.4)' : cs === 'missed' ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.07)'
+              const bg = isCur ? 'var(--accent-dim)' : cs === 'completed' ? 'rgba(34,197,94,0.2)' : cs === 'partial' ? 'rgba(251,146,60,0.15)' : cs === 'missed' ? 'rgba(239,68,68,0.15)' : isRestDot && dn < currentDay ? 'rgba(59,130,246,0.1)' : 'var(--surface-inset)'
+              const border = isCur ? 'var(--accent)' : cs === 'completed' ? 'rgba(34,197,94,0.5)' : cs === 'partial' ? 'rgba(251,146,60,0.4)' : cs === 'missed' ? 'rgba(239,68,68,0.4)' : 'var(--border-subtle)'
               const lbl = isCur ? '▶' : cs === 'completed' ? '✓' : cs === 'partial' ? '◑' : cs === 'missed' ? '✕' : isRestDot && dn <= currentDay ? '💤' : ''
-              const col = isCur ? G : cs === 'completed' ? '#22c55e' : cs === 'partial' ? '#f97316' : cs === 'missed' ? '#ef4444' : 'rgba(255,255,255,0.2)'
+              const col = isCur ? G : cs === 'completed' ? '#22c55e' : cs === 'partial' ? '#f97316' : cs === 'missed' ? '#ef4444' : 'var(--text-muted)'
               const clickable = dn < currentDay && cs
               return (
                 <div key={dn} onClick={clickable ? () => openDayReport(dn) : undefined}
-                  style={{ aspectRatio: '1', background: bg, border: `1.5px solid ${border}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: lbl.length > 1 ? '.52rem' : '.7rem', color: col, fontWeight: isCur ? 900 : 600, cursor: clickable ? 'pointer' : 'default', transition: 'all .15s', boxShadow: isCur ? `0 0 10px ${G}30` : clickable && cs ? '0 1px 4px rgba(0,0,0,0.3)' : 'none' }}
+                  style={{ aspectRatio: '1', background: bg, border: `1.5px solid ${border}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: lbl.length > 1 ? '.52rem' : '.7rem', color: col, fontWeight: isCur ? 900 : 600, cursor: clickable ? 'pointer' : 'default', transition: 'all .15s', boxShadow: isCur ? 'var(--shadow-glow)' : clickable && cs ? 'var(--shadow-card)' : 'none' }}
                   onTouchStart={e => clickable && (e.currentTarget.style.transform = 'scale(.9)')}
                   onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}>
                   {lbl}
@@ -211,14 +211,14 @@ export default function Progress() {
 
         {/* Weekly themes */}
         {program.roadmap?.weekly_overview?.length > 0 && (
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px 16px' }}>
-            <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>أهداف الأسابيع</div>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '14px 16px' }}>
+            <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'var(--text-secondary)', marginBottom: 10 }}>أهداف الأسابيع</div>
             {program.roadmap.weekly_overview.map(w => {
               const active = w.week === Math.ceil(currentDay / 7)
               return (
                 <div key={w.week} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8, opacity: active ? 1 : 0.4 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: active ? `${G}18` : 'rgba(255,255,255,0.04)', border: `1px solid ${active ? `${G}44` : 'rgba(255,255,255,0.08)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.68rem', fontWeight: 800, color: active ? G : 'rgba(255,255,255,0.3)', flexShrink: 0 }}>{w.week}</div>
-                  <div><div style={{ fontWeight: 700, fontSize: '.82rem', marginBottom: 2 }}>{w.theme}</div><div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,0.35)' }}>{w.key_objective}</div></div>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: active ? 'var(--accent-dim)' : 'var(--surface-inset)', border: `1px solid ${active ? 'var(--border-accent)' : 'var(--border-subtle)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.68rem', fontWeight: 800, color: active ? G : 'var(--text-muted)', flexShrink: 0 }}>{w.week}</div>
+                  <div><div style={{ fontWeight: 700, fontSize: '.82rem', marginBottom: 2 }}>{w.theme}</div><div style={{ fontSize: '.72rem', color: 'var(--text-secondary)' }}>{w.key_objective}</div></div>
                 </div>
               )
             })}
@@ -229,25 +229,25 @@ export default function Progress() {
       {/* Day report modal */}
       {dayModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }} onClick={() => { setDayModal(null); setDayReport(null) }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }} />
-          <div style={{ position: 'relative', background: '#0C0B08', borderRadius: '28px 28px 0 0', maxHeight: '82vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(203,162,59,0.12)', borderBottom: 'none', boxShadow: '0 -20px 60px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
-            <div style={{ height: 3, background: `linear-gradient(90deg,transparent,${G},transparent)`, flexShrink: 0 }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }} />
+          <div style={{ position: 'relative', background: 'var(--card)', borderRadius: '28px 28px 0 0', maxHeight: '82vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border)', borderBottom: 'none', boxShadow: '0 -12px 40px rgba(0,0,0,0.15)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ height: 3, background: `linear-gradient(90deg,transparent,var(--accent),transparent)`, flexShrink: 0 }} />
             <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px', flexShrink: 0 }}>
-              <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }} />
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border-subtle)' }} />
             </div>
-            <div style={{ padding: '4px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div style={{ padding: '4px 20px 16px', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
-                <div style={{ fontSize: '.65rem', fontWeight: 700, color: `${G}88`, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>تقرير اليوم</div>
-                <div style={{ fontWeight: 900, fontSize: '1.3rem', color: '#ECE3CF', lineHeight: 1 }}>{dayModal.dayNumber}</div>
-                {dayReport?.sessionDate && <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,0.3)', marginTop: 4, fontFamily: F }}>{new Date(dayReport.sessionDate).toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long' })}</div>}
+                <div style={{ fontSize: '.65rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>تقرير اليوم</div>
+                <div style={{ fontWeight: 900, fontSize: '1.3rem', color: 'var(--text-primary)', lineHeight: 1 }}>{dayModal.dayNumber}</div>
+                {dayReport?.sessionDate && <div style={{ fontSize: '.72rem', color: 'var(--text-muted)', marginTop: 4, fontFamily: F }}>{new Date(dayReport.sessionDate).toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long' })}</div>}
               </div>
-              <button onClick={() => { setDayModal(null); setDayReport(null) }} style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.85rem', flexShrink: 0 }}>✕</button>
+              <button onClick={() => { setDayModal(null); setDayReport(null) }} style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--surface-inset)', border: '1px solid var(--border)', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.85rem', flexShrink: 0 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '16px 18px 32px' }}>
               {dayReportLoading && (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 0', gap: 12 }}>
-                  <div style={{ width: 28, height: 28, border: '3px solid rgba(203,162,59,0.15)', borderTopColor: G, borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
-                  <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.3)' }}>جاري تحميل التقرير...</div>
+                  <div style={{ width: 28, height: 28, border: '3px solid var(--accent-dim)', borderTopColor: G, borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
+                  <div style={{ fontSize: '.82rem', color: 'var(--text-muted)' }}>جاري تحميل التقرير...</div>
                 </div>
               )}
               {dayReport && !dayReportLoading && (<>
@@ -269,41 +269,41 @@ export default function Progress() {
                       )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 12 }}>
-                      {[['التكرارات', dayReport.session.total_actual_reps || 0, '#ECE3CF'], ['المجموعات', dayReport.session.total_sets || 0, G], ['الهدف', dayReport.session.total_target_reps || '—', 'rgba(255,255,255,0.4)']].map(([l, v, c2]) => (
-                        <div key={l} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
+                      {[['التكرارات', dayReport.session.total_actual_reps || 0, 'var(--text-primary)'], ['المجموعات', dayReport.session.total_sets || 0, G], ['الهدف', dayReport.session.total_target_reps || '—', 'var(--text-muted)']].map(([l, v, c2]) => (
+                        <div key={l} style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
                           <div style={{ fontWeight: 900, fontSize: '1rem', color: c2, fontFamily: 'monospace', lineHeight: 1 }}>{v}</div>
-                          <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{l}</div>
+                          <div style={{ fontSize: '.6rem', color: 'var(--text-muted)', marginTop: 4 }}>{l}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '12px 14px', marginBottom: 10 }}>
+                    <div style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '12px 14px', marginBottom: 10 }}>
                       {(dayReport.session.exercises || []).slice(0, 6).map((ex, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderTop: i > 0 ? '1px solid var(--border-subtle)' : 'none' }}>
                           <div>
-                            <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>{ex.name?.split('|')[0].trim()}</div>
-                            {ex.muscle && <div style={{ fontSize: '.63rem', color: `${G}77`, marginTop: 1 }}>{ex.muscle}</div>}
+                            <div style={{ fontSize: '.82rem', color: 'var(--text-primary)', fontWeight: 600 }}>{ex.name?.split('|')[0].trim()}</div>
+                            {ex.muscle && <div style={{ fontSize: '.63rem', color: 'var(--text-muted)', marginTop: 1 }}>{ex.muscle}</div>}
                           </div>
-                          <div style={{ textAlign: 'left', flexShrink: 0 }}>
+                          <div style={{ textAlign: 'end', flexShrink: 0 }}>
                             <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#22c55e', fontSize: '.82rem' }}>{ex.reps} تكرار</div>
-                            <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,0.3)' }}>{ex.sets} مجموعة</div>
+                            <div style={{ fontSize: '.6rem', color: 'var(--text-muted)' }}>{ex.sets} مجموعة</div>
                           </div>
                         </div>
                       ))}
                     </div>
                     <button onClick={() => { router.push(dayReport.session.id ? '/dashboard?session=' + dayReport.session.id : '/dashboard'); setDayModal(null) }}
-                      style={{ width: '100%', background: `${G}0D`, border: `1px solid ${G}25`, color: G, borderRadius: 11, padding: '10px', fontFamily: F, fontWeight: 700, cursor: 'pointer', fontSize: '.82rem', letterSpacing: .5 }}>
+                      style={{ width: '100%', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', color: G, borderRadius: 11, padding: '10px', fontFamily: F, fontWeight: 700, cursor: 'pointer', fontSize: '.82rem', letterSpacing: .5 }}>
                       عرض التفاصيل الكاملة في السجل ←
                     </button>
                   </div>
                 ) : dayReport.dayRecord?.checkin_status === 'completed' ? (
-                  <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '20px', marginBottom: 12, textAlign: 'center' }}>
+                  <div style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '20px', marginBottom: 12, textAlign: 'center' }}>
                     <div style={{ fontSize: '1.4rem', marginBottom: 8 }}>🏋️</div>
-                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+                    <div style={{ fontSize: '.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
                       التمرين مكتمل لكن تفاصيل المجموعات غير متوفرة<br />
-                      <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,0.25)' }}>بيانات التمارين تُحفظ منذ v5.6</span>
+                      <span style={{ fontSize: '.72rem', color: 'var(--text-muted)' }}>بيانات التمارين تُحفظ منذ v5.6</span>
                     </div>
                     <button onClick={() => { router.push('/dashboard'); setDayModal(null) }}
-                      style={{ marginTop: 12, background: `${G}0D`, border: `1px solid ${G}25`, color: G, borderRadius: 10, padding: '8px 18px', fontFamily: F, fontWeight: 700, cursor: 'pointer', fontSize: '.78rem' }}>
+                      style={{ marginTop: 12, background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', color: G, borderRadius: 10, padding: '8px 18px', fontFamily: F, fontWeight: 700, cursor: 'pointer', fontSize: '.78rem' }}>
                       عرض السجل ←
                     </button>
                   </div>
@@ -314,26 +314,26 @@ export default function Progress() {
                   {dayReport.meals?.length > 0 ? (<>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 7, marginBottom: 10 }}>
                       {[['السعرات', dayReport.nutrition?.totalCals, G], ['بروتين', dayReport.nutrition?.totalProtein + 'g', '#3b82f6'], ['كارب', dayReport.nutrition?.totalCarbs + 'g', '#f97316'], ['دهون', dayReport.nutrition?.totalFat + 'g', '#22c55e']].map(([l, v, c2]) => (
-                        <div key={l} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '8px 4px', textAlign: 'center' }}>
+                        <div key={l} style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: '8px 4px', textAlign: 'center' }}>
                           <div style={{ fontWeight: 700, color: c2, fontFamily: 'monospace', fontSize: '.78rem', lineHeight: 1 }}>{v}</div>
-                          <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>{l}</div>
+                          <div style={{ fontSize: '.58rem', color: 'var(--text-muted)', marginTop: 3 }}>{l}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '10px 14px', marginBottom: 10 }}>
+                    <div style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '10px 14px', marginBottom: 10 }}>
                       {dayReport.meals.slice(0, 5).map((m, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderTop: i > 0 ? '1px solid var(--border-subtle)' : 'none' }}>
                           <div>
-                            <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{m.meal_name || m.meal_type}</div>
-                            <div style={{ fontSize: '.63rem', color: 'rgba(255,255,255,0.3)' }}>{m.meal_type}</div>
+                            <div style={{ fontSize: '.8rem', color: 'var(--text-primary)', fontWeight: 500 }}>{m.meal_name || m.meal_type}</div>
+                            <div style={{ fontSize: '.63rem', color: 'var(--text-muted)' }}>{m.meal_type}</div>
                           </div>
-                          <div style={{ fontFamily: 'monospace', fontSize: '.76rem', color: 'rgba(255,255,255,0.5)', flexShrink: 0 }}>{m.total_calories || 0} سعرة</div>
+                          <div style={{ fontFamily: 'monospace', fontSize: '.76rem', color: 'var(--text-secondary)', flexShrink: 0 }}>{m.total_calories || 0} سعرة</div>
                         </div>
                       ))}
                     </div>
                   </>) : (
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '20px', textAlign: 'center', marginBottom: 10 }}>
-                      <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,0.3)' }}>لم تسجّل وجبات لهذا اليوم</div>
+                    <div style={{ background: 'var(--surface-inset)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '20px', textAlign: 'center', marginBottom: 10 }}>
+                      <div style={{ fontSize: '.82rem', color: 'var(--text-muted)' }}>لم تسجّل وجبات لهذا اليوم</div>
                     </div>
                   )}
                   <button onClick={() => { router.push('/meals' + (dayReport.sessionDate ? '?date=' + dayReport.sessionDate : '')); setDayModal(null) }}
