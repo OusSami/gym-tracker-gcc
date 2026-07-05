@@ -15,12 +15,17 @@ export default function Progress() {
   const [dayModal, setDayModal] = useState(null)
   const [dayReport, setDayReport] = useState(null)
   const [dayReportLoading, setDayReportLoading] = useState(false)
+  const [profileSex, setProfileSex] = useState(null)
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) { router.push('/'); return }
       setUser(session.user)
       try {
-        const sr = await fetch('/api/packages/status?userId=' + session.user.id).then(r => r.json())
+        const [sr, pr] = await Promise.all([
+          fetch('/api/packages/status?userId=' + session.user.id).then(r => r.json()),
+          fetch('/api/profile?userId=' + session.user.id).then(r => r.json()).catch(() => ({})),
+        ])
+        setProfileSex(pr.profile?.sex || null)
         if (sr.program) {
           setProgram(sr.program)
           const dr = await fetch('/api/packages/days?programId=' + sr.program.id).then(r => r.json()).catch(() => ({ days: [] }))
@@ -47,10 +52,12 @@ export default function Progress() {
     </div>
   )
 
+  const heroImg = profileSex === 'female' ? '/gender-female.webp' : '/gender-male.webp'
+
   if (!program) return (
     <div style={{ ...B, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 28, textAlign: 'center' }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ fontSize: '3rem', marginBottom: 16 }}>📊</div>
+      <img src={heroImg} alt="" style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center 15%', marginBottom: 20, border: '3px solid var(--border-accent)' }} />
       <div style={{ fontWeight: 800, fontSize: '1.2rem', marginBottom: 8 }}>ما عندك برنامج نشط</div>
       <div style={{ fontSize: '.88rem', color: 'var(--text-muted)', marginBottom: 24 }}>ابدأ برنامجك لمتابعة تقدمك</div>
       <button onClick={() => router.push('/packages')} style={{ background: 'var(--btn-primary-bg)', color: 'var(--btn-primary-fg)', border: 'none', borderRadius: 14, padding: '14px 32px', fontFamily: F, fontWeight: 900, fontSize: '1rem', cursor: 'pointer' }}>ابدأ برنامجي 🚀</button>
@@ -107,6 +114,14 @@ export default function Progress() {
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px 100px' }} className="fu">
+
+        {/* Zero-workouts motivational banner */}
+        {completedCount === 0 && (
+          <div style={{ textAlign: 'center', padding: '8px 0 20px' }}>
+            <img src={heroImg} alt="" style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center 15%', border: '3px solid var(--border-accent)' }} />
+            <div style={{ fontSize: '.82rem', color: 'var(--text-secondary)', marginTop: 10, fontWeight: 600 }}>جاهز تبدأ؟ اليوم الأول أصعب خطوة</div>
+          </div>
+        )}
 
         {/* Stats panel */}
         <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', background: 'var(--card)', border: '1px solid var(--border)', marginBottom: 12, boxShadow: 'var(--shadow-card)' }}>
