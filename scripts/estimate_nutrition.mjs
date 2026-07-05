@@ -640,9 +640,12 @@ function estimateNutrition(recipe) {
 
 console.log('\n📥  Fetching all recipes…')
 
+// Extras (recipe_type='extra') have no ingredients array — they hold hand-set
+// USDA per-serving values and must never go through the parsing pipeline.
 let q = supabase
   .from('recipes')
   .select('id, name, category, servings, ingredients')
+  .neq('recipe_type', 'extra')
   .order('created_at')
 if (LIMIT) q = q.limit(LIMIT)
 
