@@ -68,7 +68,7 @@ export default function Progress() {
   const days = program.roadmap?.days || []
   const totalDays = program.total_days || 21
   const currentDay = program.current_day || 1
-  const completedCount = router.query.preview === 'empty' ? 0 : dayRecords.filter(d => ['completed', 'partial'].includes(d.checkin_status)).length
+  const completedCount = dayRecords.filter(d => ['completed', 'partial'].includes(d.checkin_status)).length
   const pct = Math.round((completedCount / totalDays) * 100)
 
   // Streak — consecutive checked-in days going backwards from yesterday
