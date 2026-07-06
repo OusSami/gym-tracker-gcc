@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
+import { getContent, getDailyPhrase } from '../lib/content'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1033,7 +1034,7 @@ function HomeScreen({ user, quote, onStart, router }) {
       }).length
       // Weight
       const weights = wd.entries || []
-      const latestW = weights.length ? weights[0] : null
+      const latestW = weights.length ? weights[weights.length - 1] : null
       const monthAgo = new Date(); monthAgo.setDate(monthAgo.getDate() - 30)
       const oldW = weights.find(w => new Date(w.recorded_at) <= monthAgo)
       const monthChange = latestW && oldW ? Math.round((latestW.weight_kg - oldW.weight_kg) * 10) / 10 : null
