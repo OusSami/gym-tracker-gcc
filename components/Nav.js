@@ -44,8 +44,8 @@ export function TopNav({ title, back, user, onSignOut }) {
           <span style={{fontFamily:"'Tajawal','Space Grotesk',sans-serif",fontWeight:700,fontSize:'1rem',color:'var(--text-primary)'}}>{title}</span>
         ) : (
           <div style={{display:'flex',alignItems:'baseline',gap:6}}>
-            <span style={{fontFamily:"'Noto Kufi Arabic',sans-serif",fontWeight:900,fontSize:'1.3rem',color:'var(--text-primary)',lineHeight:1}}>GYM</span>
-            <span style={{fontFamily:"'Noto Kufi Arabic',sans-serif",fontWeight:700,fontSize:'1.1rem',lineHeight:1,color:'var(--text-secondary)'}}>TRACKER</span>
+            <span style={{fontFamily:"'Noto Kufi Arabic',sans-serif",fontWeight:900,fontSize:'1.3rem',color:'var(--text-primary)',lineHeight:1}}>ميج</span>
+            <span style={{fontFamily:"'Noto Kufi Arabic',sans-serif",fontWeight:700,fontSize:'1.1rem',lineHeight:1,color:'var(--text-secondary)'}}>تراكر</span>
           </div>
         )}
       </div>

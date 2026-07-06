@@ -1089,19 +1089,15 @@ function HomeScreen({ user, quote, onStart, router }) {
   return (
     <div style={{padding:'0 0 100px',position:'relative',maxWidth:520,margin:'0 auto'}}>
 
-      {/* ── 1. HERO BLOCK — full-bleed with photo bg + scrim + CTA ── */}
+      {/* ── 1. HERO BLOCK — full-bleed with brand gradient bg + CTA ── */}
       <div style={{
         position:'relative',
         minHeight:'45vh',
-        backgroundColor:'#2D1F14',
+        background:'linear-gradient(160deg, var(--surface) 0%, var(--accent-soft) 100%)',
         display:'flex',
         flexDirection:'column',
         overflow:'hidden',
       }}>
-        {/* Hero background photo */}
-        <img src="/hero-bg.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
-        {/* Gradient scrim: light at top (face visible) → dark at bottom (button legible) */}
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(30,15,5,0.25) 0%,rgba(20,10,3,0.55) 60%,rgba(15,8,2,0.75) 100%)',pointerEvents:'none',zIndex:0}}/>
 
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
@@ -1121,7 +1117,7 @@ function HomeScreen({ user, quote, onStart, router }) {
         }}>
           <div>
             <div style={{color:'var(--text-secondary)',fontSize:'.78rem',fontFamily:"'Tajawal',sans-serif",marginBottom:8}}>{greeting}</div>
-            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2.2rem',color:'#FFFFFF',lineHeight:1.05}}>
+            <div style={{fontFamily:"'Noto Kufi Arabic','Tajawal',sans-serif",fontWeight:900,fontSize:'2.2rem',color:'var(--text-primary)',lineHeight:1.05}}>
               {firstName || 'أهلاً 👋'}
             </div>
           </div>

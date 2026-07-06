@@ -636,7 +636,7 @@ export default function Meals() {
   const [goals, setGoals]     = useState(null)
 
   // ── Top-level 3-tab bar ─────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('recipes')
+  const [activeTab, setActiveTab] = useState('nutrition')
 
   // ── Tab 1: Recipe browser ────────────────────────────────────────────────
   const [recipes, setRecipes]               = useState([])
@@ -1825,8 +1825,8 @@ export default function Meals() {
           borderBottom: '1px solid var(--accent-faint)',
         }}>
           {[
-            { key: 'recipes',   label: '🍽️ وصفات'  },
             { key: 'nutrition', label: '📊 تغذيتي'  },
+            { key: 'recipes',   label: '🍽️ وصفات'  },
           ].map(({ key, label }) => {
             const isActive = activeTab === key
             return (
