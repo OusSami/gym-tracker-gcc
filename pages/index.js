@@ -5,6 +5,7 @@ import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
 import { getContent, getDailyPhrase } from '../lib/content'
+import { Scale, Dumbbell, TrendingUp, Target, Flame } from 'lucide-react'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1102,7 +1103,7 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
           <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2}}>
-            <div style={{fontSize:'.95rem',lineHeight:1}}>🔥</div>
+            <div style={{lineHeight:1,display:'flex',justifyContent:'center'}}><Flame size={18} strokeWidth={0} fill="#ef4444"/></div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
           </div>
@@ -1136,10 +1137,10 @@ function HomeScreen({ user, quote, onStart, router }) {
         <style>{`.stat-scroll::-webkit-scrollbar{display:none}`}</style>
         <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:12,paddingInline:16,paddingBlock:12,scrollbarWidth:'none',marginInline:-16,marginBottom:2}}>
           {[
-            {icon:'⚖️',label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,bg:'var(--accent-soft)',click:()=>router.push('/weight')},
-            {icon:'🏋️',label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null,bg:'#E8E4F8'},
-            {icon:'📈',label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null,bg:'#D6EFE8'},
-            {icon:'🎯',label:'هدفك الحالي',value:d?.goal||null,bg:'var(--accent-soft)'},
+            {Icon:Scale,      label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,bg:'var(--accent-soft)',click:()=>router.push('/weight')},
+            {Icon:Dumbbell,   label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null,bg:'#E8E4F8'},
+            {Icon:TrendingUp, label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null,bg:'#D6EFE8'},
+            {Icon:Target,     label:'هدفك الحالي',value:d?.goal||null,bg:'var(--accent-soft)'},
           ].map((stat,i)=>{
             const BKGS = ['var(--accent-soft)','#E8E4F8','#D6EFE8']
             const bg = stat.bg || BKGS[i % BKGS.length]
@@ -1148,7 +1149,7 @@ function HomeScreen({ user, quote, onStart, router }) {
             return (
               <div key={i} onClick={stat.click}
                 style={{flexShrink:0,width:140,minWidth:140,height:130,borderRadius:20,background:bg,display:'flex',flexDirection:'column',justifyContent:'space-between',paddingBlock:16,paddingInline:16,cursor:stat.click?'pointer':'default'}}>
-                <div style={{fontSize:28,textAlign:'right',lineHeight:1}}>{stat.icon}</div>
+                <div style={{textAlign:'right',lineHeight:1,display:'flex',justifyContent:'flex-end'}}><stat.Icon size={26} strokeWidth={1.6} color={isEmpty?'var(--text-secondary)':'var(--text-primary)'}/></div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:22,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1.1,textAlign:'right'}}>{val}</div>
                 <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:12,color:'var(--text-secondary)',textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
               </div>

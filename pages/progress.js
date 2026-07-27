@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 import { BottomTabs } from '../components/Nav'
+import { Trophy, Flame, Star, Dumbbell, Medal, Target, Zap, Droplets } from 'lucide-react'
 
 const G = 'var(--accent)', F = "'Tajawal',sans-serif"
 const B = { minHeight: '100vh', background: 'var(--surface)', color: 'var(--text-primary)', fontFamily: F, direction: 'rtl' }
@@ -80,12 +81,12 @@ export default function Progress() {
 
   // Milestones
   const MILESTONES = [
-    { label: 'أول تمرين', icon: '🏆', need: 1 },
-    { label: '3 أيام',    icon: '🔥', need: 3 },
-    { label: 'أسبوع كامل',icon: '⭐', need: 7 },
-    { label: '10 أيام',   icon: '💪', need: 10 },
-    { label: 'النصف',     icon: '🥇', need: Math.ceil(totalDays / 2) },
-    { label: 'الإنهاء',   icon: '🎯', need: totalDays },
+    { label: 'أول تمرين', Icon: Trophy,   need: 1 },
+    { label: '3 أيام',    Icon: Flame,    need: 3 },
+    { label: 'أسبوع كامل',Icon: Star,     need: 7 },
+    { label: '10 أيام',   Icon: Dumbbell, need: 10 },
+    { label: 'النصف',     Icon: Medal,    need: Math.ceil(totalDays / 2) },
+    { label: 'الإنهاء',   Icon: Target,   need: totalDays },
   ]
 
   return (
@@ -127,7 +128,7 @@ export default function Progress() {
           <div style={{ display: 'flex' }}>
             <div style={{ flex: 1, textAlign: 'center', padding: '9px 4px', borderInlineEnd: '1px solid var(--border-subtle)' }}>
               <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1rem', color: streak >= 3 ? '#f97316' : 'var(--text-muted)', lineHeight: 1 }}>
-                {streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '💧'} {streak}
+                {streak >= 7 ? <Flame size={14} strokeWidth={0} fill="#f97316"/> : streak >= 3 ? <Zap size={14} strokeWidth={0} fill="#f97316"/> : <Droplets size={14} strokeWidth={1.8} color="var(--text-muted)"/>} {streak}
               </div>
               <div style={{ fontSize: '.5rem', color: 'var(--text-muted)', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'DM Sans',sans-serif" }}>streak</div>
             </div>
@@ -153,7 +154,7 @@ export default function Progress() {
               const done = completedCount >= m.need
               return (
                 <div key={m.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 52, opacity: done ? 1 : 0.3, filter: done ? 'none' : 'grayscale(1)' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: done ? 'var(--accent-dim)' : 'var(--surface-inset)', border: `2px solid ${done ? 'var(--accent)' : 'var(--border-subtle)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: done ? 'var(--shadow-glow)' : 'none' }}>{m.icon}</div>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: done ? 'var(--accent-dim)' : 'var(--surface-inset)', border: `2px solid ${done ? 'var(--accent)' : 'var(--border-subtle)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: done ? 'var(--shadow-glow)' : 'none' }}><m.Icon size={20} strokeWidth={1.8} color={done ? 'var(--accent)' : 'var(--text-muted)'}/></div>
                   <div style={{ fontSize: '.58rem', color: done ? G : 'var(--text-muted)', fontWeight: done ? 700 : 400, textAlign: 'center' }}>{m.label}</div>
                 </div>
               )

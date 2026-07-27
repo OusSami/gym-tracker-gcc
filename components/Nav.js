@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import React from 'react'
 import { useRouter } from 'next/router'
+import { Home, BarChart2, UtensilsCrossed, Calendar, BookOpen, ScanFace, Settings, LogOut } from 'lucide-react'
 
 export function TopNav({ title, back, user, onSignOut }) {
   const router = useRouter()
@@ -79,18 +80,18 @@ export function TopNav({ title, back, user, onSignOut }) {
                 </>
               )}
               {[
-                {icon:'🏠', label:'الرئيسية',       path:'/'},
-                {icon:'📊', label:'تقدمك',       path:'/dashboard'},
-                {icon:'🫵', label:'جسمك بالذكاء',   path:'/body'},
-                {icon:'🍽️', label:'تغذيتك',          path:'/meals'},
-                {icon:'📚', label:'مكتبة التمارين',      path:'/exercises'},
-                {icon:'⚙️', label:'الإعدادات',       path:'/settings'},
+                {Icon:Home,           label:'الرئيسية',       path:'/'},
+                {Icon:BarChart2,      label:'تقدمك',           path:'/dashboard'},
+                {Icon:ScanFace,       label:'جسمك بالذكاء',   path:'/body'},
+                {Icon:UtensilsCrossed,label:'تغذيتك',          path:'/meals'},
+                {Icon:BookOpen,       label:'مكتبة التمارين', path:'/exercises'},
+                {Icon:Settings,       label:'الإعدادات',       path:'/settings'},
               ].map(item => (
                 <button key={item.path} onClick={() => go(item.path)}
                   style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:9,cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.92rem',fontWeight:500,color:'var(--text-secondary)',transition:'all .12s',border:'none',background:'none',width:'100%',textAlign:'start',direction:'rtl'}}
                   onMouseEnter={e=>{e.currentTarget.style.background='rgba(0,0,0,0.05)';e.currentTarget.style.color='var(--text-primary)'}}
                   onMouseLeave={e=>{e.currentTarget.style.background='none';e.currentTarget.style.color='var(--text-secondary)'}}>
-                  <span>{item.icon}</span>{item.label}
+                  <item.Icon size={16} strokeWidth={1.8}/>{item.label}
                 </button>
               ))}
               <div style={{height:1,background:'rgba(0,0,0,0.08)',margin:'4px 0'}}/>
@@ -98,7 +99,7 @@ export function TopNav({ title, back, user, onSignOut }) {
                 style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:9,cursor:'pointer',fontFamily:"'Tajawal',sans-serif",fontSize:'.92rem',fontWeight:500,color:'rgba(239,68,68,0.75)',transition:'all .12s',border:'none',background:'none',width:'100%',textAlign:'start',direction:'rtl'}}
                 onMouseEnter={e=>{e.currentTarget.style.background='rgba(239,68,68,0.08)';e.currentTarget.style.color='#f87171'}}
                 onMouseLeave={e=>{e.currentTarget.style.background='none';e.currentTarget.style.color='rgba(248,113,113,0.7)'}}>
-                <span>👋</span> تسجيل الخروج
+                <LogOut size={16} strokeWidth={1.8}/> تسجيل الخروج
               </button>
             </div>
           )}
@@ -129,11 +130,11 @@ export function BottomTabs({ active }) {
   }, [active])
 
   const tabs = [
-    { id:'home',      icon:'🏠', label: hasSession ? '🔴 جارٍ' : 'الرئيسية', path:'/' },
-    { id:'dashboard', icon:'📊', label:'التقدم', path:'/progress' },
-    { id:'meals',     icon:'🍽️', label:'التغذية', path:'/meals' },
-    { id:'program',   icon:'📅', label:'برنامجي', path:'/program' },
-    { id:'exercises', icon:'📚', label:'المكتبة', path:'/exercises' },
+    { id:'home',      Icon:Home,            label: hasSession ? 'جارٍ' : 'الرئيسية', path:'/',        live: hasSession },
+    { id:'dashboard', Icon:BarChart2,        label:'التقدم',   path:'/progress' },
+    { id:'meals',     Icon:UtensilsCrossed,  label:'التغذية',  path:'/meals' },
+    { id:'program',   Icon:Calendar,         label:'برنامجي',  path:'/program' },
+    { id:'exercises', Icon:BookOpen,         label:'المكتبة',  path:'/exercises' },
   ]
 
   return (
@@ -148,21 +149,29 @@ export function BottomTabs({ active }) {
       height:'calc(60px + env(safe-area-inset-bottom))',
       direction:'rtl',
     }}>
-      {tabs.map(t => (
-        <button key={t.id} onClick={() => router.push(t.path)}
-          style={{
-            display:'flex', flexDirection:'column', alignItems:'center', gap:3,
-            paddingBlock:'6px', paddingInline:'14px',
-            borderRadius:'var(--radius-md)', cursor:'pointer',
-            transition:'all .15s', background: active===t.id ? 'rgba(0,0,0,0.06)' : 'transparent',
-            border:'none',
-            color: active===t.id ? '#111111' : '#A1A1AA',
-            minWidth:56,
-          }}>
-          <span style={{fontSize:'1.2rem',lineHeight:1}}>{t.icon}</span>
-          <span style={{fontSize:'.6rem',fontWeight: active===t.id ? 800 : 600,fontFamily:"'Tajawal',sans-serif"}}>{t.label}</span>
-        </button>
-      ))}
+      {tabs.map(t => {
+        const isActive = active === t.id
+        return (
+          <button key={t.id} onClick={() => router.push(t.path)}
+            style={{
+              display:'flex', flexDirection:'column', alignItems:'center', gap:3,
+              paddingBlock:'6px', paddingInline:'14px',
+              borderRadius:'var(--radius-md)', cursor:'pointer',
+              transition:'all .15s', background: isActive ? 'rgba(0,0,0,0.06)' : 'transparent',
+              border:'none',
+              color: isActive ? '#111111' : '#A1A1AA',
+              minWidth:56, position:'relative',
+            }}>
+            <div style={{position:'relative',lineHeight:1}}>
+              <t.Icon size={22} strokeWidth={isActive ? 2.2 : 1.6}/>
+              {t.live && (
+                <span style={{position:'absolute',top:-2,insetInlineEnd:-4,width:7,height:7,borderRadius:'50%',background:'#ef4444',border:'1.5px solid white'}}/>
+              )}
+            </div>
+            <span style={{fontSize:'.6rem',fontWeight: isActive ? 800 : 600,fontFamily:"'Tajawal',sans-serif"}}>{t.label}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
