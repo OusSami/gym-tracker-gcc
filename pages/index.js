@@ -1102,7 +1102,7 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
-          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2}}>
+          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2,animation:'flamePulse 2s ease-in-out infinite'}}>
             <div style={{lineHeight:1,display:'flex',justifyContent:'center'}}><Flame size={18} strokeWidth={0} fill="#ef4444"/></div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
@@ -1134,7 +1134,7 @@ function HomeScreen({ user, quote, onStart, router }) {
       <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
 
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable tile row ── */}
-        <style>{`.stat-scroll::-webkit-scrollbar{display:none}`}</style>
+        <style>{`.stat-scroll::-webkit-scrollbar{display:none}@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}`}</style>
         <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:0,paddingInline:16,paddingBlock:16,scrollbarWidth:'none',marginInline:-16,marginBottom:2,alignItems:'stretch'}}>
           {[
             {label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,click:()=>router.push('/weight')},
@@ -1319,10 +1319,14 @@ function HomeScreen({ user, quote, onStart, router }) {
             {Icon:ScanFace, label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
           ].map(({Icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 4px 20px rgba(168,120,90,0.13)',WebkitTapHighlightColor:'transparent',transition:'transform .12s'}}
-              onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
-              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{display:'flex',justifyContent:'center',marginBottom:10}}><Icon size={26} strokeWidth={1.8} color='var(--accent)'/></div>
+              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 1px 3px rgba(61,42,31,0.08), 0 8px 24px rgba(168,120,90,0.16)',WebkitTapHighlightColor:'transparent',transition:'transform 180ms ease, box-shadow 180ms ease'}}
+              onTouchStart={e=>{e.currentTarget.style.transform='scale(.96)';e.currentTarget.style.boxShadow='0 1px 3px rgba(61,42,31,0.08), 0 2px 6px rgba(168,120,90,0.08)'}}
+              onTouchEnd={e=>{e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='0 1px 3px rgba(61,42,31,0.08), 0 8px 24px rgba(168,120,90,0.16)'}}>
+              <div style={{display:'flex',justifyContent:'center',marginBottom:10}}>
+                <div style={{width:48,height:48,borderRadius:14,background:'linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(216,155,122,0.30)'}}>
+                  <Icon size={22} strokeWidth={1.8} color='#FFFFFF'/>
+                </div>
+              </div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)',marginBottom:3}}>{label}</div>
               <div style={{fontSize:'.6rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>

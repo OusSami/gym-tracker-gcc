@@ -157,12 +157,14 @@ export function BottomTabs({ active }) {
               display:'flex', flexDirection:'column', alignItems:'center', gap:3,
               paddingBlock:'6px', paddingInline:'14px',
               borderRadius:'var(--radius-md)', cursor:'pointer',
-              transition:'all .15s', background: isActive ? 'rgba(0,0,0,0.06)' : 'transparent',
+              transition:'transform 180ms ease', background: isActive ? 'rgba(216,155,122,0.08)' : 'transparent',
               border:'none',
               color: isActive ? 'var(--accent)' : '#A1A1AA',
               minWidth:56, position:'relative',
-            }}>
-            <div style={{position:'relative',lineHeight:1}}>
+            }}
+            onTouchStart={e=>e.currentTarget.style.transform='scale(.88)'}
+            onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+            <div style={{position:'relative',lineHeight:1,borderRadius:10,padding:'4px 6px',...(isActive?{background:'rgba(216,155,122,0.14)',boxShadow:'0 2px 6px rgba(216,155,122,0.22), 0 1px 2px rgba(61,42,31,0.06)'}:{})}}>
               <t.Icon size={22} strokeWidth={isActive ? 2.2 : 1.8}/>
               {t.live && (
                 <span style={{position:'absolute',top:-2,insetInlineEnd:-4,width:7,height:7,borderRadius:'50%',background:'#ef4444',border:'1.5px solid white'}}/>
