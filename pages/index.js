@@ -5,7 +5,7 @@ import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
 import { getContent, getDailyPhrase } from '../lib/content'
-import { Scale, Dumbbell, TrendingUp, Target, Flame } from 'lucide-react'
+import { Scale, Dumbbell, TrendingUp, Target, Flame, BarChart2, Calendar, ScanFace } from 'lucide-react'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1102,9 +1102,9 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
-          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2}}>
+          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,border:'1px solid rgba(61,42,31,0.08)',zIndex:2}}>
             <div style={{lineHeight:1,display:'flex',justifyContent:'center'}}><Flame size={18} strokeWidth={0} fill="#ef4444"/></div>
-            <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
+            <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:900,fontSize:'1.05rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
           </div>
         )}
@@ -1131,27 +1131,26 @@ function HomeScreen({ user, quote, onStart, router }) {
         </div>
       </div>
 
-      <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
+      <div style={{padding:'20px 20px 0',position:'relative',zIndex:1}}>
 
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable tile row ── */}
         <style>{`.stat-scroll::-webkit-scrollbar{display:none}`}</style>
-        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:12,paddingInline:16,paddingBlock:12,scrollbarWidth:'none',marginInline:-16,marginBottom:2}}>
+        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:14,paddingInline:20,paddingBlock:14,scrollbarWidth:'none',marginInline:-20,marginBottom:2}}>
           {[
-            {Icon:Scale,      label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,bg:'var(--accent-soft)',click:()=>router.push('/weight')},
-            {Icon:Dumbbell,   label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null,bg:'#E8E4F8'},
-            {Icon:TrendingUp, label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null,bg:'#D6EFE8'},
-            {Icon:Target,     label:'هدفك الحالي',value:d?.goal||null,bg:'var(--accent-soft)'},
+            {Icon:Scale,      label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,accent:true,click:()=>router.push('/weight')},
+            {Icon:Dumbbell,   label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null},
+            {Icon:TrendingUp, label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null},
+            {Icon:Target,     label:'هدفك الحالي',value:d?.goal||null},
           ].map((stat,i)=>{
-            const BKGS = ['var(--accent-soft)','#E8E4F8','#D6EFE8']
-            const bg = stat.bg || BKGS[i % BKGS.length]
             const val = stat.value != null ? stat.value : '—'
             const isEmpty = stat.value == null
+            const valColor = isEmpty ? 'var(--text-secondary)' : stat.accent ? 'var(--accent)' : 'var(--text-primary)'
             return (
               <div key={i} onClick={stat.click}
-                style={{flexShrink:0,width:140,minWidth:140,height:130,borderRadius:20,background:bg,display:'flex',flexDirection:'column',justifyContent:'space-between',paddingBlock:16,paddingInline:16,cursor:stat.click?'pointer':'default'}}>
-                <div style={{textAlign:'right',lineHeight:1,display:'flex',justifyContent:'flex-end'}}><stat.Icon size={26} strokeWidth={1.6} color={isEmpty?'var(--text-secondary)':'var(--text-primary)'}/></div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:22,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1.1,textAlign:'right'}}>{val}</div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:12,color:'var(--text-secondary)',textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
+                style={{flexShrink:0,width:148,minWidth:148,height:140,borderRadius:20,background:'var(--card)',border:'1px solid rgba(61,42,31,0.08)',display:'flex',flexDirection:'column',justifyContent:'space-between',paddingBlock:18,paddingInline:18,cursor:stat.click?'pointer':'default'}}>
+                <div style={{textAlign:'right',lineHeight:1,display:'flex',justifyContent:'flex-end'}}><stat.Icon size={24} strokeWidth={1.5} color='var(--text-secondary)'/></div>
+                <div style={{fontFamily:"'Playfair Display','Tajawal',Georgia,serif",fontWeight:700,fontSize:24,color:valColor,lineHeight:1.1,textAlign:'right'}}>{val}</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:11,color:'var(--text-secondary)',textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
               </div>
             )
           })}
@@ -1160,7 +1159,7 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── 3. ACTIVE PROGRAM CARD ── */}
         {activeProgram?.program && (
           <div onClick={() => router.push('/program?id=' + activeProgram.program.id)}
-            style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
+            style={{background:'var(--card)',border:'1px solid rgba(61,42,31,0.08)',borderRadius:22,padding:'18px 20px',marginBottom:18,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
             onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
             onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
@@ -1225,10 +1224,13 @@ function HomeScreen({ user, quote, onStart, router }) {
           const ftgt = d?.fatTarget || 65
           return (
             <div onClick={() => router.push('/meals')}
-              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'18px 20px',marginBottom:14,cursor:'pointer',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--card)',border:'1px solid rgba(61,42,31,0.08)',borderRadius:22,padding:'20px 22px',marginBottom:18,cursor:'pointer',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.98)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-secondary)',fontWeight:700,marginBottom:14,letterSpacing:1,textTransform:'uppercase'}}>السعرات اليوم</div>
+              <div style={{marginBottom:16}}>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.62rem',color:'var(--text-secondary)',fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>السعرات اليوم</div>
+                <div style={{width:24,height:2,background:'var(--accent)',borderRadius:1,marginTop:5}}/>
+              </div>
               <div style={{display:'flex',alignItems:'center',gap:20,marginBottom:14}}>
                 <svg width={64} height={64} style={{flexShrink:0}}>
                   <circle cx={32} cy={32} r={r} fill="none" stroke="var(--accent-soft)" strokeWidth={4}/>
@@ -1239,7 +1241,7 @@ function HomeScreen({ user, quote, onStart, router }) {
                   <text x={32} y={37} textAnchor="middle" fill={arcColor} fontSize={10} fontWeight={900} fontFamily="monospace">{Math.round(pct*100)}%</text>
                 </svg>
                 <div style={{flex:1}}>
-                  <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'1.9rem',color:arcColor,lineHeight:1}}>{todayMeals===null?'...':cal}</div>
+                  <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:900,fontSize:'1.9rem',color:arcColor,lineHeight:1}}>{todayMeals===null?'...':cal}</div>
                   <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.72rem',color:'var(--text-secondary)',marginTop:2}}>من {target} سعرة</div>
                   {remaining>0
                     ? <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.7rem',color:'#4ade80',marginTop:3,fontWeight:700}}>باقي {remaining} سعرة</div>
@@ -1272,10 +1274,13 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── 6. WEEKLY PLANNER STRIP ── */}
         {d?.weekDays && (
-          <div style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:22,padding:'16px 18px',marginBottom:14,boxShadow:'var(--shadow-card)'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.74rem',color:'var(--text-secondary)'}}>هذا الأسبوع</div>
-              <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:800,fontSize:'.76rem',color:'var(--accent)'}}>{d.weekSessions} تمرين</div>
+          <div style={{background:'var(--card)',border:'1px solid rgba(61,42,31,0.08)',borderRadius:22,padding:'18px 20px',marginBottom:18}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
+              <div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.74rem',color:'var(--text-secondary)'}}>هذا الأسبوع</div>
+                <div style={{width:24,height:2,background:'var(--accent)',borderRadius:1,marginTop:5}}/>
+              </div>
+              <div style={{fontFamily:"'Playfair Display','Tajawal',Georgia,serif",fontWeight:700,fontSize:'.9rem',color:'var(--text-primary)'}}>{d.weekSessions} <span style={{fontFamily:"'Tajawal',sans-serif",fontWeight:600,fontSize:'.7rem',color:'var(--text-secondary)'}}>تمرين</span></div>
             </div>
             <div style={{display:'flex',gap:4,justifyContent:'space-between'}}>
               {d.weekDays.map(({ts,hasSession,isToday},i)=>{
@@ -1315,17 +1320,17 @@ function HomeScreen({ user, quote, onStart, router }) {
         </div>
 
         {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginBottom:18}}>
           {[
-            {icon:'📊',label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
-            {icon:'📅',label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
-            {icon:'🔬',label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
-          ].map(({icon,label,sub,path})=>(
+            {Icon:BarChart2,label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
+            {Icon:Calendar, label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
+            {Icon:ScanFace, label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
+          ].map(({Icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--card)',border:'1px solid rgba(61,42,31,0.08)',borderRadius:18,padding:'18px 12px',cursor:'pointer',textAlign:'center',WebkitTapHighlightColor:'transparent'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{fontSize:'1.6rem',marginBottom:8}}>{icon}</div>
+              <div style={{display:'flex',justifyContent:'center',marginBottom:10}}><Icon size={24} strokeWidth={1.5} color='var(--text-secondary)'/></div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)',marginBottom:3}}>{label}</div>
               <div style={{fontSize:'.6rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
