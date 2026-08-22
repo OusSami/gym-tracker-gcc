@@ -5,7 +5,7 @@ import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
 import { getContent, getDailyPhrase } from '../lib/content'
-import { Flame, BarChart2, Calendar, ScanFace } from 'lucide-react'
+import { Scale, Dumbbell, TrendingUp, Target, Flame } from 'lucide-react'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1094,7 +1094,7 @@ function HomeScreen({ user, quote, onStart, router }) {
       <div style={{
         position:'relative',
         minHeight:'45vh',
-        background:'radial-gradient(ellipse at 100% 0%, rgba(61,42,31,0.06) 0%, transparent 50%), linear-gradient(160deg, var(--surface) 0%, #ECC8B0 55%, var(--accent) 100%)',
+        background:'linear-gradient(160deg, var(--surface) 0%, var(--accent-soft) 100%)',
         display:'flex',
         flexDirection:'column',
         overflow:'hidden',
@@ -1102,7 +1102,7 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* Streak badge — top-end corner */}
         {d?.streak > 0 && (
-          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2,animation:'flamePulse 2s ease-in-out infinite'}}>
+          <div style={{position:'absolute',top:14,insetInlineEnd:14,background:'rgba(255,255,255,0.95)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',borderRadius:14,padding:'7px 12px',textAlign:'center',minWidth:52,boxShadow:'0 2px 12px rgba(0,0,0,0.15)',zIndex:2}}>
             <div style={{lineHeight:1,display:'flex',justifyContent:'center'}}><Flame size={18} strokeWidth={0} fill="#ef4444"/></div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:'.95rem',color:'#ef4444',lineHeight:1.1}}>{d.streak}</div>
             <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:'.5rem',color:'#888',marginTop:1}}>يوم</div>
@@ -1134,21 +1134,24 @@ function HomeScreen({ user, quote, onStart, router }) {
       <div style={{padding:'16px 16px 0',position:'relative',zIndex:1}}>
 
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable tile row ── */}
-        <style>{`.stat-scroll::-webkit-scrollbar{display:none}@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}`}</style>
-        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:0,paddingInline:16,paddingBlock:16,scrollbarWidth:'none',marginInline:-16,marginBottom:2,alignItems:'stretch'}}>
+        <style>{`.stat-scroll::-webkit-scrollbar{display:none}`}</style>
+        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:12,paddingInline:16,paddingBlock:12,scrollbarWidth:'none',marginInline:-16,marginBottom:2}}>
           {[
-            {label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,click:()=>router.push('/weight')},
-            {label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null},
-            {label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null},
-            {label:'هدفك الحالي',value:d?.goal||null},
+            {Icon:Scale,      label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,bg:'var(--accent-soft)',click:()=>router.push('/weight')},
+            {Icon:Dumbbell,   label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null,bg:'#E8E4F8'},
+            {Icon:TrendingUp, label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null,bg:'#D6EFE8'},
+            {Icon:Target,     label:'هدفك الحالي',value:d?.goal||null,bg:'var(--accent-soft)'},
           ].map((stat,i)=>{
+            const BKGS = ['var(--accent-soft)','#E8E4F8','#D6EFE8']
+            const bg = stat.bg || BKGS[i % BKGS.length]
             const val = stat.value != null ? stat.value : '—'
             const isEmpty = stat.value == null
             return (
               <div key={i} onClick={stat.click}
-                style={{flexShrink:0,display:'flex',flexDirection:'column',justifyContent:'flex-start',alignItems:'flex-end',paddingBlock:12,paddingInline:20,maxWidth:140,borderInlineStart:i>0?'1px solid rgba(61,42,31,0.08)':'none',cursor:stat.click?'pointer':'default'}}>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:10,fontWeight:600,letterSpacing:'1px',color:'var(--text-secondary)',marginBottom:8,textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:34,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1,textAlign:'right',wordBreak:'break-word'}}>{val}</div>
+                style={{flexShrink:0,width:140,minWidth:140,height:130,borderRadius:20,background:bg,display:'flex',flexDirection:'column',justifyContent:'space-between',paddingBlock:16,paddingInline:16,cursor:stat.click?'pointer':'default'}}>
+                <div style={{textAlign:'right',lineHeight:1,display:'flex',justifyContent:'flex-end'}}><stat.Icon size={26} strokeWidth={1.6} color={isEmpty?'var(--text-secondary)':'var(--text-primary)'}/></div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:22,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1.1,textAlign:'right'}}>{val}</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:12,color:'var(--text-secondary)',textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
               </div>
             )
           })}
@@ -1314,19 +1317,15 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
           {[
-            {Icon:BarChart2,label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
-            {Icon:Calendar, label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
-            {Icon:ScanFace, label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
-          ].map(({Icon,label,sub,path})=>(
+            {icon:'📊',label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
+            {icon:'📅',label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
+            {icon:'🔬',label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
+          ].map(({icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 1px 3px rgba(61,42,31,0.08), 0 8px 24px rgba(168,120,90,0.16)',WebkitTapHighlightColor:'transparent',transition:'transform 180ms ease, box-shadow 180ms ease'}}
-              onTouchStart={e=>{e.currentTarget.style.transform='scale(.96)';e.currentTarget.style.boxShadow='0 1px 3px rgba(61,42,31,0.08), 0 2px 6px rgba(168,120,90,0.08)'}}
-              onTouchEnd={e=>{e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='0 1px 3px rgba(61,42,31,0.08), 0 8px 24px rgba(168,120,90,0.16)'}}>
-              <div style={{display:'flex',justifyContent:'center',marginBottom:10}}>
-                <div style={{width:48,height:48,borderRadius:14,background:'linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(216,155,122,0.30)'}}>
-                  <Icon size={22} strokeWidth={1.8} color='#FFFFFF'/>
-                </div>
-              </div>
+              style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
+              onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
+              onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{fontSize:'1.6rem',marginBottom:8}}>{icon}</div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)',marginBottom:3}}>{label}</div>
               <div style={{fontSize:'.6rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
