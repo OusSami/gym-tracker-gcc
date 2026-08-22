@@ -159,11 +159,11 @@ export function BottomTabs({ active }) {
               borderRadius:'var(--radius-md)', cursor:'pointer',
               transition:'all .15s', background: isActive ? 'rgba(0,0,0,0.06)' : 'transparent',
               border:'none',
-              color: isActive ? '#111111' : '#A1A1AA',
+              color: isActive ? 'var(--accent)' : '#A1A1AA',
               minWidth:56, position:'relative',
             }}>
             <div style={{position:'relative',lineHeight:1}}>
-              <t.Icon size={22} strokeWidth={isActive ? 2.2 : 1.6}/>
+              <t.Icon size={22} strokeWidth={isActive ? 2.2 : 1.8}/>
               {t.live && (
                 <span style={{position:'absolute',top:-2,insetInlineEnd:-4,width:7,height:7,borderRadius:'50%',background:'#ef4444',border:'1.5px solid white'}}/>
               )}

@@ -5,7 +5,7 @@ import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
 import { getContent, getDailyPhrase } from '../lib/content'
-import { Flame } from 'lucide-react'
+import { Flame, BarChart2, Calendar, ScanFace } from 'lucide-react'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1314,15 +1314,15 @@ function HomeScreen({ user, quote, onStart, router }) {
         {/* ── 9. QUICK ACCESS — 3 equal surface-inset tiles ── */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:14}}>
           {[
-            {icon:'📊',label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
-            {icon:'📅',label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
-            {icon:'🔬',label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
-          ].map(({icon,label,sub,path})=>(
+            {Icon:BarChart2,label:'تقدمك',sub:'أرقام حقيقية',path:'/dashboard'},
+            {Icon:Calendar, label:'برنامجي',sub:'تدريب مخصص',path:'/program'},
+            {Icon:ScanFace, label:'جسمي',sub:'تحليل ذكي',path:'/assessment'},
+          ].map(({Icon,label,sub,path})=>(
             <div key={label} onClick={()=>router.push(path)}
-              style={{background:'var(--surface-inset)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'var(--shadow-card)',WebkitTapHighlightColor:'transparent'}}
+              style={{background:'var(--card)',border:'1px solid var(--border-subtle)',borderRadius:18,padding:'16px 10px',cursor:'pointer',textAlign:'center',boxShadow:'0 4px 20px rgba(168,120,90,0.13)',WebkitTapHighlightColor:'transparent',transition:'transform .12s'}}
               onTouchStart={e=>e.currentTarget.style.transform='scale(.95)'}
               onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
-              <div style={{fontSize:'1.6rem',marginBottom:8}}>{icon}</div>
+              <div style={{display:'flex',justifyContent:'center',marginBottom:10}}><Icon size={26} strokeWidth={1.8} color='var(--accent)'/></div>
               <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:'.78rem',color:'var(--text-primary)',marginBottom:3}}>{label}</div>
               <div style={{fontSize:'.6rem',color:'var(--text-secondary)',fontFamily:"'Tajawal',sans-serif"}}>{sub}</div>
             </div>
