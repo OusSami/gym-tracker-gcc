@@ -5,7 +5,7 @@ import { TopNav, BottomTabs } from '../components/Nav'
 import { MUSCLE_TREE, getMuscleColor, getMuscleGroup, displayMuscle, ALL_MUSCLES_FLAT, normalizeMuscle } from '../lib/muscles'
 import { calcNutrientGoals } from '../lib/nutrition'
 import { getContent, getDailyPhrase } from '../lib/content'
-import { Scale, Dumbbell, TrendingUp, Target, Flame } from 'lucide-react'
+import { Flame } from 'lucide-react'
 
 const S = {
   AUTH:'auth', HOME:'home', SETUP:'setup', WARMUP:'warmup', UPLOAD:'upload',
@@ -1094,7 +1094,7 @@ function HomeScreen({ user, quote, onStart, router }) {
       <div style={{
         position:'relative',
         minHeight:'45vh',
-        background:'linear-gradient(160deg, var(--surface) 0%, var(--accent-soft) 100%)',
+        background:'radial-gradient(ellipse at 100% 0%, rgba(61,42,31,0.06) 0%, transparent 50%), linear-gradient(160deg, var(--surface) 0%, #ECC8B0 55%, var(--accent) 100%)',
         display:'flex',
         flexDirection:'column',
         overflow:'hidden',
@@ -1135,23 +1135,20 @@ function HomeScreen({ user, quote, onStart, router }) {
 
         {/* ── 2. HORIZONTAL STAT CARDS — scrollable tile row ── */}
         <style>{`.stat-scroll::-webkit-scrollbar{display:none}`}</style>
-        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:12,paddingInline:16,paddingBlock:12,scrollbarWidth:'none',marginInline:-16,marginBottom:2}}>
+        <div className="stat-scroll" style={{display:'flex',flexDirection:'row',overflowX:'auto',gap:0,paddingInline:16,paddingBlock:16,scrollbarWidth:'none',marginInline:-16,marginBottom:2,alignItems:'stretch'}}>
           {[
-            {Icon:Scale,      label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,bg:'var(--accent-soft)',click:()=>router.push('/weight')},
-            {Icon:Dumbbell,   label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null,bg:'#E8E4F8'},
-            {Icon:TrendingUp, label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null,bg:'#D6EFE8'},
-            {Icon:Target,     label:'هدفك الحالي',value:d?.goal||null,bg:'var(--accent-soft)'},
+            {label:`آخر وزن · ${d?.unit||'كجم'}`,value:d?.latestW?d.latestW.weight_kg:null,click:()=>router.push('/weight')},
+            {label:'تمارين هذا الأسبوع',value:d?d.weekSessions:null},
+            {label:'التغير هذا الشهر',value:d?.monthChange!=null?(d.monthChange>0?'+':'')+d.monthChange:null},
+            {label:'هدفك الحالي',value:d?.goal||null},
           ].map((stat,i)=>{
-            const BKGS = ['var(--accent-soft)','#E8E4F8','#D6EFE8']
-            const bg = stat.bg || BKGS[i % BKGS.length]
             const val = stat.value != null ? stat.value : '—'
             const isEmpty = stat.value == null
             return (
               <div key={i} onClick={stat.click}
-                style={{flexShrink:0,width:140,minWidth:140,height:130,borderRadius:20,background:bg,display:'flex',flexDirection:'column',justifyContent:'space-between',paddingBlock:16,paddingInline:16,cursor:stat.click?'pointer':'default'}}>
-                <div style={{textAlign:'right',lineHeight:1,display:'flex',justifyContent:'flex-end'}}><stat.Icon size={26} strokeWidth={1.6} color={isEmpty?'var(--text-secondary)':'var(--text-primary)'}/></div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:700,fontSize:22,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1.1,textAlign:'right'}}>{val}</div>
-                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:12,color:'var(--text-secondary)',textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
+                style={{flexShrink:0,display:'flex',flexDirection:'column',justifyContent:'flex-start',alignItems:'flex-end',paddingBlock:12,paddingInline:20,maxWidth:140,borderInlineStart:i>0?'1px solid rgba(61,42,31,0.08)':'none',cursor:stat.click?'pointer':'default'}}>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontSize:10,fontWeight:600,letterSpacing:'1px',color:'var(--text-secondary)',marginBottom:8,textAlign:'right',lineHeight:1.3}}>{stat.label}</div>
+                <div style={{fontFamily:"'Tajawal',sans-serif",fontWeight:900,fontSize:34,color:isEmpty?'var(--text-secondary)':'var(--text-primary)',lineHeight:1,textAlign:'right',wordBreak:'break-word'}}>{val}</div>
               </div>
             )
           })}
