@@ -1,6 +1,26 @@
 import { logApiUsage, checkRateLimit, RATE_LIMITS } from '../../lib/logApiUsage'
 export const config = { api: { bodyParser: { sizeLimit: '10mb' } } }
 
+async function callOpenAI(apiKey, prompt, imageBase64, imageMime) {
+  const content = [{ type: 'text', text: prompt }]
+  if (imageBase64) {
+    content.push({ type: 'image_url', image_url: { url: 'data:' + (imageMime || 'image/jpeg') + ';base64,' + imageBase64, detail: 'high' } })
+  }
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content }],
+      temperature: 0.1,
+      max_tokens: 3000,
+    })
+  })
+  const data = await r.json()
+  if (!r.ok || data.error) throw new Error(data?.error?.message || 'OpenAI HTTP ' + r.status)
+  return data?.choices?.[0]?.message?.content || ''
+}
+
 async function callGemini(apiKey, parts) {
   const r = await fetch(
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,
@@ -84,8 +104,7 @@ export default async function handler(req, res) {
   const parts = [{ text: prompt }]
   if (imageBase64) parts.push({ inline_data: { mime_type: imageMime || 'image/jpeg', data: imageBase64 } })
 
-  try {
-    const raw = await callGemini(apiKey, parts)
+  function parseAndValidate(raw) {
     const cleaned = raw.replace(/```json|```/gi, '').trim()
     const match = cleaned.match(/\{[\s\S]*\}/)
     if (!match) throw new Error('No JSON found in response')
@@ -95,6 +114,27 @@ export default async function handler(req, res) {
     if (data.total_calories && Math.abs(data.total_calories - calcCal) > data.total_calories * 0.3) {
       data.total_calories = Math.round(calcCal)
     }
+    return data
+  }
+
+  const openaiKey = process.env.OPENAI_API_KEY
+
+  // Try OpenAI (gpt-4o) first, fall back to Gemini on any error
+  if (openaiKey) {
+    try {
+      const raw = await callOpenAI(openaiKey, prompt, imageBase64, imageMime)
+      const data = parseAndValidate(raw)
+      data._provider = 'openai'
+      return res.status(200).json(data)
+    } catch(e) {
+      console.error('meal-analyze OpenAI error (falling back to Gemini):', e.message)
+    }
+  }
+
+  try {
+    const raw = await callGemini(apiKey, parts)
+    const data = parseAndValidate(raw)
+    data._provider = 'gemini'
     return res.status(200).json(data)
   } catch(e) {
     return res.status(500).json({ error: 'Analysis failed: ' + e.message })

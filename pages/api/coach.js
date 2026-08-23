@@ -51,6 +51,27 @@ ${streak ? `- سلسلة الالتزام: ${streak} يوم متواصل` : ''}
   return base + userBlock
 }
 
+async function callOpenAI(apiKey, systemPrompt, messages) {
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))
+      ],
+      temperature: 0.4,
+      max_tokens: 500,
+    })
+  })
+  const data = await r.json()
+  if (!r.ok || data.error) throw new Error(data?.error?.message || 'OpenAI HTTP ' + r.status)
+  const text = data?.choices?.[0]?.message?.content || ''
+  const usage = data?.usage || {}
+  return { text, inputTokens: usage.prompt_tokens || 0, outputTokens: usage.completion_tokens || 0 }
+}
+
 async function callGemini(apiKey, systemPrompt, messages) {
   const r = await fetch(
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,
@@ -100,11 +121,23 @@ export default async function handler(req, res) {
 
   const systemPrompt = buildSystemPrompt(context, userData)
   const messages = [...history, { role: 'user', content: message }]
+  const openaiKey = process.env.OPENAI_API_KEY
+
+  // Try OpenAI (gpt-4o-mini) first, fall back to Gemini on error
+  if (openaiKey) {
+    try {
+      const { text, inputTokens, outputTokens } = await callOpenAI(openaiKey, systemPrompt, messages)
+      logApiUsage(userId, 'coach', inputTokens, outputTokens)
+      return res.json({ reply: text, remaining: rateCheck.remaining - 1, _provider: 'openai' })
+    } catch(e) {
+      console.error('coach OpenAI error (falling back to Gemini):', e.message)
+    }
+  }
 
   try {
     const { text, inputTokens, outputTokens } = await callGemini(apiKey, systemPrompt, messages)
     logApiUsage(userId, 'coach', inputTokens, outputTokens)
-    return res.json({ reply: text, remaining: rateCheck.remaining - 1 })
+    return res.json({ reply: text, remaining: rateCheck.remaining - 1, _provider: 'gemini' })
   } catch(e) {
     return res.status(500).json({ error: 'تعذر الاتصال. حاول مرة ثانية.' })
   }
