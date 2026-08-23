@@ -123,22 +123,24 @@ export default async function handler(req, res) {
   const messages = [...history, { role: 'user', content: message }]
   const openaiKey = process.env.OPENAI_API_KEY
 
-  // Try OpenAI (gpt-4o-mini) first, fall back to Gemini on error
+  // Try Gemini first, fall back to OpenAI (gpt-4o-mini) on error
+  try {
+    const { text, inputTokens, outputTokens } = await callGemini(apiKey, systemPrompt, messages)
+    logApiUsage(userId, 'coach', inputTokens, outputTokens)
+    return res.json({ reply: text, remaining: rateCheck.remaining - 1, _provider: 'gemini' })
+  } catch(e) {
+    console.error('coach Gemini error (falling back to OpenAI):', e.message)
+  }
+
   if (openaiKey) {
     try {
       const { text, inputTokens, outputTokens } = await callOpenAI(openaiKey, systemPrompt, messages)
       logApiUsage(userId, 'coach', inputTokens, outputTokens)
       return res.json({ reply: text, remaining: rateCheck.remaining - 1, _provider: 'openai' })
     } catch(e) {
-      console.error('coach OpenAI error (falling back to Gemini):', e.message)
+      return res.status(500).json({ error: 'تعذر الاتصال. حاول مرة ثانية.' })
     }
   }
 
-  try {
-    const { text, inputTokens, outputTokens } = await callGemini(apiKey, systemPrompt, messages)
-    logApiUsage(userId, 'coach', inputTokens, outputTokens)
-    return res.json({ reply: text, remaining: rateCheck.remaining - 1, _provider: 'gemini' })
-  } catch(e) {
-    return res.status(500).json({ error: 'تعذر الاتصال. حاول مرة ثانية.' })
-  }
+  return res.status(500).json({ error: 'تعذر الاتصال. حاول مرة ثانية.' })
 }

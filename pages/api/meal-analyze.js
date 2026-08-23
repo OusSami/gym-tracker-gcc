@@ -119,7 +119,16 @@ export default async function handler(req, res) {
 
   const openaiKey = process.env.OPENAI_API_KEY
 
-  // Try OpenAI (gpt-4o) first, fall back to Gemini on any error
+  // Try Gemini first, fall back to OpenAI (gpt-4o) on error
+  try {
+    const raw = await callGemini(apiKey, parts)
+    const data = parseAndValidate(raw)
+    data._provider = 'gemini'
+    return res.status(200).json(data)
+  } catch(e) {
+    console.error('meal-analyze Gemini error (falling back to OpenAI):', e.message)
+  }
+
   if (openaiKey) {
     try {
       const raw = await callOpenAI(openaiKey, prompt, imageBase64, imageMime)
@@ -127,16 +136,9 @@ export default async function handler(req, res) {
       data._provider = 'openai'
       return res.status(200).json(data)
     } catch(e) {
-      console.error('meal-analyze OpenAI error (falling back to Gemini):', e.message)
+      return res.status(500).json({ error: 'Analysis failed: ' + e.message })
     }
   }
 
-  try {
-    const raw = await callGemini(apiKey, parts)
-    const data = parseAndValidate(raw)
-    data._provider = 'gemini'
-    return res.status(200).json(data)
-  } catch(e) {
-    return res.status(500).json({ error: 'Analysis failed: ' + e.message })
-  }
+  return res.status(500).json({ error: 'Analysis failed: Gemini unavailable and no OpenAI key configured' })
 }
