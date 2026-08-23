@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../../lib/supabase'
+import { checkRateLimit, logApiUsage } from '../../lib/logApiUsage'
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY
 
@@ -35,6 +36,11 @@ export default async function handler(req, res) {
   const { userId, periodType, periodFrom, periodTo, sessions, meals, weightEntries, profile, force } = req.body
   if (!userId || !periodType || !periodFrom || !periodTo)
     return res.status(400).json({ error: 'Missing params' })
+
+  const rateCheck = await checkRateLimit(userId, 'analysis', 10)
+  if (!rateCheck.allowed) {
+    return res.status(429).json({ error: 'وصلت للحد اليومي لتقارير التحليل (10 تقارير). رجّع باكر.', remaining: 0 })
+  }
 
   const periodKey = getPeriodKey(periodType, periodFrom)
 
@@ -169,6 +175,9 @@ export default async function handler(req, res) {
     const match = raw.replace(/```json|```/gi, '').trim().match(/\{[\s\S]*\}/)
     if (!match) throw new Error('No JSON')
     const report = JSON.parse(match[0])
+
+    const usage = data?.usageMetadata || {}
+    logApiUsage(userId, 'analysis', usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
 
     // Store report
     await sb.from('analysis_reports').upsert({

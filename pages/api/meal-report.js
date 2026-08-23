@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../../lib/supabase'
+import { checkRateLimit, logApiUsage } from '../../lib/logApiUsage'
 
 export default async function handler(req, res) {
   const sb = supabaseAdmin()
@@ -18,6 +19,11 @@ export default async function handler(req, res) {
   const { meals, water_ml, goals, date, userId } = req.body
   if (!meals?.length) return res.status(400).json({ error: 'No meals to analyze' })
   if (!userId) return res.status(400).json({ error: 'Missing userId' })
+
+  const rateCheck = await checkRateLimit(userId, 'meal_report', 10)
+  if (!rateCheck.allowed) {
+    return res.status(429).json({ error: 'وصلت للحد اليومي لتقارير التغذية (10 تقارير). رجّع باكر.', remaining: 0 })
+  }
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' })
@@ -117,6 +123,9 @@ export default async function handler(req, res) {
       meals_hash: mealsHash,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id,report_date' })
+
+    const usage = data?.usageMetadata || {}
+    logApiUsage(userId, 'meal_report', usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
 
     return res.status(200).json({ report, meals_hash: mealsHash })
   } catch(e) {

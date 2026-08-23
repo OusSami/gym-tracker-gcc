@@ -5,6 +5,7 @@
  * We return recommendations — the frontend asks the user to confirm.
  */
 import { supabaseAdmin } from '../../../lib/supabase'
+import { checkRateLimit, logApiUsage } from '../../../lib/logApiUsage'
 
 async function callGemini(apiKey, prompt) {
   const r = await fetch(
@@ -29,6 +30,11 @@ export default async function handler(req, res) {
 
   const { userId, programId, dayNumber, category, reasonText, exerciseName } = req.body
   if (!userId || !category) return res.status(400).json({ error: 'Missing fields' })
+
+  const rateCheck = await checkRateLimit(userId, 'reason', 10)
+  if (!rateCheck.allowed) {
+    return res.status(429).json({ error: 'وصلت للحد اليومي لتحليل الأسباب (10 تحليلات). رجّع باكر.', remaining: 0 })
+  }
 
   const apiKey = process.env.GEMINI_API_KEY
   const sb = supabaseAdmin()
@@ -119,6 +125,7 @@ ${conditionsText}
       const cleaned = text.replace(/```json|```/gi, '').trim()
       const parsed = JSON.parse(cleaned.match(/\{[\s\S]*\}/)?.[0] || cleaned)
       Object.assign(analysis, parsed)
+      logApiUsage(userId, 'reason', 0, 0)
     } catch (e) {
       console.error('analyze-reason AI error:', e.message)
       // Conservative fallback
